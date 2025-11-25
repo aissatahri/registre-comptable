@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.app.registre.controller.PaiementController">
+
+    <top>
+        <VBox spacing="15" style="-fx-background-color: white; -fx-padding: 20;">
+            <HBox spacing="20" alignment="CENTER_LEFT">
+                <VBox>
+                    <Text styleClass="title" text="Gestion des Paiements"/>
+                    <Text styleClass="subtitle" text="Tableau récapitulatif des paiements par année"/>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <ComboBox fx:id="anneeComboBox" promptText="Sélectionner l'année"/>
+                <Button text="Nouveau Paiement" fx:id="btnNouveau" styleClass="btn-primary" onAction="#showAddPaiementDialog"/>
+                <Button text="Supprimer sélection" fx:id="btnSupprimerSelection" styleClass="btn-danger" onAction="#deleteSelected"/>
+                <Button text="Actualiser" onAction="#refreshData"/>
+                <MenuButton fx:id="columnsMenu" text="Colonnes" />
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <TabPane>
+            <BorderPane.margin>
+                <Insets top="20" right="20" bottom="20" left="20" />
+            </BorderPane.margin>
+            <tabs>
+                <Tab text="Vue d'ensemble">
+                    <ScrollPane fitToWidth="true">
+                        <TableView fx:id="paiementsTable" prefHeight="400">
+                            <columns>
+                                <TableColumn fx:id="colAnnee" text="Année" prefWidth="80"/>
+                                <TableColumn fx:id="colType" text="Type" prefWidth="100"/>
+                                <TableColumn fx:id="colCategorie" text="Catégorie" prefWidth="150"/>
+                                        <TableColumn fx:id="colMontant" text="Montant" prefWidth="120"/>
+                                        <TableColumn fx:id="actionsColumn" text="Actions" prefWidth="140"/>
+                            </columns>
+                        </TableView>
+                    </ScrollPane>
+                </Tab>
+
+                <Tab text="Par année">
+                    <VBox spacing="20" style="-fx-padding: 20;">
+                        <HBox spacing="20" alignment="CENTER_LEFT">
+                            <VBox styleClass="card" spacing="10">
+                                <Text text="INVESTISSEMENT" style="-fx-font-weight: bold; -fx-fill: #3498db;"/>
+                                <Text fx:id="totalInvText" text="0.00" style="-fx-font-size: 24; -fx-fill: #2c3e50;"/>
+                            </VBox>
+                            <VBox styleClass="card" spacing="10">
+                                <Text text="FONCTIONNEMENT" style="-fx-font-weight: bold; -fx-fill: #e74c3c;"/>
+                                <Text fx:id="totalExpText" text="0.00" style="-fx-font-size: 24; -fx-fill: #2c3e50;"/>
+                            </VBox>
+                            <VBox styleClass="card" spacing="10">
+                                <Text text="TOTAL" style="-fx-font-weight: bold; -fx-fill: #27ae60;"/>
+                                <Text fx:id="totalGeneralText" text="0.00" style="-fx-font-size: 24; -fx-fill: #2c3e50;"/>
+                            </VBox>
+                        </HBox>
+                    </VBox>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </center>
+
+</BorderPane>

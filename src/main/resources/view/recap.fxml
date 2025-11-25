@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.app.registre.controller.RecapController">
+
+    <top>
+        <VBox spacing="15" style="-fx-background-color: white; -fx-padding: 20;">
+            <HBox spacing="20" alignment="CENTER_LEFT">
+                <VBox>
+                    <Text styleClass="title" text="Récapitulatif Comptable"/>
+                    <Text styleClass="subtitle" text="Vue d'ensemble et statistiques complètes"/>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="Générer Rapport" styleClass="btn-primary" onAction="#generateReport"/>
+                <Button text="Actualiser" onAction="#refreshData"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true">
+            <VBox spacing="20" style="-fx-padding: 20;">
+                <HBox spacing="20" alignment="CENTER_LEFT">
+                    <VBox styleClass="card" spacing="10" prefWidth="200">
+                        <Text text="Total Opérations" style="-fx-font-weight: bold; -fx-fill: #7f8c8d;"/>
+                        <Text fx:id="totalOpsText" text="0" style="-fx-font-size: 28; -fx-fill: #2c3e50;"/>
+                    </VBox>
+                    <VBox styleClass="card" spacing="10" prefWidth="200">
+                        <Text text="Total Recettes" style="-fx-font-weight: bold; -fx-fill: #7f8c8d;"/>
+                        <Text fx:id="totalRecettesText" text="0.00" style="-fx-font-size: 28; -fx-fill: #27ae60;"/>
+                    </VBox>
+                    <VBox styleClass="card" spacing="10" prefWidth="200">
+                        <Text text="Total Dépenses" style="-fx-font-weight: bold; -fx-fill: #7f8c8d;"/>
+                        <Text fx:id="totalDepensesText" text="0.00" style="-fx-font-size: 28; -fx-fill: #e74c3c;"/>
+                    </VBox>
+                    <VBox styleClass="card" spacing="10" prefWidth="200">
+                        <Text text="Solde" style="-fx-font-weight: bold; -fx-fill: #7f8c8d;"/>
+                        <Text fx:id="soldeText" text="0.00" style="-fx-font-size: 28; -fx-fill: #3498db;"/>
+                    </VBox>
+                </HBox>
+
+                <HBox spacing="20">
+                    <VBox styleClass="card" spacing="15" prefWidth="400">
+                        <Text text="Répartition par Mois" style="-fx-font-weight: bold;"/>
+                        <PieChart fx:id="moisPieChart" prefHeight="300"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+
+</BorderPane>

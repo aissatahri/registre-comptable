@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.app.registre.controller.MoisController">
+
+    <top>
+        <VBox spacing="15" style="-fx-background-color: white; -fx-padding: 20;">
+            <HBox spacing="20" alignment="CENTER_LEFT">
+                <VBox>
+                    <Text styleClass="title" text="Vue par Mois"/>
+                    <Text styleClass="subtitle" text="Consultation des opérations par mois"/>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <ComboBox fx:id="moisComboBox" promptText="Sélectionner un mois" onAction="#loadMoisData"/>
+                <Button text="Exporter le mois" styleClass="btn-success" onAction="#exportMoisToExcel"/>
+                <MenuButton fx:id="columnsMenu" text="Colonnes" />
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <VBox spacing="20" style="-fx-padding: 20;">
+            <HBox spacing="20" alignment="CENTER_LEFT">
+                <VBox styleClass="card" spacing="10" prefWidth="200">
+                    <Text text="Mois sélectionné" style="-fx-font-weight: bold; -fx-fill: #7f8c8d;"/>
+                    <Text fx:id="moisSelectedText" text="Aucun" style="-fx-font-size: 20; -fx-fill: #2c3e50;"/>
+                </VBox>
+                <VBox styleClass="card" spacing="10" prefWidth="200">
+                    <Text text="Opérations" style="-fx-font-weight: bold; -fx-fill: #7f8c8d;"/>
+                    <Text fx:id="moisOperationsText" text="0" style="-fx-font-size: 20; -fx-fill: #3498db;"/>
+                </VBox>
+                <VBox styleClass="card" spacing="10" prefWidth="200">
+                    <Text text="Montant total" style="-fx-font-weight: bold; -fx-fill: #7f8c8d;"/>
+                    <Text fx:id="moisMontantText" text="0.00" style="-fx-font-size: 20; -fx-fill: #27ae60;"/>
+                </VBox>
+                <VBox styleClass="card" spacing="10" prefWidth="200">
+                    <Text text="Moyenne" style="-fx-font-weight: bold; -fx-fill: #7f8c8d;"/>
+                    <Text fx:id="moisMoyenneText" text="0.00" style="-fx-font-size: 20; -fx-fill: #f39c12;"/>
+                </VBox>
+            </HBox>
+
+            <VBox styleClass="card" spacing="15">
+                <Text text="Opérations du mois" style="-fx-font-weight: bold;"/>
+                <TableView fx:id="moisOperationsTable" prefHeight="400">
+                    <columns>
+                        <TableColumn fx:id="colOp" text="OP" prefWidth="80"/>
+                        <TableColumn fx:id="colNature" text="Nature" prefWidth="120"/>
+                        <TableColumn fx:id="colBudg" text="BUDG" prefWidth="80"/>
+                        <TableColumn fx:id="colMontant" text="Montant" prefWidth="100"/>
+                        <TableColumn fx:id="colDateEntree" text="Date Entrée" prefWidth="110"/>
+                        <TableColumn fx:id="colDateVisa" text="Date Visa" prefWidth="110"/>
+                        <TableColumn fx:id="colDateRejet" text="Date Rejet" prefWidth="110"/>
+                        <TableColumn fx:id="colMotifRejet" text="Motif Rejet" prefWidth="160"/>
+                        <TableColumn fx:id="colDateReponse" text="Date Réponse" prefWidth="120"/>
+                        <TableColumn fx:id="colContenuReponse" text="Contenu Réponse" prefWidth="180"/>
+                        <TableColumn fx:id="colDecision" text="Décision" prefWidth="100"/>
+                    </columns>
+                </TableView>
+            </VBox>
+        </VBox>
+    </center>
+
+</BorderPane>

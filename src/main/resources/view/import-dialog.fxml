@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+
+<DialogPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.app.registre.controller.ImportDialogController">
+
+    <header>
+        <Text text="Importation depuis Excel" style="-fx-font-size: 18; -fx-font-weight: bold; -fx-fill: #2c3e50;"/>
+    </header>
+
+    <content>
+        <VBox spacing="15" style="-fx-padding: 20;">
+            <Label text="Sélectionnez le fichier Excel à importer:"/>
+
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <TextField fx:id="filePathField" promptText="Chemin du fichier" HBox.hgrow="ALWAYS" editable="false"/>
+                <Button text="Parcourir" onAction="#browseFile"/>
+            </HBox>
+
+            <Separator/>
+
+            <Label text="Options d'importation:"/>
+            <CheckBox fx:id="replaceDataCheck" text="Remplacer les données existantes"/>
+            <CheckBox fx:id="validateDataCheck" text="Valider les données avant import" selected="true"/>
+
+            <VBox spacing="5">
+                <Label text="Aperçu des données:" style="-fx-font-weight: bold;"/>
+                <TableView fx:id="previewTable" prefHeight="200">
+                    <columns>
+                        <TableColumn text="OP" prefWidth="80"/>
+                        <TableColumn text="Nature" prefWidth="120"/>
+                        <TableColumn text="Montant" prefWidth="100"/>
+                        <TableColumn text="Date" prefWidth="110"/>
+                    </columns>
+                </TableView>
+                <Label fx:id="previewCountText" text="0 opérations trouvées"/>
+            </VBox>
+
+            <Text fx:id="errorText" fill="red" visible="false"/>
+        </VBox>
+    </content>
+</DialogPane>

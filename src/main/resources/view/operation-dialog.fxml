@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+
+<DialogPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.app.registre.controller.OperationDialogController">
+
+    <header>
+        <Text fx:id="dialogTitle" style="-fx-font-size: 18; -fx-font-weight: bold; -fx-fill: #2c3e50;"/>
+    </header>
+
+    <content>
+        <ScrollPane fitToWidth="true" prefHeight="400">
+            <GridPane hgap="15" vgap="15" style="-fx-padding: 20;">
+                <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
+
+                <Label text="OP *" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                <TextField fx:id="opField" promptText="Numéro OP" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                <Label text="OV/CHEQ" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+                <TextField fx:id="ovCheqField" promptText="OV/CHEQ" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+
+                <Label text="IMP" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                <TextField fx:id="impField" promptText="IMP" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                <Label text="Nature *" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+                <ComboBox fx:id="natureCombo" promptText="Sélectionner" GridPane.rowIndex="1" GridPane.columnIndex="3"/>
+
+                <Label text="BUDG" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                <TextField fx:id="budgField" promptText="BUDG" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                <Label text="Montant *" GridPane.rowIndex="2" GridPane.columnIndex="2"/>
+                <TextField fx:id="montantField" promptText="0.00" GridPane.rowIndex="2" GridPane.columnIndex="3"/>
+
+                <Label text="Date Entrée *" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                <DatePicker fx:id="dateEntreePicker" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+                <Label text="Mois *" GridPane.rowIndex="3" GridPane.columnIndex="2"/>
+                <ComboBox fx:id="moisCombo" promptText="Sélectionner" GridPane.rowIndex="3" GridPane.columnIndex="3"/>
+
+                <Label text="Date Visa" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                <DatePicker fx:id="dateVisaPicker" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+                <Label text="Date Rejet" GridPane.rowIndex="4" GridPane.columnIndex="2"/>
+                <DatePicker fx:id="dateRejetPicker" GridPane.rowIndex="4" GridPane.columnIndex="3"/>
+
+                <Label text="Décision" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+                <ComboBox fx:id="decisionCombo" promptText="Sélectionner" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+
+                <Label text="Motif Rejet" GridPane.rowIndex="5" GridPane.columnIndex="2"/>
+                <TextField fx:id="motifRejetField" promptText="Motif de rejet" GridPane.rowIndex="5" GridPane.columnIndex="3"/>
+
+                <Label text="Date Réponse" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+                <DatePicker fx:id="dateReponsePicker" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+
+                <Label text="Contenu Réponse" GridPane.rowIndex="6" GridPane.columnIndex="2"/>
+                <TextField fx:id="contenuReponseField" promptText="Contenu de réponse" GridPane.rowIndex="6" GridPane.columnIndex="3"/>
+
+                <HBox spacing="10" GridPane.rowIndex="7" GridPane.columnIndex="0" GridPane.columnSpan="4">
+                    <Text fx:id="validationText" fill="red" visible="false"/>
+                </HBox>
+            </GridPane>
+        </ScrollPane>
+    </content>
+</DialogPane>
