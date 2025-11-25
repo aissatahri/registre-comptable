@@ -13,6 +13,7 @@ import javafx.scene.input.KeyCode;
 import javafx.animation.TranslateTransition;
 import javafx.util.Duration;
 import javafx.scene.text.Text;
+import javafx.scene.control.Button;
 import com.app.registre.dao.RecapDAO;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -25,6 +26,10 @@ public class MenuController {
     @FXML private VBox sidebar;
     @FXML private Text opsCountMenuText;
     @FXML private Text recettesMenuText;
+    @FXML private Button btnRegistre;
+    @FXML private Button btnPaiement;
+    @FXML private Button btnRecap;
+    @FXML private Button btnMois;
     private boolean sidebarVisible = true;
     private final RecapDAO recapDAO = new RecapDAO();
 
@@ -32,18 +37,21 @@ public class MenuController {
     private void showRegistre() {
         loadView("/view/registre.fxml");
         refreshMenuStats();
+        setActive(btnRegistre);
     }
 
     @FXML
     private void showPaiement() {
         loadView("/view/paiement.fxml");
         refreshMenuStats();
+        setActive(btnPaiement);
     }
 
     @FXML
     private void showRecap() {
         loadView("/view/recap.fxml");
         refreshMenuStats();
+        setActive(btnRecap);
     }
 
     @FXML
@@ -86,6 +94,7 @@ public class MenuController {
     private void showMois() {
         loadView("/view/mois.fxml");
         refreshMenuStats();
+        setActive(btnMois);
     }
 
     private void loadView(String fxmlFile) {
@@ -110,6 +119,16 @@ public class MenuController {
             if (opsCountMenuText != null) opsCountMenuText.setText(String.valueOf(ops));
             if (recettesMenuText != null) recettesMenuText.setText(nf.format(recettes));
         } catch (Exception ignore) {}
+    }
+
+    private void setActive(Button active) {
+        if (active == null) return;
+        java.util.List<Button> all = java.util.Arrays.asList(btnRegistre, btnPaiement, btnRecap, btnMois);
+        for (Button b : all) {
+            if (b == null) continue;
+            b.getStyleClass().remove("active");
+        }
+        active.getStyleClass().add("active");
     }
 
     private void showError(String message, Exception e) {

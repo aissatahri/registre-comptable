@@ -36,11 +36,11 @@
 
             <Separator opacity="0.3" />
 
-            <VBox spacing="5">
-                <Button fx:id="btnRegistre" onAction="#showRegistre" styleClass="menu-button" text="Registre des OP" />
-                <Button fx:id="btnPaiement" onAction="#showPaiement" styleClass="menu-button" text="Paiements" />
-                <Button fx:id="btnRecap" onAction="#showRecap" styleClass="menu-button" text="Récapitulatif" />
-                <Button fx:id="btnMois" onAction="#showMois" styleClass="menu-button" text="Par Mois" />
+            <VBox spacing="5" fillWidth="true">
+                <Button fx:id="btnRegistre" onAction="#showRegistre" styleClass="menu-button" text="Registre des OP" maxWidth="Infinity" />
+                <Button fx:id="btnPaiement" onAction="#showPaiement" styleClass="menu-button" text="Paiements" maxWidth="Infinity" />
+                <Button fx:id="btnRecap" onAction="#showRecap" styleClass="menu-button" text="Récapitulatif" maxWidth="Infinity" />
+                <Button fx:id="btnMois" onAction="#showMois" styleClass="menu-button" text="Par Mois" maxWidth="Infinity" />
             </VBox>
 
             <Separator opacity="0.3" />
