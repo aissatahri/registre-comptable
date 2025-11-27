@@ -13,6 +13,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.control.Button;
 import javafx.util.Callback;
 import java.util.Optional;
+import com.app.registre.util.DialogUtils;
 
 public class PaiementController {
 
@@ -60,6 +61,7 @@ public class PaiementController {
         }
 
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        DialogUtils.initOwner(confirm, paiementsTable);
         confirm.setTitle("Supprimer les paiements sélectionnés");
         confirm.setHeaderText(null);
         confirm.setContentText("Supprimer " + selected.size() + " paiements ?");
@@ -129,6 +131,7 @@ public class PaiementController {
 
             Dialog<javafx.scene.control.ButtonType> dialog = new Dialog<>();
             dialog.setDialogPane(dialogPane);
+            DialogUtils.initOwner(dialog, paiementsTable);
             dialog.setTitle("Modifier Paiement");
 
             javafx.scene.control.ButtonType saveButtonType = new javafx.scene.control.ButtonType("Enregistrer", javafx.scene.control.ButtonBar.ButtonData.OK_DONE);
@@ -161,6 +164,7 @@ public class PaiementController {
     private void deletePaiement(Paiement p) {
         if (p == null) return;
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        DialogUtils.initOwner(confirm, paiementsTable);
         confirm.setTitle("Confirmer la suppression");
         confirm.setHeaderText(null);
         confirm.setContentText("Supprimer le paiement ?");
@@ -214,6 +218,7 @@ public class PaiementController {
 
             Dialog<javafx.scene.control.ButtonType> dialog = new Dialog<>();
             dialog.setDialogPane(dialogPane);
+            DialogUtils.initOwner(dialog, paiementsTable);
             dialog.setTitle("Nouveau Paiement");
 
             javafx.scene.control.ButtonType saveButtonType = new javafx.scene.control.ButtonType("Enregistrer", javafx.scene.control.ButtonBar.ButtonData.OK_DONE);
@@ -246,6 +251,7 @@ public class PaiementController {
 
     private void showInfo(String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        DialogUtils.initOwner(alert, paiementsTable);
         alert.setTitle("Information");
         alert.setHeaderText(null);
         alert.setContentText(message);

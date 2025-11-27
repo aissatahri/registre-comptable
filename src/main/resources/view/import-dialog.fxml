@@ -31,9 +31,8 @@
                 <Label text="Aperçu des données:" style="-fx-font-weight: bold;"/>
                 <TableView fx:id="previewTable" prefHeight="200">
                     <columns>
-                        <TableColumn text="OP" prefWidth="80"/>
                         <TableColumn text="Nature" prefWidth="120"/>
-                        <TableColumn text="Montant" prefWidth="100"/>
+                        <TableColumn text="Solde" prefWidth="100"/>
                         <TableColumn text="Date" prefWidth="110"/>
                     </columns>
                 </TableView>

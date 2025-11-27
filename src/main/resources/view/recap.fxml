@@ -35,9 +35,20 @@
                         <Text text="Total Recettes" style="-fx-font-weight: bold; -fx-fill: #7f8c8d;"/>
                         <Text fx:id="totalRecettesText" text="0.00" style="-fx-font-size: 28; -fx-fill: #27ae60;"/>
                     </VBox>
-                    <VBox styleClass="card" spacing="10" prefWidth="200">
-                        <Text text="Total Dépenses" style="-fx-font-weight: bold; -fx-fill: #7f8c8d;"/>
-                        <Text fx:id="totalDepensesText" text="0.00" style="-fx-font-size: 28; -fx-fill: #e74c3c;"/>
+                    <VBox styleClass="card" spacing="8" prefWidth="520">
+                        <Text text="Sur &amp; Dépenses" style="-fx-font-weight: bold; -fx-fill: #7f8c8d;"/>
+                        <HBox spacing="10" alignment="BASELINE_LEFT">
+                            <Text text="Sur RAM:" style="-fx-fill: #7f8c8d;" />
+                            <Text fx:id="totalSurRamText" text="0.00" style="-fx-font-size: 20; -fx-fill: #f39c12;"/>
+                        </HBox>
+                        <HBox spacing="10" alignment="BASELINE_LEFT">
+                            <Text text="Sur ENG:" style="-fx-fill: #7f8c8d;" />
+                            <Text fx:id="totalSurEngText" text="0.00" style="-fx-font-size: 20; -fx-fill: #f39c12;"/>
+                        </HBox>
+                        <HBox spacing="10" alignment="BASELINE_LEFT">
+                            <Text text="Total Dépenses:" style="-fx-fill: #7f8c8d;" />
+                            <Text fx:id="totalDepensesText" text="0.00" style="-fx-font-size: 20; -fx-fill: #e74c3c;"/>
+                        </HBox>
                     </VBox>
                     <VBox styleClass="card" spacing="10" prefWidth="200">
                         <Text text="Solde" style="-fx-font-weight: bold; -fx-fill: #7f8c8d;"/>

@@ -58,13 +58,13 @@ public class PaiementDialogController {
         try {
             montant = Double.parseDouble(montantText.replace(',', '.'));
         } catch (Exception e) {
-            validationText.setText("Montant invalide.");
+            validationText.setText("Solde invalide.");
             validationText.setVisible(true);
             return false;
         }
 
         if (montant <= 0) {
-            validationText.setText("Le montant doit être supérieur à 0.");
+            validationText.setText("Le solde doit être supérieur à 0.");
             validationText.setVisible(true);
             return false;
         }

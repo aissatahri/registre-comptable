@@ -4,11 +4,47 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="189dfc45-43d5-48fa-94cb-a5089b5b5a05" name="Changes" comment="" />
+    <list default="true" id="189dfc45-43d5-48fa-94cb-a5089b5b5a05" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/app/registre/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/app/registre/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/app/registre/controller/MenuController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/app/registre/controller/MenuController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/app/registre/controller/MoisController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/app/registre/controller/MoisController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/app/registre/controller/OperationDialogController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/app/registre/controller/OperationDialogController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/app/registre/controller/PaiementController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/app/registre/controller/PaiementController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/app/registre/controller/PaiementDialogController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/app/registre/controller/PaiementDialogController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/app/registre/controller/RecapController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/app/registre/controller/RecapController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/app/registre/controller/RegistreController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/app/registre/controller/RegistreController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/app/registre/dao/Database.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/app/registre/dao/Database.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/app/registre/dao/OperationDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/app/registre/dao/OperationDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/app/registre/dao/PaiementDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/app/registre/dao/PaiementDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/app/registre/dao/RecapDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/app/registre/dao/RecapDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/app/registre/model/Operation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/app/registre/model/Operation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/app/registre/model/Paiement.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/app/registre/model/Paiement.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/app/registre/util/ExcelUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/app/registre/util/ExcelUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/view/import-dialog.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/view/import-dialog.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/view/menu.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/view/menu.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/view/mois.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/view/mois.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/view/operation-dialog.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/view/operation-dialog.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/view/paiement-dialog.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/view/paiement-dialog.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/view/paiement.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/view/paiement.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/view/recap.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/view/recap.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/view/registre.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/view/registre.fxml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+        <option value="FxmlFile" />
+        <option value="CSS File" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -20,23 +56,65 @@
       </MavenGeneralSettings>
     </option>
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 2
-}]]></component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2
+}</component>
   <component name="ProjectId" id="35nGpTasPNQisUmDmZSQvhwWXIn" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="showModules" value="false" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
-    "kotlin-language-version-configured": "true",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.HelloApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
+    &quot;Application.Registre Comptable.executor&quot;: &quot;Run&quot;,
+    &quot;Application.Registre comptable.executor&quot;: &quot;Run&quot;,
+    &quot;Application.Registre-comptable.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;ToolWindowDatabase.ShowToolbar&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Aissa/AppData/Local/SceneBuilder/SceneBuilder.exe&quot;,
+    &quot;list.type.of.created.stylesheet&quot;: &quot;CSS&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\Project_JavaFX\registre-comptable\src\main\resources\images" />
+      <recent name="D:\Project_JavaFX\registre-comptable\src\main\resources" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="Main" type="Application" factoryName="Application" nameIsGenerated="true">
+      <option name="ALTERNATIVE_JRE_PATH" value="zulu-22" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+      <option name="MAIN_CLASS_NAME" value="com.app.registre.Main" />
+      <module name="registre-comptable" />
+      <option name="VM_PARAMETERS" value="--module-path &quot;C:\javafx-sdk-21.0.2\lib&quot; --add-modules javafx.controls,javafx.fxml,javafx.graphics" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.app.registre.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -53,8 +131,22 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1763738608462</updated>
-      <workItem from="1763738609610" duration="17000" />
+      <workItem from="1763738609610" duration="12407000" />
+      <workItem from="1763767009195" duration="117000" />
+      <workItem from="1763767156475" duration="194000" />
+      <workItem from="1763768265779" duration="2803000" />
+      <workItem from="1764072794791" duration="61000" />
+      <workItem from="1764110412276" duration="2137000" />
+      <workItem from="1764170805147" duration="1358000" />
+      <workItem from="1764179004683" duration="4404000" />
+      <workItem from="1764186840626" duration="17861000" />
+      <workItem from="1764239573337" duration="9019000" />
+      <workItem from="1764252546883" duration="657000" />
+      <workItem from="1764274829600" duration="7178000" />
     </task>
     <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
   </component>
 </project>

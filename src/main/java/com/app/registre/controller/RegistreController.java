@@ -12,9 +12,12 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
+import javafx.stage.Window;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import javafx.util.Callback;
@@ -22,20 +25,22 @@ import javafx.util.Callback;
 public class RegistreController {
 
     @FXML private TableView<Operation> operationsTable;
-    @FXML private TableColumn<Operation, String> colOp;
-    @FXML private TableColumn<Operation, String> colOvCheq;
+    @FXML private TableColumn<Operation, Integer> colOvCheq;
     @FXML private TableColumn<Operation, String> colImp;
+    @FXML private TableColumn<Operation, String> colDesignation;
+    @FXML private TableColumn<Operation, String> colN;
     @FXML private TableColumn<Operation, String> colNature;
     @FXML private TableColumn<Operation, String> colBudg;
+    @FXML private TableColumn<Operation, String> colExercice;
+    @FXML private TableColumn<Operation, String> colBeneficiaire;
     @FXML private TableColumn<Operation, Double> colMontant;
-    @FXML private TableColumn<Operation, java.time.LocalDate> colDateEntree;
+    @FXML private TableColumn<Operation, java.time.LocalDate> colDateEmission;
     @FXML private TableColumn<Operation, java.time.LocalDate> colDateVisa;
-    @FXML private TableColumn<Operation, java.time.LocalDate> colDateRejet;
-    @FXML private TableColumn<Operation, String> colMotifRejet;
-    @FXML private TableColumn<Operation, java.time.LocalDate> colDateReponse;
-    @FXML private TableColumn<Operation, String> colContenuReponse;
-    @FXML private TableColumn<Operation, String> colMois;
-    @FXML private TableColumn<Operation, String> colDecision;
+    @FXML private TableColumn<Operation, Integer> colOpOr;
+    @FXML private TableColumn<Operation, Double> colRecette;
+    @FXML private TableColumn<Operation, Double> colSurRam;
+    @FXML private TableColumn<Operation, Double> colSurEng;
+    @FXML private TableColumn<Operation, Double> colDepense;
     @FXML private TableColumn<Operation, Void> actionsColumn;
     @FXML private TableColumn<Operation, Boolean> selectColumn;
     @FXML private TextField searchField;
@@ -44,8 +49,6 @@ public class RegistreController {
     @FXML private javafx.scene.control.MenuButton columnsMenu;
     @FXML private Text totalOperationsText;
     @FXML private Text totalMontantText;
-    @FXML private Text dossiersPayesText;
-    @FXML private Text dossiersRejetesText;
 
     private ObservableList<Operation> operations;
     private OperationDAO operationDAO;
@@ -57,20 +60,23 @@ public class RegistreController {
             operationDAO = new OperationDAO();
             recapDAO = new RecapDAO();
 
-            colOp.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("op"));
-            colOvCheq.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("ovCheq"));
+            // Map Table columns to Operation properties (ordered like the operation dialog)
             colImp.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("imp"));
+            colDesignation.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("designation"));
             colNature.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("nature"));
+            colN.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("n"));
             colBudg.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("budg"));
-            colMontant.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("montant"));
-            colDateEntree.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("dateEntree"));
+            colExercice.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("exercice"));
+            colBeneficiaire.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("beneficiaire"));
+            colDateEmission.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("dateEmission"));
             colDateVisa.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("dateVisa"));
-            colDateRejet.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("dateRejet"));
-            colMotifRejet.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("motifRejet"));
-            colDateReponse.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("dateReponse"));
-            colContenuReponse.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("contenuReponse"));
-            colMois.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("mois"));
-            colDecision.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("decision"));
+            colOpOr.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("opOr"));
+            colOvCheq.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("ovCheq"));
+            colRecette.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("recette"));
+            colSurRam.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("surRam"));
+            colSurEng.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("surEng"));
+            colDepense.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("depense"));
+            colMontant.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("montant"));
             selectColumn.setCellValueFactory(cellData -> cellData.getValue().selectedProperty());
             selectColumn.setCellFactory(javafx.scene.control.cell.CheckBoxTableCell.forTableColumn(selectColumn));
             selectColumn.setStyle("-fx-alignment: CENTER;");
@@ -88,7 +94,7 @@ public class RegistreController {
             operationsTable.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
 
             java.time.format.DateTimeFormatter df = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            colDateEntree.setCellFactory(col -> new TableCell<>() {
+            colDateEmission.setCellFactory(col -> new TableCell<>() {
                 @Override protected void updateItem(java.time.LocalDate item, boolean empty) {
                     super.updateItem(item, empty);
                     setText(empty || item == null ? "" : df.format(item));
@@ -100,28 +106,30 @@ public class RegistreController {
                     setText(empty || item == null ? "" : df.format(item));
                 }
             });
-            colDateRejet.setCellFactory(col -> new TableCell<>() {
-                @Override protected void updateItem(java.time.LocalDate item, boolean empty) {
+
+            colN.setCellFactory(col -> new TableCell<>() {
+                @Override protected void updateItem(String item, boolean empty) {
                     super.updateItem(item, empty);
-                    setText(empty || item == null ? "" : df.format(item));
-                }
-            });
-            colDateReponse.setCellFactory(col -> new TableCell<>() {
-                @Override protected void updateItem(java.time.LocalDate item, boolean empty) {
-                    super.updateItem(item, empty);
-                    setText(empty || item == null ? "" : df.format(item));
+                    setText(empty || item == null ? "" : item);
                 }
             });
 
             java.text.NumberFormat nf = java.text.NumberFormat.getNumberInstance(java.util.Locale.FRANCE);
             nf.setMinimumFractionDigits(2);
             nf.setMaximumFractionDigits(2);
-            colMontant.setCellFactory(col -> new TableCell<>() {
+            // Format numeric columns (recette, surRam, surEng, depense, montant)
+            javafx.util.Callback<TableColumn<Operation, Double>, TableCell<Operation, Double>> doubleCellFactory = col -> new TableCell<>() {
                 @Override protected void updateItem(Double item, boolean empty) {
                     super.updateItem(item, empty);
                     setText(empty || item == null ? "" : nf.format(item));
                 }
-            });
+            };
+
+            colRecette.setCellFactory(doubleCellFactory);
+            colSurRam.setCellFactory(doubleCellFactory);
+            colSurEng.setCellFactory(doubleCellFactory);
+            colDepense.setCellFactory(doubleCellFactory);
+            colMontant.setCellFactory(doubleCellFactory);
 
             loadOperations();
             setupFilters();
@@ -183,6 +191,36 @@ public class RegistreController {
 
     private void loadOperations() {
         List<Operation> operationList = operationDAO.findAll();
+        // Recompute cumulative solde so that each row's solde = previous_solde + recette - depense
+        double prevSolde = 0.0;
+        int startIndex = 0;
+        // If an explicit "Solde initial" record exists, use it as starting balance and begin after it
+        for (int i = 0; i < operationList.size(); i++) {
+            Operation op = operationList.get(i);
+            if (op.getDesignation() != null && "Solde initial".equalsIgnoreCase(op.getDesignation().trim())) {
+                Double s = op.getSolde();
+                prevSolde = s != null ? s : 0.0;
+                startIndex = i + 1;
+                break;
+            }
+        }
+
+        for (int i = startIndex; i < operationList.size(); i++) {
+            Operation op = operationList.get(i);
+            double recette = op.getRecette() != null ? op.getRecette() : 0.0;
+            double depense = op.getDepense() != null ? op.getDepense() : 0.0;
+            double computed = prevSolde + recette - depense;
+            // Only update model & DB when different to avoid unnecessary writes
+            Double existing = op.getSolde();
+            if (existing == null || Math.abs(existing - computed) > 0.0001) {
+                op.setSolde(computed);
+                try {
+                    operationDAO.update(op);
+                } catch (Exception ignored) {}
+            }
+            prevSolde = computed;
+        }
+
         operations = FXCollections.observableArrayList(operationList);
         operationsTable.setItems(operations);
         operationsTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -196,6 +234,9 @@ public class RegistreController {
 
         filterNature.getItems().addAll("MARCHE V", "MARCHE NV", "BC", "REGIE", "CONVENTION", "ESD", "SUBVENTION");
 
+        // Default to the current month on view load
+        try { filterMois.setValue(getCurrentMonth()); } catch (Exception ignored) {}
+
         filterMois.valueProperty().addListener((obs, oldVal, newVal) -> applyFilters());
         filterNature.valueProperty().addListener((obs, oldVal, newVal) -> applyFilters());
         searchField.textProperty().addListener((obs, oldVal, newVal) -> applyFilters());
@@ -205,14 +246,20 @@ public class RegistreController {
     private void applyFilters() {
         String mois = filterMois.getValue();
         String nature = filterNature.getValue();
-        String search = searchField.getText().toLowerCase();
+        String search = searchField.getText() == null ? "" : searchField.getText().toLowerCase();
 
         ObservableList<Operation> filtered = FXCollections.observableArrayList();
 
         for (Operation op : operations) {
             boolean matches = true;
-
-            if (mois != null && !mois.equals(op.getMois())) matches = false;
+            // Determine month from dateEmission first (preferred), otherwise fall back to stored mois
+            String opMonth = null;
+            if (op.getDateEmission() != null) {
+                opMonth = getMonthName(op.getDateEmission());
+            } else if (op.getMois() != null) {
+                opMonth = op.getMois();
+            }
+            if (mois != null && (opMonth == null || !mois.equals(opMonth))) matches = false;
             if (nature != null && !nature.equals(op.getNature())) matches = false;
 
             if (!search.isEmpty() && !containsSearch(op, search)) matches = false;
@@ -237,29 +284,48 @@ public class RegistreController {
     }
 
     private boolean containsSearch(Operation op, String search) {
-        return (op.getOp() != null && op.getOp().toLowerCase().contains(search)) ||
-                (op.getNature() != null && op.getNature().toLowerCase().contains(search)) ||
-                (op.getImp() != null && op.getImp().toLowerCase().contains(search)) ||
-                (op.getDecision() != null && op.getDecision().toLowerCase().contains(search)) ||
-                (op.getOvCheq() != null && op.getOvCheq().toLowerCase().contains(search)) ||
-                (op.getBudg() != null && op.getBudg().toLowerCase().contains(search)) ||
-                (op.getMois() != null && op.getMois().toLowerCase().contains(search)) ||
-                (op.getMotifRejet() != null && op.getMotifRejet().toLowerCase().contains(search)) ||
-                (op.getContenuReponse() != null && op.getContenuReponse().toLowerCase().contains(search));
+        return (op.getDesignation() != null && op.getDesignation().toLowerCase().contains(search)) ||
+            (op.getNature() != null && op.getNature().toLowerCase().contains(search)) ||
+            (op.getImp() != null && op.getImp().toLowerCase().contains(search)) ||
+            ((op.getOvCheqType() != null && op.getOvCheqType().toLowerCase().contains(search)) || (op.getOvCheq() != null && String.valueOf(op.getOvCheq()).contains(search))) ||
+            (op.getBudg() != null && op.getBudg().toLowerCase().contains(search)) ||
+            (op.getExercice() != null && op.getExercice().toLowerCase().contains(search)) ||
+            (op.getBeneficiaire() != null && op.getBeneficiaire().toLowerCase().contains(search));
     }
 
     /* --------------------------- STATISTICS --------------------------- */
 
     private void updateStatistics() {
         int totalOps = operationsTable.getItems().size();
-        double totalMontant = operationsTable.getItems().stream().mapToDouble(Operation::getMontant).sum();
+        // Instead of total montant, show the latest solde (dernier solde)
+        java.text.NumberFormat nf = java.text.NumberFormat.getNumberInstance(java.util.Locale.FRANCE);
+        nf.setMinimumFractionDigits(2);
+        nf.setMaximumFractionDigits(2);
+        // Compute last solde from currently visible operations (post-filters)
+        double displaySolde = 0.0;
+        ObservableList<Operation> items = operationsTable.getItems();
+        if (items != null && !items.isEmpty()) {
+            Operation best = null;
+            java.time.LocalDate bestDate = null;
+            for (Operation op : items) {
+                java.time.LocalDate d = op.getDateEmission() != null ? op.getDateEmission() : op.getDateVisa();
+                if (d != null) {
+                    if (best == null || bestDate == null || d.isAfter(bestDate) || (d.equals(bestDate) && op.getId() > best.getId())) {
+                        best = op;
+                        bestDate = d;
+                    }
+                } else {
+                    // keep as fallback if no dated operations found yet
+                    if (best == null) best = op;
+                }
+            }
+            if (best != null && best.getSolde() != null) displaySolde = best.getSolde();
+        }
         int payes = countDecision(operationsTable.getItems(), new String[]{"P", "ACCEPTE", "ACCEPTÉ"});
         int rejetes = countDecision(operationsTable.getItems(), new String[]{"R", "REFUSE", "REFUSÉ"});
 
         totalOperationsText.setText(String.valueOf(totalOps));
-        totalMontantText.setText(String.format("%,.2f", totalMontant));
-        dossiersPayesText.setText(String.valueOf(payes));
-        dossiersRejetesText.setText(String.valueOf(rejetes));
+        totalMontantText.setText(nf.format(displaySolde));
     }
 
     private int countDecision(List<Operation> items, String[] tokens) {
@@ -293,8 +359,9 @@ public class RegistreController {
     public void deleteOperation(Operation selected) {
         if (selected != null) {
             Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+            initAlertOwner(confirmAlert);
             confirmAlert.setTitle("Confirmation de suppression");
-            confirmAlert.setHeaderText("Supprimer l'opération " + selected.getOp() + " ?");
+            confirmAlert.setHeaderText("Supprimer l'opération sélectionnée ?");
             confirmAlert.setContentText("Cette action est irréversible.");
 
             Optional<ButtonType> result = confirmAlert.showAndWait();
@@ -312,6 +379,7 @@ public class RegistreController {
     @FXML
     private void deleteAllOperations() {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        initAlertOwner(confirm);
         confirm.setTitle("Supprimer toutes les opérations");
         confirm.setHeaderText("Supprimer toutes les opérations du registre ?");
         confirm.setContentText("Cette action est irréversible.");
@@ -334,6 +402,7 @@ public class RegistreController {
         }
 
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        initAlertOwner(confirm);
         confirm.setTitle("Supprimer la sélection");
         confirm.setHeaderText(null);
         confirm.setContentText("Supprimer " + toDelete.size() + " opérations sélectionnées ?");
@@ -358,6 +427,12 @@ public class RegistreController {
 
             Dialog<ButtonType> dialog = new Dialog<>();
             dialog.setDialogPane(dialogPane);
+            // Attach dialog to owner window and make it window-modal
+            Window owner = getOwnerWindow();
+            if (owner != null) {
+                dialog.initOwner(owner);
+                dialog.initModality(Modality.WINDOW_MODAL);
+            }
             dialog.setTitle(isEditMode ? "Modifier l'opération" : "Nouvelle opération");
 
             ButtonType saveButtonType = new ButtonType("Enregistrer", ButtonBar.ButtonData.OK_DONE);
@@ -365,27 +440,54 @@ public class RegistreController {
             dialog.getDialogPane().getButtonTypes().addAll(saveButtonType, cancelButtonType);
 
             Button saveButton = (Button) dialog.getDialogPane().lookupButton(saveButtonType);
-            saveButton.setOnAction(event -> controller.handleSave());
+            // Prevent the dialog from closing if validation fails inside the controller.
+            saveButton.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
+                controller.handleSave();
+                if (!controller.isSaved()) {
+                    // consume the event to prevent the dialog from closing when validation failed
+                    event.consume();
+                } else {
+                    // ensure the dialog result is set so showAndWait returns
+                    dialog.setResult(saveButtonType);
+                }
+            });
 
             Optional<ButtonType> result = dialog.showAndWait();
 
-            if (result.isPresent() && result.get() == saveButtonType) {
-                Operation updatedOperation = controller.getOperation();
-                if (updatedOperation != null) {
-                    if (isEditMode) {
-                        operationDAO.update(updatedOperation);
-                        showInfo("Opération modifiée avec succès");
-                    } else {
-                        operationDAO.insert(updatedOperation);
-                        showInfo("Opération ajoutée avec succès");
-                    }
-                    loadOperations();
-                    autoResizeColumns();
-                    notifyMenuStats();
-                }
+            // Some dialog closing paths may not return the exact ButtonType (custom handlers may close the stage).
+            // Rely on the controller's operation instance: controller.handleSave() creates/sets the operation;
+            // controller.handleCancel() sets it to null. If an Operation is present, persist it.
+            Operation updatedOperation = controller.getOperation();
+            if (updatedOperation == null) {
+                System.out.println("[RegistreController] No operation returned from dialog (operation is null)");
+            } else {
+                System.out.println("[RegistreController] Operation returned from dialog: imp=" + updatedOperation.getImp() + " designation=" + updatedOperation.getDesignation() + " solde=" + updatedOperation.getMontant());
             }
-        } catch (IOException e) {
-            showError("Erreur lors du chargement du dialogue: " + e.getMessage());
+
+            if (updatedOperation != null) {
+                if (isEditMode) {
+                    operationDAO.update(updatedOperation);
+                    // If the updated operation is the initial balance, recompute all soldes
+                    if (updatedOperation.getDesignation() != null && "Solde initial".equalsIgnoreCase(updatedOperation.getDesignation().trim())) {
+                        try { operationDAO.recomputeAllSoldes(); } catch (Exception ignored) {}
+                    }
+                    showInfo("Opération modifiée avec succès");
+                } else {
+                    operationDAO.insert(updatedOperation);
+                    if (updatedOperation.getDesignation() != null && "Solde initial".equalsIgnoreCase(updatedOperation.getDesignation().trim())) {
+                        try { operationDAO.recomputeAllSoldes(); } catch (Exception ignored) {}
+                    }
+                    showInfo("Opération ajoutée avec succès");
+                }
+                loadOperations();
+                autoResizeColumns();
+                notifyMenuStats();
+            }
+        } catch (Exception e) {
+            // Print full stacktrace to console for debugging the FXML/controller initialization
+            e.printStackTrace();
+            String msg = e.toString();
+            showError("Erreur lors du chargement du dialogue: " + msg);
         }
     }
 
@@ -461,6 +563,7 @@ public class RegistreController {
 
     private void showInfo(String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        initAlertOwner(alert);
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
@@ -468,9 +571,25 @@ public class RegistreController {
 
     private void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
+        initAlertOwner(alert);
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    private Window getOwnerWindow() {
+        if (operationsTable != null && operationsTable.getScene() != null) {
+            return operationsTable.getScene().getWindow();
+        }
+        return null;
+    }
+
+    private void initAlertOwner(Alert alert) {
+        Window owner = getOwnerWindow();
+        if (owner != null) {
+            alert.initOwner(owner);
+            alert.initModality(Modality.WINDOW_MODAL);
+        }
     }
 
     private void autoResizeColumns() {
@@ -483,7 +602,10 @@ public class RegistreController {
                 String s = cell == null ? "" : cell.toString();
                 max = Math.max(max, computeTextWidth(s));
             }
-            col.setPrefWidth(Math.max(60, max + 24));
+            // Add extra padding to ensure header text is fully visible and set minWidth
+            double padded = Math.max(80, max + 48);
+            col.setMinWidth(padded);
+            col.setPrefWidth(padded);
         }
     }
 
@@ -492,6 +614,19 @@ public class RegistreController {
         javafx.scene.text.Text t = new javafx.scene.text.Text(text);
         t.setStyle("-fx-font-size: 13px;");
         return t.getLayoutBounds().getWidth();
+    }
+
+    private String getCurrentMonth() {
+        String[] months = {"JANVIER", "FEVRIER", "MARS", "AVRIL", "MAI", "JUIN",
+                "JUILLET", "AOUT", "SEPTEMBRE", "OCTOBRE", "NOVEMBRE", "DECEMBRE"};
+        return months[LocalDate.now().getMonthValue() - 1];
+    }
+
+    private String getMonthName(java.time.LocalDate d) {
+        if (d == null) return null;
+        String[] months = {"JANVIER", "FEVRIER", "MARS", "AVRIL", "MAI", "JUIN",
+                "JUILLET", "AOUT", "SEPTEMBRE", "OCTOBRE", "NOVEMBRE", "DECEMBRE"};
+        return months[d.getMonthValue() - 1];
     }
 
     private void notifyMenuStats() {

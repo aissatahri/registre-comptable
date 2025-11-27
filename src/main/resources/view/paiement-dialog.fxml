@@ -25,7 +25,7 @@
             <Label text="Catégorie" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
             <TextField fx:id="categorieField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-            <Label text="Montant *" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+            <Label text="Solde *" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
             <TextField fx:id="montantField" promptText="0.00" GridPane.rowIndex="1" GridPane.columnIndex="3"/>
 
             <HBox spacing="10" GridPane.rowIndex="2" GridPane.columnIndex="0" GridPane.columnSpan="4">

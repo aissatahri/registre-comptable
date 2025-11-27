@@ -1,3 +1,23 @@
+# Ignore local IDE config
+.idea/
+*.iml
+
+# Build output
+/target/
+
+# Database files
+/*.db
+/*.db.bak*
+
+# Runtime dumps
+*.stackdump
+
+# Local logs and query outputs
+query_*.txt
+
+# OS files
+Thumbs.db
+*.DS_Store
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/

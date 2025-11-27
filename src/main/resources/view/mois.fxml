@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.*?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.geometry.Insets?>
@@ -16,6 +17,7 @@
                     <Text styleClass="subtitle" text="Consultation des opérations par mois"/>
                 </VBox>
                 <Region HBox.hgrow="ALWAYS"/>
+                <ComboBox fx:id="anneeComboBox" promptText="Année" onAction="#loadMoisData" />
                 <ComboBox fx:id="moisComboBox" promptText="Sélectionner un mois" onAction="#loadMoisData"/>
                 <Button text="Exporter le mois" styleClass="btn-success" onAction="#exportMoisToExcel"/>
                 <MenuButton fx:id="columnsMenu" text="Colonnes" />
@@ -30,37 +32,65 @@
                     <Text text="Mois sélectionné" style="-fx-font-weight: bold; -fx-fill: #7f8c8d;"/>
                     <Text fx:id="moisSelectedText" text="Aucun" style="-fx-font-size: 20; -fx-fill: #2c3e50;"/>
                 </VBox>
-                <VBox styleClass="card" spacing="10" prefWidth="200">
+                <VBox styleClass="card" spacing="10" prefWidth="140">
                     <Text text="Opérations" style="-fx-font-weight: bold; -fx-fill: #7f8c8d;"/>
                     <Text fx:id="moisOperationsText" text="0" style="-fx-font-size: 20; -fx-fill: #3498db;"/>
                 </VBox>
-                <VBox styleClass="card" spacing="10" prefWidth="200">
-                    <Text text="Montant total" style="-fx-font-weight: bold; -fx-fill: #7f8c8d;"/>
-                    <Text fx:id="moisMontantText" text="0.00" style="-fx-font-size: 20; -fx-fill: #27ae60;"/>
+                <VBox styleClass="card" spacing="10" prefWidth="160">
+                    <Text text="Recette" style="-fx-font-weight: bold; -fx-fill: #7f8c8d;"/>
+                    <Text fx:id="moisRecetteText" text="0.00" style="-fx-font-size: 20; -fx-fill: #27ae60;"/>
+                </VBox>
+                <VBox styleClass="card" spacing="8" prefWidth="360">
+                    <Text text="Sur &amp; Dépenses (Mois)" style="-fx-font-weight: bold; -fx-fill: #7f8c8d;"/>
+                    <HBox spacing="10" alignment="BASELINE_LEFT">
+                        <Text text="Sur RAM:" style="-fx-fill: #7f8c8d;" />
+                        <Text fx:id="moisSurRamText" text="0.00" style="-fx-font-size: 16; -fx-fill: #f39c12;"/>
+                    </HBox>
+                    <HBox spacing="10" alignment="BASELINE_LEFT">
+                        <Text text="Sur ENG:" style="-fx-fill: #7f8c8d;" />
+                        <Text fx:id="moisSurEngText" text="0.00" style="-fx-font-size: 16; -fx-fill: #f39c12;"/>
+                    </HBox>
+                    <HBox spacing="10" alignment="BASELINE_LEFT">
+                        <Text text="Dépense:" style="-fx-fill: #7f8c8d;" />
+                        <Text fx:id="moisDepenseText" text="0.00" style="-fx-font-size: 16; -fx-fill: #e74c3c;"/>
+                    </HBox>
                 </VBox>
                 <VBox styleClass="card" spacing="10" prefWidth="200">
-                    <Text text="Moyenne" style="-fx-font-weight: bold; -fx-fill: #7f8c8d;"/>
-                    <Text fx:id="moisMoyenneText" text="0.00" style="-fx-font-size: 20; -fx-fill: #f39c12;"/>
+                    <Text text="Solde précédent" style="-fx-font-weight: bold; -fx-fill: #7f8c8d;"/>
+                    <Text fx:id="moisPrevSoldeText" text="0.00" style="-fx-font-size: 16; -fx-fill: #7f8c8d;"/>
+                </VBox>
+                <VBox styleClass="card" spacing="10" prefWidth="200">
+                    <Text text="Dernier solde" style="-fx-font-weight: bold; -fx-fill: #7f8c8d;"/>
+                    <Text fx:id="moisMontantText" text="0.00" style="-fx-font-size: 20; -fx-fill: #2c3e50;"/>
                 </VBox>
             </HBox>
 
             <VBox styleClass="card" spacing="15">
                 <Text text="Opérations du mois" style="-fx-font-weight: bold;"/>
-                <TableView fx:id="moisOperationsTable" prefHeight="400">
-                    <columns>
-                        <TableColumn fx:id="colOp" text="OP" prefWidth="80"/>
-                        <TableColumn fx:id="colNature" text="Nature" prefWidth="120"/>
-                        <TableColumn fx:id="colBudg" text="BUDG" prefWidth="80"/>
-                        <TableColumn fx:id="colMontant" text="Montant" prefWidth="100"/>
-                        <TableColumn fx:id="colDateEntree" text="Date Entrée" prefWidth="110"/>
-                        <TableColumn fx:id="colDateVisa" text="Date Visa" prefWidth="110"/>
-                        <TableColumn fx:id="colDateRejet" text="Date Rejet" prefWidth="110"/>
-                        <TableColumn fx:id="colMotifRejet" text="Motif Rejet" prefWidth="160"/>
-                        <TableColumn fx:id="colDateReponse" text="Date Réponse" prefWidth="120"/>
-                        <TableColumn fx:id="colContenuReponse" text="Contenu Réponse" prefWidth="180"/>
-                        <TableColumn fx:id="colDecision" text="Décision" prefWidth="100"/>
-                    </columns>
-                </TableView>
+                <ScrollPane fitToHeight="true" fitToWidth="false" hbarPolicy="AS_NEEDED" vbarPolicy="AS_NEEDED">
+                    <content>
+                        <TableView fx:id="moisOperationsTable" prefHeight="400">
+                            <columns>
+                                <TableColumn fx:id="colImp" text="IMP" prefWidth="80"/>
+                                <TableColumn fx:id="colDesignation" text="Désignation" prefWidth="200"/>
+                                <TableColumn fx:id="colNature" text="Nature" prefWidth="120"/>
+                                <TableColumn fx:id="colN" text="N" prefWidth="60"/>
+                                <TableColumn fx:id="colBudg" text="BUDG" prefWidth="80"/>
+                                <TableColumn fx:id="colExercice" text="Exercice" prefWidth="80"/>
+                                <TableColumn fx:id="colBeneficiaire" text="Bénéficiaire" prefWidth="160"/>
+                                <TableColumn fx:id="colDateEmission" text="Date Emission" prefWidth="110"/>
+                                <TableColumn fx:id="colDateVisa" text="Date Visa" prefWidth="110"/>
+                                <TableColumn fx:id="colOpOr" text="OP/OR" prefWidth="80"/>
+                                <TableColumn fx:id="colOvCheq" text="OV/CHEQ" prefWidth="80"/>
+                                <TableColumn fx:id="colRecette" text="Recette" prefWidth="100"/>
+                                <TableColumn fx:id="colSurRam" text="Sur RAM" prefWidth="100"/>
+                                <TableColumn fx:id="colSurEng" text="Sur Eng" prefWidth="100"/>
+                                <TableColumn fx:id="colDepense" text="Dépense" prefWidth="100"/>
+                                <TableColumn fx:id="colMontant" text="Solde" prefWidth="100"/>
+                            </columns>
+                        </TableView>
+                    </content>
+                </ScrollPane>
             </VBox>
         </VBox>
     </center>

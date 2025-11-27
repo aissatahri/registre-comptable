@@ -32,17 +32,19 @@
             </BorderPane.margin>
             <tabs>
                 <Tab text="Vue d'ensemble">
-                    <ScrollPane fitToWidth="true">
-                        <TableView fx:id="paiementsTable" prefHeight="400">
+                    <ScrollPane fitToWidth="false" fitToHeight="true" hbarPolicy="AS_NEEDED" vbarPolicy="AS_NEEDED">
+                            <content>
+                                <TableView fx:id="paiementsTable" prefHeight="400">
                             <columns>
                                 <TableColumn fx:id="colAnnee" text="Année" prefWidth="80"/>
                                 <TableColumn fx:id="colType" text="Type" prefWidth="100"/>
                                 <TableColumn fx:id="colCategorie" text="Catégorie" prefWidth="150"/>
-                                        <TableColumn fx:id="colMontant" text="Montant" prefWidth="120"/>
+                                        <TableColumn fx:id="colMontant" text="Solde" prefWidth="120"/>
                                         <TableColumn fx:id="actionsColumn" text="Actions" prefWidth="140"/>
                             </columns>
-                        </TableView>
-                    </ScrollPane>
+                                </TableView>
+                            </content>
+                        </ScrollPane>
                 </Tab>
 
                 <Tab text="Par année">

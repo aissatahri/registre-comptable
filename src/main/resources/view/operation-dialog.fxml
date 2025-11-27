@@ -1,67 +1,99 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Text?>
 
-<DialogPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.app.registre.controller.OperationDialogController">
+<DialogPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.app.registre.controller.OperationDialogController">
 
     <header>
-        <Text fx:id="dialogTitle" style="-fx-font-size: 18; -fx-font-weight: bold; -fx-fill: #2c3e50;"/>
+        <Text fx:id="dialogTitle" style="-fx-font-size: 18; -fx-font-weight: bold; -fx-fill: #2c3e50;" />
     </header>
 
     <content>
         <ScrollPane fitToWidth="true" prefHeight="400">
-            <GridPane hgap="15" vgap="15" style="-fx-padding: 20;">
-                <padding><Insets top="10" right="10" bottom="10" left="10"/></padding>
+            <GridPane hgap="15" style="-fx-padding: 20;" vgap="15">
+                <padding><Insets bottom="10" left="10" right="10" top="10" /></padding>
 
-                <Label text="OP *" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                <TextField fx:id="opField" promptText="Numéro OP" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                <Label text="IMP" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                <TextField fx:id="impField" promptText="IMP" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
-                <Label text="OV/CHEQ" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
-                <TextField fx:id="ovCheqField" promptText="OV/CHEQ" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+                <Label text="Désignation" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                <TextField fx:id="designationField" promptText="Désignation" GridPane.columnIndex="3" GridPane.rowIndex="0" />
 
-                <Label text="IMP" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                <TextField fx:id="impField" promptText="IMP" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                <Label text="Nature *" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                <ComboBox fx:id="natureCombo" promptText="Sélectionner" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
-                <Label text="Nature *" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
-                <ComboBox fx:id="natureCombo" promptText="Sélectionner" GridPane.rowIndex="1" GridPane.columnIndex="3"/>
+                <Label text="N" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                <TextField fx:id="nField" promptText="0" GridPane.columnIndex="3" GridPane.rowIndex="1" />
 
-                <Label text="BUDG" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                <TextField fx:id="budgField" promptText="BUDG" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                <Label text="BUDG" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                <ComboBox fx:id="budgCombo" promptText="INV/EXP" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
-                <Label text="Montant *" GridPane.rowIndex="2" GridPane.columnIndex="2"/>
-                <TextField fx:id="montantField" promptText="0.00" GridPane.rowIndex="2" GridPane.columnIndex="3"/>
+                <Label text="Exercice" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                <TextField fx:id="exerciceField" promptText="2025" GridPane.columnIndex="3" GridPane.rowIndex="2" />
 
-                <Label text="Date Entrée *" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-                <DatePicker fx:id="dateEntreePicker" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                <Label text="Bénéficiaire" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                <TextField fx:id="beneficiaireField" promptText="Nom" GridPane.columnIndex="1" GridPane.rowIndex="3" />
 
-                <Label text="Mois *" GridPane.rowIndex="3" GridPane.columnIndex="2"/>
-                <ComboBox fx:id="moisCombo" promptText="Sélectionner" GridPane.rowIndex="3" GridPane.columnIndex="3"/>
+                <Label text="Date Emission" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                <DatePicker fx:id="dateEmissionPicker" GridPane.columnIndex="3" GridPane.rowIndex="3" />
 
-                <Label text="Date Visa" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
-                <DatePicker fx:id="dateVisaPicker" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+                <Label text="Date Visa" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                <DatePicker fx:id="dateVisaPicker" GridPane.columnIndex="1" GridPane.rowIndex="4" />
 
-                <Label text="Date Rejet" GridPane.rowIndex="4" GridPane.columnIndex="2"/>
-                <DatePicker fx:id="dateRejetPicker" GridPane.rowIndex="4" GridPane.columnIndex="3"/>
+                <Label text="OP/OR" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                <TextField fx:id="opOrField" promptText="0" GridPane.columnIndex="3" GridPane.rowIndex="4" />
 
-                <Label text="Décision" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
-                <ComboBox fx:id="decisionCombo" promptText="Sélectionner" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+                <Label text="OV/CHEQ" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+                <TextField fx:id="ovCheqNumber" promptText="Numéro OV/CHEQ" GridPane.columnIndex="1" GridPane.rowIndex="5" />
 
-                <Label text="Motif Rejet" GridPane.rowIndex="5" GridPane.columnIndex="2"/>
-                <TextField fx:id="motifRejetField" promptText="Motif de rejet" GridPane.rowIndex="5" GridPane.columnIndex="3"/>
+                <Label text="Recette" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+                <TextField fx:id="recetteField" promptText="0.00" GridPane.columnIndex="3" GridPane.rowIndex="5" />
 
-                <Label text="Date Réponse" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
-                <DatePicker fx:id="dateReponsePicker" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+                <Label text="Sur RAM" GridPane.columnIndex="0" GridPane.rowIndex="6" />
+                <TextField fx:id="surRamField" promptText="0.00" GridPane.columnIndex="1" GridPane.rowIndex="6" />
 
-                <Label text="Contenu Réponse" GridPane.rowIndex="6" GridPane.columnIndex="2"/>
-                <TextField fx:id="contenuReponseField" promptText="Contenu de réponse" GridPane.rowIndex="6" GridPane.columnIndex="3"/>
+                <Label text="Sur Eng" GridPane.columnIndex="2" GridPane.rowIndex="6" />
+                <TextField fx:id="surEngField" promptText="0.00" GridPane.columnIndex="3" GridPane.rowIndex="6" />
 
-                <HBox spacing="10" GridPane.rowIndex="7" GridPane.columnIndex="0" GridPane.columnSpan="4">
-                    <Text fx:id="validationText" fill="red" visible="false"/>
+                <Label text="Solde (pour Solde initial)" GridPane.columnIndex="0" GridPane.rowIndex="7" />
+                <TextField fx:id="soldeField" promptText="0.00" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+
+                <Label text="Dépense" GridPane.columnIndex="0" GridPane.rowIndex="8" />
+                <Label fx:id="depenseField" text="0.00" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+
+                <!-- Mois removed as requested -->
+
+                <HBox spacing="10" GridPane.columnIndex="0" GridPane.columnSpan="4" GridPane.rowIndex="9">
+                    <Text fx:id="validationText" fill="red" visible="false" />
                 </HBox>
+            <columnConstraints>
+               <ColumnConstraints />
+               <ColumnConstraints />
+               <ColumnConstraints />
+               <ColumnConstraints />
+            </columnConstraints>
+            <rowConstraints>
+               <RowConstraints />
+               <RowConstraints />
+               <RowConstraints />
+               <RowConstraints />
+               <RowConstraints />
+               <RowConstraints />
+               <RowConstraints />
+               <RowConstraints />
+               <RowConstraints />
+            </rowConstraints>
             </GridPane>
         </ScrollPane>
     </content>

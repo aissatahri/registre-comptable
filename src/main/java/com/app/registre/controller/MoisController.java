@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.time.LocalDate;
+import com.app.registre.util.DialogUtils;
 import java.time.format.DateTimeFormatter;
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -25,23 +26,34 @@ import java.util.Locale;
 public class MoisController {
 
     @FXML private ComboBox<String> moisComboBox;
+    @FXML private ComboBox<String> anneeComboBox;
     @FXML private Text moisSelectedText;
     @FXML private Text moisOperationsText;
     @FXML private Text moisMontantText;
-    @FXML private Text moisMoyenneText;
+    @FXML private Text moisRecetteText;
+    @FXML private Text moisSurRamText;
+    @FXML private Text moisSurEngText;
+    @FXML private Text moisDepenseText;
+    @FXML private Text moisPrevSoldeText;
     @FXML private TableView<Operation> moisOperationsTable;
     @FXML private TableView<?> natureTable;
-    @FXML private TableColumn<Operation, String> colOp;
+    // Columns aligned with the operation dialog / mois.fxml
+    @FXML private TableColumn<Operation, String> colImp;
+    @FXML private TableColumn<Operation, String> colDesignation;
     @FXML private TableColumn<Operation, String> colNature;
+    @FXML private TableColumn<Operation, String> colN;
     @FXML private TableColumn<Operation, String> colBudg;
-    @FXML private TableColumn<Operation, Double> colMontant;
-    @FXML private TableColumn<Operation, LocalDate> colDateEntree;
+    @FXML private TableColumn<Operation, String> colExercice;
+    @FXML private TableColumn<Operation, String> colBeneficiaire;
+    @FXML private TableColumn<Operation, LocalDate> colDateEmission;
     @FXML private TableColumn<Operation, LocalDate> colDateVisa;
-    @FXML private TableColumn<Operation, LocalDate> colDateRejet;
-    @FXML private TableColumn<Operation, String> colMotifRejet;
-    @FXML private TableColumn<Operation, LocalDate> colDateReponse;
-    @FXML private TableColumn<Operation, String> colContenuReponse;
-    @FXML private TableColumn<Operation, String> colDecision;
+    @FXML private TableColumn<Operation, Integer> colOpOr;
+    @FXML private TableColumn<Operation, String> colOvCheq;
+    @FXML private TableColumn<Operation, Double> colRecette;
+    @FXML private TableColumn<Operation, Double> colSurRam;
+    @FXML private TableColumn<Operation, Double> colSurEng;
+    @FXML private TableColumn<Operation, Double> colDepense;
+    @FXML private TableColumn<Operation, Double> colMontant;
     @FXML private javafx.scene.control.MenuButton columnsMenu;
 
     private ObservableList<Operation> operations;
@@ -50,11 +62,13 @@ public class MoisController {
     public void initialize() {
         operationDAO = new OperationDAO();
         setupMoisComboBox();
+        setupAnneeComboBox();
         setupColumns();
         moisOperationsTable.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
         setupColumnsMenu();
+        // Default to current month
         if (moisComboBox.getValue() == null && !moisComboBox.getItems().isEmpty()) {
-            moisComboBox.setValue(moisComboBox.getItems().get(0));
+            try { moisComboBox.setValue(getCurrentMonth()); } catch (Exception ignored) { moisComboBox.setValue(moisComboBox.getItems().get(0)); }
         }
         loadMoisData();
     }
@@ -66,21 +80,41 @@ public class MoisController {
         );
     }
 
+    private void setupAnneeComboBox() {
+        if (anneeComboBox == null) return;
+        java.util.Set<Integer> years = new java.util.TreeSet<>(java.util.Collections.reverseOrder());
+        java.util.List<Operation> all = operationDAO.findAll();
+        for (Operation op : all) {
+            if (op.getDateEmission() != null) years.add(op.getDateEmission().getYear());
+        }
+        if (years.isEmpty()) years.add(LocalDate.now().getYear());
+        anneeComboBox.getItems().clear();
+        for (Integer y : years) anneeComboBox.getItems().add(y.toString());
+        if (anneeComboBox.getValue() == null && !anneeComboBox.getItems().isEmpty()) {
+            anneeComboBox.setValue(anneeComboBox.getItems().get(0));
+        }
+    }
+
     private void setupColumns() {
-        colOp.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("op"));
+        colImp.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("imp"));
+        colDesignation.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("designation"));
         colNature.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("nature"));
+        colN.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("n"));
         colBudg.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("budg"));
-        colMontant.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("montant"));
-        colDateEntree.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("dateEntree"));
+        colExercice.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("exercice"));
+        colBeneficiaire.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("beneficiaire"));
+        colDateEmission.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("dateEmission"));
         colDateVisa.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("dateVisa"));
-        colDateRejet.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("dateRejet"));
-        colMotifRejet.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("motifRejet"));
-        colDateReponse.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("dateReponse"));
-        colContenuReponse.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("contenuReponse"));
-        colDecision.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("decision"));
+        colOpOr.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("opOr"));
+        colOvCheq.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("ovCheq"));
+        colRecette.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("recette"));
+        colSurRam.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("surRam"));
+        colSurEng.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("surEng"));
+        colDepense.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("depense"));
+        colMontant.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("montant"));
 
         DateTimeFormatter df = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        colDateEntree.setCellFactory(col -> new TableCell<>() {
+        colDateEmission.setCellFactory(col -> new TableCell<>() {
             @Override protected void updateItem(LocalDate item, boolean empty) {
                 super.updateItem(item, empty);
                 setText(empty || item == null ? "" : df.format(item));
@@ -92,16 +126,11 @@ public class MoisController {
                 setText(empty || item == null ? "" : df.format(item));
             }
         });
-        colDateRejet.setCellFactory(col -> new TableCell<>() {
-            @Override protected void updateItem(LocalDate item, boolean empty) {
+
+        colN.setCellFactory(col -> new TableCell<>() {
+            @Override protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
-                setText(empty || item == null ? "" : df.format(item));
-            }
-        });
-        colDateReponse.setCellFactory(col -> new TableCell<>() {
-            @Override protected void updateItem(LocalDate item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(empty || item == null ? "" : df.format(item));
+                setText(empty || item == null ? "" : item);
             }
         });
 
@@ -131,9 +160,22 @@ public class MoisController {
     @FXML
     private void loadMoisData() {
         String mois = moisComboBox.getValue();
+        String annee = anneeComboBox != null ? anneeComboBox.getValue() : null;
+        int filterYear = annee != null ? Integer.parseInt(annee) : LocalDate.now().getYear();
         if (mois != null) {
-            List<Operation> operationList = operationDAO.findByMois(mois);
-            operations = FXCollections.observableArrayList(operationList);
+            // Load all operations and filter by month derived from dateEmission (preferred) or fallback to stored mois
+            List<Operation> all = operationDAO.findAll();
+            List<Operation> filtered = new java.util.ArrayList<>();
+            for (Operation op : all) {
+                // Only include operations that have a date_emission and match both month and year
+                if (op.getDateEmission() != null) {
+                    if (getMonthName(op.getDateEmission()).equals(mois) && op.getDateEmission().getYear() == filterYear) {
+                        filtered.add(op);
+                    }
+                }
+            }
+
+            operations = FXCollections.observableArrayList(filtered);
             moisOperationsTable.setItems(operations);
             autoResizeColumns();
 
@@ -143,14 +185,80 @@ public class MoisController {
 
     private void updateMoisStatistics(String mois) {
         moisSelectedText.setText(mois);
-
-        int count = operations.size();
-        double total = operationDAO.getTotalMontantByMois(mois);
-        double moyenne = count > 0 ? total / count : 0;
+        int count = operations == null ? 0 : operations.size();
+        double totalRecette = 0.0;
+        double totalSurRam = 0.0;
+        double totalSurEng = 0.0;
+        double totalDepense = 0.0;
+        Double dernierSolde = null;
+        if (operations != null) {
+            for (Operation op : operations) {
+                if (op.getRecette() != null) totalRecette += op.getRecette();
+                double sr = op.getSurRam() != null ? op.getSurRam() : 0.0;
+                double se = op.getSurEng() != null ? op.getSurEng() : 0.0;
+                totalSurRam += sr;
+                totalSurEng += se;
+                if (op.getDepense() != null) totalDepense += op.getDepense();
+                if (op.getSolde() != null) dernierSolde = op.getSolde();
+            }
+        }
+        double moyenne = count > 0 ? (totalRecette - totalDepense) / count : 0;
 
         moisOperationsText.setText(String.valueOf(count));
-        moisMontantText.setText(String.format("%,.2f", total));
-        moisMoyenneText.setText(String.format("%,.2f", moyenne));
+        moisRecetteText.setText(String.format("%,.2f", totalRecette));
+        moisSurRamText.setText(String.format("%,.2f", totalSurRam));
+        moisSurEngText.setText(String.format("%,.2f", totalSurEng));
+        moisDepenseText.setText(String.format("%,.2f", totalDepense));
+            // compute previous solde for the month: take the last record of (month-1) in the SAME YEAR
+        try {
+            int monthNum = monthNumberFromName(mois);
+            int year = anneeComboBox != null && anneeComboBox.getValue() != null ? Integer.parseInt(anneeComboBox.getValue()) : LocalDate.now().getYear();
+
+            // --- SOLDE PRECEDENT : dernier solde du mois précédent (même année) ---
+            try {
+                Double prev = 0.0;
+                int prevMonth = monthNum - 1;
+                if (prevMonth >= 1) {
+                    prev = operationDAO.getLastMontantForMonthYear(year, prevMonth);
+                    if (prev == null) {
+                        // si aucune opération dans le mois précédent → solde précédent = 0.0
+                        if (operationDAO.hasOperationsForMonthYear(year, prevMonth)) {
+                            // si des opérations existent mais solde null, recompute et relire
+                            operationDAO.recomputeAllSoldes();
+                            prev = operationDAO.getLastMontantForMonthYear(year, prevMonth);
+                            if (prev == null) prev = 0.0;
+                        } else {
+                            prev = 0.0;
+                        }
+                    }
+                } else {
+                    // JANVIER → pas de mois précédent dans l'année
+                    prev = 0.0;
+                }
+
+                if (moisPrevSoldeText != null) {
+                    moisPrevSoldeText.setText(String.format("%,.2f", prev));
+                }
+
+                // --- DERNIER SOLDE DU MOIS COURANT ---
+                if (operations == null || operations.isEmpty()) {
+                    // Aucun mouvement dans le mois → dernier solde = solde précédent
+                    moisMontantText.setText(String.format("%,.2f", prev));
+                } else {
+                    // Il y a des opérations → on prend le solde de la dernière opération
+                    Double curr = operationDAO.getLastMontantForMonthYear(year, monthNum);
+                    moisMontantText.setText(String.format("%,.2f", curr == null ? prev : curr));
+                }
+            } catch (Exception ignored) {
+                moisMontantText.setText(String.format("%,.2f", dernierSolde == null ? 0.0 : dernierSolde));
+            }
+
+        } catch (Exception ignored) {
+            moisMontantText.setText(String.format("%,.2f", dernierSolde == null ? 0.0 : dernierSolde));
+        }
+        // moyenne not displayed in the FXML anymore
+
+        // no previous-month solde displayed
     }
 
     @FXML
@@ -173,6 +281,7 @@ public class MoisController {
                 showInfo("Export réussi !");
             } catch (IOException e) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
+                DialogUtils.initOwner(alert, moisOperationsTable);
                 alert.setHeaderText(null);
                 alert.setContentText("Erreur lors de l'export: " + e.getMessage());
                 alert.showAndWait();
@@ -182,6 +291,7 @@ public class MoisController {
 
     private void showInfo(String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        DialogUtils.initOwner(alert, moisOperationsTable);
         alert.setTitle("Information");
         alert.setHeaderText(null);
         alert.setContentText(message);
@@ -190,6 +300,7 @@ public class MoisController {
 
     private void autoResizeColumns() {
         for (TableColumn<?, ?> col : moisOperationsTable.getColumns()) {
+            // Start with header text width (use bolder measurement to avoid truncation)
             double max = computeTextWidth(col.getText());
             int rows = moisOperationsTable.getItems() != null ? moisOperationsTable.getItems().size() : 0;
             int sample = Math.min(rows, 200);
@@ -198,14 +309,42 @@ public class MoisController {
                 String s = cell == null ? "" : cell.toString();
                 max = Math.max(max, computeTextWidth(s));
             }
-            col.setPrefWidth(Math.max(60, max + 24));
+            // Add extra padding to leave room for sort icons and header padding
+            col.setPrefWidth(Math.max(80, max + 40));
         }
     }
 
     private double computeTextWidth(String text) {
         if (text == null) return 0;
         javafx.scene.text.Text t = new javafx.scene.text.Text(text);
-        t.setStyle("-fx-font-size: 13px;");
+        // use a bolder measurement to account for header font weight
+        t.setStyle("-fx-font-size: 13px; -fx-font-weight: bold;");
         return t.getLayoutBounds().getWidth();
     }
+
+    private String getCurrentMonth() {
+        String[] months = {"JANVIER", "FEVRIER", "MARS", "AVRIL", "MAI", "JUIN",
+                "JUILLET", "AOUT", "SEPTEMBRE", "OCTOBRE", "NOVEMBRE", "DECEMBRE"};
+        return months[LocalDate.now().getMonthValue() - 1];
+    }
+
+    private String getMonthName(java.time.LocalDate d) {
+        if (d == null) return null;
+        String[] months = {"JANVIER", "FEVRIER", "MARS", "AVRIL", "MAI", "JUIN",
+                "JUILLET", "AOUT", "SEPTEMBRE", "OCTOBRE", "NOVEMBRE", "DECEMBRE"};
+        return months[d.getMonthValue() - 1];
+    }
+
+    private int monthNumberFromName(String mois) {
+        if (mois == null) return LocalDate.now().getMonthValue();
+        String[] months = {"JANVIER", "FEVRIER", "MARS", "AVRIL", "MAI", "JUIN",
+                "JUILLET", "AOUT", "SEPTEMBRE", "OCTOBRE", "NOVEMBRE", "DECEMBRE"};
+        for (int i = 0; i < months.length; i++) {
+            if (months[i].equalsIgnoreCase(mois.trim())) return i + 1;
+        }
+        return LocalDate.now().getMonthValue();
+    }
+
+    
+
 }
