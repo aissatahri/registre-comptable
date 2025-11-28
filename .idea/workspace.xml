@@ -6,10 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="189dfc45-43d5-48fa-94cb-a5089b5b5a05" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/app/registre/controller/MoisController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/app/registre/controller/MoisController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/app/registre/controller/RegistreController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/app/registre/controller/RegistreController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/app/registre/util/ExcelUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/app/registre/util/ExcelUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/view/registre.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/view/registre.fxml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -121,7 +117,8 @@
       <workItem from="1764186840626" duration="17861000" />
       <workItem from="1764239573337" duration="9019000" />
       <workItem from="1764252546883" duration="657000" />
-      <workItem from="1764274829600" duration="11349000" />
+      <workItem from="1764274829600" duration="11677000" />
+      <workItem from="1764324441058" duration="1194000" />
     </task>
     <servers />
   </component>
