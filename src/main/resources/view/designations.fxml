@@ -11,12 +11,14 @@
             <HBox spacing="10" alignment="CENTER_LEFT">
                 <Label text="Designations" style="-fx-font-size: 16; -fx-font-weight: bold;"/>
                 <Region HBox.hgrow="ALWAYS"/>
+                <Button text="Importer" fx:id="importBtn"/>
+                <Button text="Exporter" fx:id="exportBtn"/>
                 <Button text="Ajouter" fx:id="addBtn"/>
                 <Button text="Modifier" fx:id="editBtn"/>
                 <Button text="Supprimer" fx:id="deleteBtn"/>
                 <Button text="Enregistrer" fx:id="saveBtn"/>
             </HBox>
-            <TableView fx:id="table" prefHeight="480">
+            <TableView fx:id="table" prefHeight="480" editable="true">
                 <columns>
                     <TableColumn fx:id="colImp" text="IMP" prefWidth="120" />
                     <TableColumn fx:id="colDesignation" text="Designation" prefWidth="600" />
