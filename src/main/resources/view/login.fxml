@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.app.registre.controller.LoginController" spacing="10" alignment="CENTER" stylesheets="/style.css">
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20" />
+    </padding>
+    <Label text="Connexion" style="-fx-font-size:18px; -fx-font-weight:bold;" />
+    <GridPane hgap="10" vgap="10">
+        <Label text="Nom d'utilisateur:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+        <TextField fx:id="usernameField" text="admin" promptText="admin" GridPane.rowIndex="0" GridPane.columnIndex="1" onAction="#handleLogin" />
+
+        <Label text="Mot de passe:" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+        <PasswordField fx:id="passwordField" text="admin" promptText="••••••" GridPane.rowIndex="1" GridPane.columnIndex="1" onAction="#handleLogin" />
+    </GridPane>
+    <Label fx:id="errorLabel" textFill="red" />
+    <HBox spacing="10">
+        <Button fx:id="btnLogin" text="Se connecter" onAction="#handleLogin" defaultButton="true" />
+        <Button fx:id="btnCancel" text="Annuler" onAction="#handleCancel" />
+    </HBox>
+</VBox>
