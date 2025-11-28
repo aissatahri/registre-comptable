@@ -44,16 +44,7 @@
                 <Button fx:id="btnInitialSolde" onAction="#showEditInitialSolde" styleClass="menu-button" text="Solde initial" maxWidth="Infinity" />
                 <Button text="Réglages" styleClass="menu-button" disable="true" maxWidth="Infinity" />
                 <VBox spacing="4" style="-fx-padding: 0 0 0 8;">
-                    <Button fx:id="btnDesignations" onAction="#showDesignations" styleClass="menu-button" maxWidth="Infinity">
-                        <graphic>
-                            <ImageView fitWidth="16" fitHeight="16">
-                                <Image url="@../images/icon.png" />
-                            </ImageView>
-                        </graphic>
-                        <text>
-                            <Text text="Designations" />
-                        </text>
-                    </Button>
+                    <Button fx:id="btnDesignations" onAction="#showDesignations" styleClass="menu-button" text="Designations" maxWidth="Infinity" />
                 </VBox>
             </VBox>
 
