@@ -162,32 +162,51 @@
 }
 
 /* TitledPane (Réglages) styling to look like a folded button */
-.titled-pane > .title {
-    -fx-background-color: linear-gradient(#f0f2f4, #dfe6e9);
-    -fx-padding: 8 12;
-    -fx-background-radius: 6;
-    -fx-border-radius: 6;
-    -fx-font-weight: 700;
+
+/* Style specifically for the Réglages TitledPane (id = reglagesPane) */
+#reglagesPane > .title {
+    -fx-background-color: linear-gradient(#f3f5f7, #e6eaed);
+    -fx-padding: 10 14;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-font-weight: 800;
     -fx-font-size: 16px;
-    -fx-text-fill: #2c3e50;
-}
-.titled-pane > .title > .arrow-button {
-    -fx-background-color: transparent;
-}
-.titled-pane > .title .arrow {
-    -fx-shape: "M 0 0 L 8 6 L 0 12 Z"; /* triangle */
-    -fx-background-color: #2c9dd6;
-    -fx-padding: 4;
-    -fx-translate-x: -6;
-}
-.titled-pane > .content {
-    -fx-padding: 6 0 0 0;
+    -fx-text-fill: #7f8c8d;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.06), 6, 0, 0, 2);
 }
 
-/* Make menu buttons inside titled pane more subtle */
-.titled-pane .menu-button {
-    -fx-font-size: 13px;
-    -fx-padding: 8 14;
+/* Arrow / caret styling inside the reglages pane header */
+#reglagesPane > .title .arrow-button {
+    -fx-background-color: transparent;
+}
+#reglagesPane > .title .arrow {
+    -fx-shape: "M 0 0 L 10 6 L 0 12 Z"; /* triangle */
+    -fx-background-color: #2c9dd6;
+    -fx-padding: 6;
+    -fx-background-radius: 6;
+    -fx-translate-x: -6;
+}
+
+#reglagesPane > .content {
+    -fx-padding: 8 0 0 0;
+}
+
+/* Submenu button styling (inside reglages) */
+.submenu-button {
+    -fx-font-size: 14px;
+    -fx-padding: 10 14 10 28; /* indent a bit to the right */
+    -fx-text-fill: #ecf0f1;
+    -fx-background-color: transparent;
+}
+.submenu-button:hover {
+    -fx-background-color: rgba(255,255,255,0.04);
+    -fx-text-fill: #ffffff;
+}
+
+/* When the titled pane is expanded, give the header a subtle accent */
+#reglagesPane:expanded > .title {
+    -fx-background-color: linear-gradient(#eef7fb, #dff0f6);
+    -fx-text-fill: #2c9dd6;
 }
 
 /* Stat numbers inside stat-box */

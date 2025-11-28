@@ -46,10 +46,10 @@
 
             <!-- Réglages group (collapsible) -->
             <Separator opacity="0.0" />
-            <TitledPane text="Réglages" expanded="false" collapsible="true" style="-fx-text-fill: #bdc3c7; -fx-padding: 6 0 0 0;">
+            <TitledPane fx:id="reglagesPane" text="Réglages" expanded="false" collapsible="true" style="-fx-text-fill: #bdc3c7; -fx-padding: 6 0 0 0;">
                 <content>
                     <VBox spacing="4">
-                        <Button fx:id="btnDesignations" onAction="#showDesignations" styleClass="menu-button" text="Designations" maxWidth="Infinity" />
+                        <Button fx:id="btnDesignations" onAction="#showDesignations" styleClass="menu-button submenu-button" text="Designations" maxWidth="Infinity" />
                     </VBox>
                 </content>
             </TitledPane>
