@@ -13,17 +13,30 @@ import java.util.List;
 public class ExcelUtil {
 
     public static void exportOperationsToExcel(List<Operation> operations, String filePath) throws IOException {
+        exportOperationsToExcel(operations, filePath, null);
+    }
+
+    public static void exportOperationsToExcel(List<Operation> operations, String filePath, Double prevSolde) throws IOException {
         try (Workbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("Operations");
 
             // Style pour l'en-tête
             CellStyle headerStyle = createHeaderStyle(workbook);
 
+            int headerRowIndex = 0;
+            // If prevSolde provided, write an info row above header
+            if (prevSolde != null) {
+                Row info = sheet.createRow(0);
+                info.createCell(0).setCellValue("solde_precedent");
+                info.createCell(1).setCellValue(prevSolde);
+                headerRowIndex = 1;
+            }
             // Créer l'en-tête
-            Row headerRow = sheet.createRow(0);
-            String[] headers = {"OP", "OV/CHEQ", "IMP", "Nature", "BUDG", "Montant",
-                    "Date Entrée", "Date Visa", "Date Rejet", "Décision",
-                    "Motif Rejet", "Date Réponse", "Contenu Réponse", "Mois"};
+            Row headerRow = sheet.createRow(headerRowIndex);
+                        // Export only these fields in this exact order as requested by user
+                        String[] headers = {"imp", "designation", "nature", "n", "budg", "exercice", "beneficiaire",
+                            "date_emission", "date_visa", "op_or", "ov_cheq_type", "ov_cheq", "recette",
+                            "sur_ram", "sur_eng", "depense", "solde"};
 
             for (int i = 0; i < headers.length; i++) {
                 Cell cell = headerRow.createCell(i);
@@ -32,29 +45,28 @@ public class ExcelUtil {
             }
 
             // Remplir les données
-            int rowNum = 1;
+            int rowNum = headerRowIndex + 1;
             for (Operation op : operations) {
                 Row row = sheet.createRow(rowNum++);
 
-                row.createCell(0).setCellValue(op.getOp() != null ? op.getOp() : "");
-                // OV/CHEQ: prefer showing "TYPE number" if available, otherwise type or number
-                String ovCell = "";
-                if (op.getOvCheqType() != null && op.getOvCheq() != null) ovCell = op.getOvCheqType() + " " + op.getOvCheq();
-                else if (op.getOvCheqType() != null) ovCell = op.getOvCheqType();
-                else if (op.getOvCheq() != null) ovCell = String.valueOf(op.getOvCheq());
-                row.createCell(1).setCellValue(ovCell);
-                row.createCell(2).setCellValue(op.getImp() != null ? op.getImp() : "");
-                row.createCell(3).setCellValue(op.getNature() != null ? op.getNature() : "");
+                // Write only the requested fields in the exact order
+                row.createCell(0).setCellValue(op.getImp() != null ? op.getImp() : "");
+                row.createCell(1).setCellValue(op.getDesignation() != null ? op.getDesignation() : "");
+                row.createCell(2).setCellValue(op.getNature() != null ? op.getNature() : "");
+                row.createCell(3).setCellValue(op.getN() != null ? op.getN() : "");
                 row.createCell(4).setCellValue(op.getBudg() != null ? op.getBudg() : "");
-                row.createCell(5).setCellValue(op.getMontant());
-                row.createCell(6).setCellValue(op.getDateEntree() != null ? op.getDateEntree().toString() : "");
-                row.createCell(7).setCellValue(op.getDateVisa() != null ? op.getDateVisa().toString() : "");
-                row.createCell(8).setCellValue(op.getDateRejet() != null ? op.getDateRejet().toString() : "");
-                row.createCell(9).setCellValue(op.getDecision() != null ? op.getDecision() : "");
-                row.createCell(10).setCellValue(op.getMotifRejet() != null ? op.getMotifRejet() : "");
-                row.createCell(11).setCellValue(op.getDateReponse() != null ? op.getDateReponse().toString() : "");
-                row.createCell(12).setCellValue(op.getContenuReponse() != null ? op.getContenuReponse() : "");
-                row.createCell(13).setCellValue(op.getMois() != null ? op.getMois() : "");
+                row.createCell(5).setCellValue(op.getExercice() != null ? op.getExercice() : "");
+                row.createCell(6).setCellValue(op.getBeneficiaire() != null ? op.getBeneficiaire() : "");
+                row.createCell(7).setCellValue(op.getDateEmission() != null ? op.getDateEmission().toString() : "");
+                row.createCell(8).setCellValue(op.getDateVisa() != null ? op.getDateVisa().toString() : "");
+                row.createCell(9).setCellValue(op.getOpOr() != null ? op.getOpOr() : 0);
+                row.createCell(10).setCellValue(op.getOvCheqType() != null ? op.getOvCheqType() : "");
+                row.createCell(11).setCellValue(op.getOvCheq() != null ? op.getOvCheq() : 0);
+                row.createCell(12).setCellValue(op.getRecette() != null ? op.getRecette() : 0.0);
+                row.createCell(13).setCellValue(op.getSurRam() != null ? op.getSurRam() : 0.0);
+                row.createCell(14).setCellValue(op.getSurEng() != null ? op.getSurEng() : 0.0);
+                row.createCell(15).setCellValue(op.getDepense() != null ? op.getDepense() : 0.0);
+                row.createCell(16).setCellValue(op.getSolde() != null ? op.getSolde() : 0.0);
             }
 
             // Ajuster automatiquement la largeur des colonnes
@@ -100,38 +112,30 @@ public class ExcelUtil {
                 Row row = sheet.getRow(i);
                 if (row != null) {
                     Operation operation = new Operation();
-
-                    operation.setOp(getCellStringValue(row.getCell(0)));
-                    // Parse OV/CHEQ cell: can be "OV 12345", "OV", or numeric
-                    String ovRaw = getCellStringValue(row.getCell(1));
-                    if (ovRaw != null && !ovRaw.isBlank()) {
-                        String t = ovRaw.trim();
-                        String[] parts = t.split("\\s+", 2);
-                        if (parts.length == 2) {
-                            operation.setOvCheqType(parts[0]);
-                            try { operation.setOvCheq(Integer.parseInt(parts[1])); } catch (NumberFormatException ex) { operation.setOvCheq(null); }
-                        } else {
-                            // single token: could be numeric or type
-                            try { operation.setOvCheq(Integer.parseInt(parts[0])); operation.setOvCheqType(null); }
-                            catch (NumberFormatException ex) { operation.setOvCheqType(parts[0]); operation.setOvCheq(null); }
-                        }
-                    }
-                    operation.setImp(getCellStringValue(row.getCell(2)));
-                    operation.setNature(getCellStringValue(row.getCell(3)));
+                    // Read according to requested export order
+                    operation.setImp(getCellStringValue(row.getCell(0)));
+                    operation.setDesignation(getCellStringValue(row.getCell(1)));
+                    operation.setNature(getCellStringValue(row.getCell(2)));
+                    operation.setN(getCellStringValue(row.getCell(3)));
                     operation.setBudg(getCellStringValue(row.getCell(4)));
-                    operation.setMontant(getCellNumericValue(row.getCell(5)));
-
-                    // Dates
-                    operation.setDateEntree(parseDate(getCellStringValue(row.getCell(6))));
-                    operation.setDateVisa(parseDate(getCellStringValue(row.getCell(7))));
-                    operation.setDateRejet(parseDate(getCellStringValue(row.getCell(8))));
-
-                    operation.setDecision(getCellStringValue(row.getCell(9)));
-                    operation.setMotifRejet(getCellStringValue(row.getCell(10)));
-
-                    operation.setDateReponse(parseDate(getCellStringValue(row.getCell(11))));
-                    operation.setContenuReponse(getCellStringValue(row.getCell(12)));
-                    operation.setMois(getCellStringValue(row.getCell(13)));
+                    operation.setExercice(getCellStringValue(row.getCell(5)));
+                    operation.setBeneficiaire(getCellStringValue(row.getCell(6)));
+                    operation.setDateEmission(parseDate(getCellStringValue(row.getCell(7))));
+                    operation.setDateVisa(parseDate(getCellStringValue(row.getCell(8))));
+                    // OP/OR
+                    String opOrStr = getCellStringValue(row.getCell(9));
+                    try { operation.setOpOr(opOrStr == null || opOrStr.isBlank() ? null : Integer.parseInt(opOrStr)); } catch (NumberFormatException ex) { operation.setOpOr(null); }
+                    // OV/CHEQ type and value
+                    operation.setOvCheqType(getCellStringValue(row.getCell(10)));
+                    String ovVal = getCellStringValue(row.getCell(11));
+                    try { operation.setOvCheq(ovVal == null || ovVal.isBlank() ? null : Integer.parseInt(ovVal)); } catch (NumberFormatException ex) { operation.setOvCheq(null); }
+                    // Numeric columns: recette (12), sur_ram (13), sur_eng (14), depense (15), solde (16)
+                    operation.setRecette(getCellNumericValue(row.getCell(12)));
+                    operation.setSurRam(getCellNumericValue(row.getCell(13)));
+                    operation.setSurEng(getCellNumericValue(row.getCell(14)));
+                    operation.setDepense(getCellNumericValue(row.getCell(15)));
+                    double sol = getCellNumericValue(row.getCell(16));
+                    operation.setSolde(sol);
                     if ((operation.getMois() == null || operation.getMois().isBlank()) && operation.getDateEntree() != null) {
                         operation.setMois(toFrenchMonth(operation.getDateEntree()));
                     }

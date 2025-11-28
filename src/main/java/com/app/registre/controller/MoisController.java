@@ -66,6 +66,26 @@ public class MoisController {
         setupColumns();
         moisOperationsTable.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
         setupColumnsMenu();
+        // Highlight rows that contain a `recette` value in yellow
+        moisOperationsTable.setRowFactory(tv -> {
+            javafx.scene.control.TableRow<Operation> row = new javafx.scene.control.TableRow<>() {
+                @Override
+                protected void updateItem(Operation item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setStyle("");
+                    } else {
+                        Double recette = item.getRecette();
+                        if (recette != null && Math.abs(recette) > 0.000001) {
+                            setStyle("-fx-background-color: #fff59d;");
+                        } else {
+                            setStyle("");
+                        }
+                    }
+                }
+            };
+            return row;
+        });
         // Default to current month
         if (moisComboBox.getValue() == null && !moisComboBox.getItems().isEmpty()) {
             try { moisComboBox.setValue(getCurrentMonth()); } catch (Exception ignored) { moisComboBox.setValue(moisComboBox.getItems().get(0)); }
@@ -276,10 +296,33 @@ public class MoisController {
 
         File file = fileChooser.showSaveDialog(moisOperationsTable.getScene().getWindow());
         if (file != null) {
-            try {
-                ExcelUtil.exportOperationsToExcel(operations, file.getAbsolutePath());
-                showInfo("Export réussi !");
-            } catch (IOException e) {
+                try {
+                    // compute previous month's last solde using same logic as updateMoisStatistics
+                    Double prev = 0.0;
+                    try {
+                        int monthNum = monthNumberFromName(mois);
+                        int year = anneeComboBox != null && anneeComboBox.getValue() != null ? Integer.parseInt(anneeComboBox.getValue()) : LocalDate.now().getYear();
+                        int prevMonth = monthNum - 1;
+                        if (prevMonth >= 1) {
+                            prev = operationDAO.getLastMontantForMonthYear(year, prevMonth);
+                            if (prev == null) {
+                                if (operationDAO.hasOperationsForMonthYear(year, prevMonth)) {
+                                    operationDAO.recomputeAllSoldes();
+                                    prev = operationDAO.getLastMontantForMonthYear(year, prevMonth);
+                                    if (prev == null) prev = 0.0;
+                                } else {
+                                    prev = 0.0;
+                                }
+                            }
+                        } else {
+                            prev = 0.0;
+                        }
+                    } catch (Exception ex) {
+                        prev = 0.0;
+                    }
+                    ExcelUtil.exportOperationsToExcel(operations, file.getAbsolutePath(), prev);
+                    showInfo("Export réussi !");
+                } catch (IOException e) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 DialogUtils.initOwner(alert, moisOperationsTable);
                 alert.setHeaderText(null);

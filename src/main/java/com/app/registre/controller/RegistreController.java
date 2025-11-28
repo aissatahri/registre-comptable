@@ -135,6 +135,34 @@ public class RegistreController {
             setupFilters();
             setupColumnsMenu();
             setupActionButtons();
+            // Enable double-click on a row to edit the operation
+            // and highlight rows that contain a `recette` value in yellow
+            operationsTable.setRowFactory(tv -> {
+                TableRow<Operation> row = new TableRow<>() {
+                    @Override
+                    protected void updateItem(Operation item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty || item == null) {
+                            setStyle("");
+                        } else {
+                            Double recette = item.getRecette();
+                            if (recette != null && Math.abs(recette) > 0.000001) {
+                                // light yellow background
+                                setStyle("-fx-background-color: #fff59d;");
+                            } else {
+                                setStyle("");
+                            }
+                        }
+                    }
+                };
+                row.setOnMouseClicked(event -> {
+                    if (event.getClickCount() == 2 && !row.isEmpty()) {
+                        Operation rowData = row.getItem();
+                        editOperation(rowData);
+                    }
+                });
+                return row;
+            });
             updateStatistics();
         } catch (Exception e) {
             showError("Erreur d'initialisation du registre: " + e.getMessage());
@@ -506,8 +534,10 @@ public class RegistreController {
         if (file != null) {
             try {
                 List<Operation> operationsToExport = operationsTable.getItems();
-                ExcelUtil.exportOperationsToExcel(operationsToExport, file.getAbsolutePath());
+                ExcelUtil.exportOperationsToExcel(operationsToExport, file.getAbsolutePath(), null);
                 showInfo("Export réussi !");
+                // Attempt to open the exported file with the system default application
+                openFileIfPossible(file);
             } catch (IOException e) {
                 showError("Erreur lors de l'export: " + e.getMessage());
             }
@@ -547,6 +577,8 @@ public class RegistreController {
                     loadOperations();
                     autoResizeColumns();
                     notifyMenuStats();
+                    // After a successful import, try to open the source file for convenience
+                    openFileIfPossible(file);
                 }
             } catch (IOException e) {
                 String msg = e.getMessage() != null ? e.getMessage() : "";
@@ -556,6 +588,39 @@ public class RegistreController {
                     showError("Erreur lors de l'import: " + msg);
                 }
             }
+        }
+    }
+
+    /**
+     * Try to open the given file with the system default application.
+     * Uses java.awt.Desktop when available, otherwise falls back to platform-specific commands.
+     */
+    private void openFileIfPossible(File file) {
+        if (file == null) return;
+        try {
+            if (java.awt.Desktop.isDesktopSupported()) {
+                java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
+                if (desktop.isSupported(java.awt.Desktop.Action.OPEN)) {
+                    desktop.open(file);
+                    return;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Desktop open failed: " + e.getMessage());
+        }
+
+        // Fallback to platform specific commands
+        try {
+            String os = System.getProperty("os.name").toLowerCase();
+            if (os.contains("win")) {
+                new ProcessBuilder("cmd", "/c", "start", "\"\"", file.getAbsolutePath()).start();
+            } else if (os.contains("mac")) {
+                new ProcessBuilder("open", file.getAbsolutePath()).start();
+            } else {
+                new ProcessBuilder("xdg-open", file.getAbsolutePath()).start();
+            }
+        } catch (Exception e) {
+            System.err.println("Fallback open failed: " + e.getMessage());
         }
     }
 

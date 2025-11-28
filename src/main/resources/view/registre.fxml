@@ -85,7 +85,7 @@
                 <Text fx:id="totalOperationsText" style="-fx-font-size: 16; -fx-fill: #2c3e50;" text="0" />
             </VBox>
             <VBox>
-                <Text style="-fx-font-weight: bold;" text="Solde total:" />
+                <Text style="-fx-font-weight: bold;" text="Solde:" />
                 <Text fx:id="totalMontantText" style="-fx-font-size: 16; -fx-fill: #27ae60;" text="0.00" />
             </VBox>
             <VBox />
