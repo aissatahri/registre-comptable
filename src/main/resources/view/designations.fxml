@@ -14,42 +14,42 @@
             <HBox spacing="10" alignment="CENTER_LEFT">
                 <Text styleClass="title" text="Designations" />
                 <Region HBox.hgrow="ALWAYS"/>
-                <Button text="Importer" fx:id="importBtn" styleClass="btn-success btn-icon">
+                <Button text="Importer" fx:id="importBtn" styleClass="btn-success btn-icon" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-background-radius: 5; -fx-padding: 6 10; -fx-border-color: transparent;">
                     <graphic>
                         <ImageView fitWidth="14" fitHeight="14">
                             <Image url="@../images/downward_alt_16dp.png" />
                         </ImageView>
                     </graphic>
                 </Button>
-                <Button text="Exporter" fx:id="exportBtn" styleClass="btn-success btn-icon">
+                <Button text="Exporter" fx:id="exportBtn" styleClass="btn-success btn-icon" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-background-radius: 5; -fx-padding: 6 10; -fx-border-color: transparent;">
                     <graphic>
                         <ImageView fitWidth="14" fitHeight="14">
                             <Image url="@../images/export_16dp.png" />
                         </ImageView>
                     </graphic>
                 </Button>
-                <Button text="Ajouter" fx:id="addBtn" styleClass="btn-primary btn-icon">
+                <Button text="Ajouter" fx:id="addBtn" styleClass="btn-primary btn-icon" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 5; -fx-padding: 6 10; -fx-border-color: transparent;">
                     <graphic>
                         <ImageView fitWidth="14" fitHeight="14">
                             <Image url="@../images/add_16dp.png" />
                         </ImageView>
                     </graphic>
                 </Button>
-                <Button text="Modifier" fx:id="editBtn" styleClass="btn-warning btn-icon">
+                <Button text="Modifier" fx:id="editBtn" styleClass="btn-warning btn-icon" style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-background-radius: 5; -fx-padding: 6 10; -fx-border-color: transparent;">
                     <graphic>
                         <ImageView fitWidth="14" fitHeight="14">
                             <Image url="@../images/edit_16dp.png" />
                         </ImageView>
                     </graphic>
                 </Button>
-                <Button text="Supprimer" fx:id="deleteBtn" styleClass="btn-danger btn-icon">
+                <Button text="Supprimer" fx:id="deleteBtn" styleClass="btn-danger btn-icon" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 5; -fx-padding: 6 10; -fx-border-color: transparent;">
                     <graphic>
                         <ImageView fitWidth="14" fitHeight="14">
                             <Image url="@../images/delete_16dp.png" />
                         </ImageView>
                     </graphic>
                 </Button>
-                <Button text="Enregistrer" fx:id="saveBtn" styleClass="btn-primary btn-icon">
+                <Button text="Enregistrer" fx:id="saveBtn" styleClass="btn-primary btn-icon" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 5; -fx-padding: 6 10; -fx-border-color: transparent;">
                     <graphic>
                         <ImageView fitWidth="14" fitHeight="14">
                             <Image url="@../images/save_16dp.png" />
