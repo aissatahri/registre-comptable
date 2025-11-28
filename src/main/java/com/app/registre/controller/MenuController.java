@@ -186,9 +186,30 @@ public class MenuController {
 
     @FXML
     private void showDesignations() {
-        loadView("/view/designations.fxml");
-        refreshMenuStats();
-        setActive(btnDesignations);
+        try {
+            FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(getClass().getResource("/view/designations.fxml")));
+            Parent view = loader.load();
+
+            javafx.stage.Stage dialog = new javafx.stage.Stage();
+            dialog.initOwner(rootPane.getScene() != null ? rootPane.getScene().getWindow() : null);
+            dialog.initModality(javafx.stage.Modality.WINDOW_MODAL);
+            dialog.setTitle("Designations");
+
+            javafx.scene.Scene scene = new javafx.scene.Scene(view);
+            // copy application's stylesheets if available
+            if (rootPane.getScene() != null && rootPane.getScene().getStylesheets() != null) {
+                scene.getStylesheets().addAll(rootPane.getScene().getStylesheets());
+            }
+
+            dialog.setScene(scene);
+            dialog.showAndWait();
+
+            refreshMenuStats();
+            setActive(btnDesignations);
+        } catch (Exception e) {
+            e.printStackTrace();
+            showError("Erreur lors de l'ouverture de la fenêtre Designations", e);
+        }
     }
 
     private void loadView(String fxmlFile) {
