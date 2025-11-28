@@ -56,41 +56,37 @@ public class Database {
     }
 
     private void createTables() {
+        // Create operations table with the cleaned schema (only the requested columns)
         String createOperationsTable = """
             CREATE TABLE IF NOT EXISTS operations (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                ov_cheq TEXT,
                 imp TEXT,
+                designation TEXT,
                 nature TEXT,
+                n TEXT,
                 budg TEXT,
-                montant REAL,
-                date_entree DATE,
+                exercice TEXT,
+                beneficiaire TEXT,
+                date_emission DATE,
                 date_visa DATE,
-                date_rejet DATE,
-                decision TEXT,
-                motif_rejet TEXT,
-                date_reponse DATE,
-                contenu_reponse TEXT,
-                mois TEXT
-            )
-            """;
-
-        String createPaiementsTable = """
-            CREATE TABLE IF NOT EXISTS paiements (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                annee TEXT,
-                type TEXT,
-                montant REAL,
-                categorie TEXT
+                op_or INTEGER,
+                ov_cheq_type TEXT,
+                ov_cheq INTEGER,
+                recette REAL,
+                sur_ram REAL,
+                sur_eng REAL,
+                depense REAL,
+                solde REAL
             )
             """;
 
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(createOperationsTable);
-            stmt.execute(createPaiementsTable);
-            ensureOperationNewColumns();
+            // Run migrations to normalize older schemas into the cleaned form
             migrateRemoveOpColumn();
             migrateToFormSchema();
+            // Ensure any missing columns are added (safe no-op if schema already matches)
+            ensureOperationNewColumns();
             // Backfill depense for existing rows where depense is NULL
             backfillDepenseIfNull();
         } catch (SQLException e) {
