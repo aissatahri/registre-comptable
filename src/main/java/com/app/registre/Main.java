@@ -17,8 +17,38 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         try {
-            log.info("Chargement du FXML...");
+            // Before loading the main UI, ensure there is at least one user and show login dialog
+            log.info("Initialisation des utilisateurs et affichage de la fenêtre de connexion...");
+            com.app.registre.dao.UserDAO userDAO = new com.app.registre.dao.UserDAO();
+            if (userDAO.getUserCount() == 0) {
+                // create default admin/admin - user should change this later
+                userDAO.createUser("admin", "admin");
+                log.info("Compte administrateur par défaut créé: admin / admin (changez le mot de passe)");
+            }
 
+            // Load login dialog
+            FXMLLoader loginLoader = new FXMLLoader(getClass().getResource("/view/login.fxml"));
+            Parent loginRoot = loginLoader.load();
+            Scene loginScene = new Scene(loginRoot);
+            Stage loginStage = new Stage();
+            loginStage.initOwner(primaryStage);
+            loginStage.initModality(javafx.stage.Modality.WINDOW_MODAL);
+            loginStage.setResizable(false);
+            loginStage.setTitle("Connexion");
+            loginStage.setScene(loginScene);
+            // Apply stylesheet so login looks consistent
+            String cssLogin = Objects.requireNonNull(getClass().getResource("/style.css")).toExternalForm();
+            loginScene.getStylesheets().add(cssLogin);
+            // Show and wait for authentication
+            loginStage.showAndWait();
+            com.app.registre.controller.LoginController loginController = loginLoader.getController();
+            if (loginController == null || !loginController.isAuthenticated()) {
+                log.info("Utilisateur non authentifié: arrêt de l'application");
+                javafx.application.Platform.exit();
+                return;
+            }
+
+            log.info("Chargement du FXML principal...");
             // Méthode plus explicite pour charger le FXML
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/menu.fxml"));
             Parent root = loader.load();

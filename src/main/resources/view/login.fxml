@@ -2,11 +2,11 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.app.registre.controller.LoginController" spacing="10" alignment="CENTER" stylesheets="/style.css">
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.app.registre.controller.LoginController" spacing="10" alignment="CENTER" stylesheets="/style.css" styleClass="card" prefWidth="420">
     <padding>
-        <Insets top="20" right="20" bottom="20" left="20" />
+        <Insets top="16" right="20" bottom="16" left="20" />
     </padding>
-    <Label text="Connexion" style="-fx-font-size:18px; -fx-font-weight:bold;" />
+    <Text styleClass="title" text="Connexion" />
     <GridPane hgap="10" vgap="10">
         <Label text="Nom d'utilisateur:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
         <TextField fx:id="usernameField" text="admin" promptText="admin" GridPane.rowIndex="0" GridPane.columnIndex="1" onAction="#handleLogin" />
@@ -16,7 +16,7 @@
     </GridPane>
     <Label fx:id="errorLabel" textFill="red" />
     <HBox spacing="10">
-        <Button fx:id="btnLogin" text="Se connecter" onAction="#handleLogin" defaultButton="true" />
-        <Button fx:id="btnCancel" text="Annuler" onAction="#handleCancel" />
+        <Button fx:id="btnLogin" text="Se connecter" onAction="#handleLogin" defaultButton="true" styleClass="btn-primary" />
+        <Button fx:id="btnCancel" text="Annuler" onAction="#handleCancel" styleClass="btn-warning" />
     </HBox>
 </VBox>
