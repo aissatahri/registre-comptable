@@ -16,42 +16,42 @@
                 <Button text="Importer" fx:id="importBtn">
                     <graphic>
                         <ImageView fitWidth="14" fitHeight="14">
-                            <Image url="@../images/icon.png" />
+                            <Image url="@../images/import.png" />
                         </ImageView>
                     </graphic>
                 </Button>
                 <Button text="Exporter" fx:id="exportBtn">
                     <graphic>
                         <ImageView fitWidth="14" fitHeight="14">
-                            <Image url="@../images/icon.png" />
+                            <Image url="@../images/export.png" />
                         </ImageView>
                     </graphic>
                 </Button>
                 <Button text="Ajouter" fx:id="addBtn">
                     <graphic>
                         <ImageView fitWidth="14" fitHeight="14">
-                            <Image url="@../images/icon.png" />
+                            <Image url="@../images/add.png" />
                         </ImageView>
                     </graphic>
                 </Button>
                 <Button text="Modifier" fx:id="editBtn">
                     <graphic>
                         <ImageView fitWidth="14" fitHeight="14">
-                            <Image url="@../images/icon.png" />
+                            <Image url="@../images/edit.png" />
                         </ImageView>
                     </graphic>
                 </Button>
                 <Button text="Supprimer" fx:id="deleteBtn">
                     <graphic>
                         <ImageView fitWidth="14" fitHeight="14">
-                            <Image url="@../images/icon.png" />
+                            <Image url="@../images/delete.png" />
                         </ImageView>
                     </graphic>
                 </Button>
                 <Button text="Enregistrer" fx:id="saveBtn">
                     <graphic>
                         <ImageView fitWidth="14" fitHeight="14">
-                            <Image url="@../images/icon.png" />
+                            <Image url="@../images/save.png" />
                         </ImageView>
                     </graphic>
                 </Button>

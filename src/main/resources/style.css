@@ -15,11 +15,9 @@
     -fx-text-fill: white;
     -fx-border-color: transparent;
     -fx-border-radius: 5;
-    -fx-padding: 12 18;
+    -fx-padding: 10 15;
     -fx-alignment: CENTER_LEFT;
-    -fx-font-weight: 700;
-    -fx-font-size: 14px;
-    -fx-pref-width: 220;
+    -fx-font-weight: bold;
 }
 
 .menu-button:hover {
@@ -28,12 +26,11 @@
 }
 
 .menu-button.active {
-    -fx-background-color: rgba(255,255,255,0.06);
-    -fx-text-fill: #ecf0f1;
-    -fx-border-color: transparent;
-    -fx-border-width: 0 0 0 4;
-    -fx-border-insets: 0 6 0 0;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 6, 0, 0, 2);
+    -fx-background-color: rgba(255,255,255,0.15);
+    -fx-text-fill: #3498db;
+    -fx-border-color: #3498db;
+    -fx-border-width: 0 0 0 3;
+    -fx-border-insets: 0;
 }
 
 .menu-button:pressed {
@@ -42,12 +39,10 @@
 
 /* Boîtes de statistiques */
 .stat-box {
-    -fx-background-color: rgba(255,255,255,0.04);
-    -fx-background-radius: 8;
-    -fx-padding: 10 12;
+    -fx-background-color: rgba(255,255,255,0.1);
+    -fx-background-radius: 5;
+    -fx-padding: 10;
     -fx-alignment: CENTER;
-    -fx-min-width: 88px;
-    -fx-min-height: 48px;
 }
 
 /* Tableaux */
@@ -156,73 +151,6 @@
     -fx-padding: 4;
 }
 
-/* Sidebar specific styles (target sidebar by id) */
-#sidebar {
-    -fx-background-color: #2c3e50;
-}
-
-/* TitledPane (Réglages) styling to look like a folded button */
-
-/* Style specifically for the Réglages TitledPane (id = reglagesPane) */
-#reglagesPane > .title {
-    -fx-background-color: linear-gradient(#f3f5f7, #e6eaed);
-    -fx-padding: 10 14;
-    -fx-background-radius: 8;
-    -fx-border-radius: 8;
-    -fx-font-weight: 800;
-    -fx-font-size: 16px;
-    -fx-text-fill: #7f8c8d;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.06), 6, 0, 0, 2);
-}
-
-/* Arrow / caret styling inside the reglages pane header */
-#reglagesPane > .title .arrow-button {
-    -fx-background-color: transparent;
-}
-#reglagesPane > .title .arrow {
-    -fx-shape: "M 0 0 L 10 6 L 0 12 Z"; /* triangle */
-    -fx-background-color: #2c9dd6;
-    -fx-padding: 6;
-    -fx-background-radius: 6;
-    -fx-translate-x: -6;
-}
-
-#reglagesPane > .content {
-    -fx-padding: 8 0 0 0;
-}
-
-/* Submenu button styling (inside reglages) */
-.submenu-button {
-    -fx-font-size: 14px;
-    -fx-padding: 10 14 10 28; /* indent a bit to the right */
-    -fx-text-fill: #ecf0f1;
-    -fx-background-color: transparent;
-}
-.submenu-button:hover {
-    -fx-background-color: rgba(255,255,255,0.04);
-    -fx-text-fill: #ffffff;
-}
-
-/* When the titled pane is expanded, give the header a subtle accent */
-#reglagesPane:expanded > .title {
-    -fx-background-color: linear-gradient(#eef7fb, #dff0f6);
-    -fx-text-fill: #2c9dd6;
-}
-
-/* Stat numbers inside stat-box */
-.stat-box .text {
-    -fx-fill: white;
-}
-.stat-box .label {
-    -fx-fill: #bdc3c7;
-    -fx-font-size: 11px;
-}
-
-/* Improve contrast of stat numbers */
-.stat-box > .text[style] {
-    -fx-font-weight: 700;
-}
-
 /* Champs de formulaire */
 .text-field, .comboBox {
     -fx-background-color: white;
@@ -319,4 +247,9 @@
     -fx-font-size: 11px;
     -fx-text-fill: #7f8c8d;
     -fx-padding: 6 0 0 0;
+}
+
+/* Button graphic spacing: give a small gap between icon and text */
+.button .graphic {
+    -fx-padding: 0 8 0 0;
 }
