@@ -10,7 +10,7 @@
             fx:controller="com.app.registre.controller.MoisController">
 
     <top>
-        <VBox spacing="15" style="-fx-background-color: white; -fx-padding: 20;">
+        <VBox spacing="15" styleClass="page-header">
             <HBox spacing="20" alignment="CENTER_LEFT">
                 <VBox>
                     <Text styleClass="title" text="Vue par Mois"/>
