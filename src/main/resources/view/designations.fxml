@@ -13,42 +13,42 @@
             <HBox spacing="10" alignment="CENTER_LEFT">
                 <Label text="Designations" style="-fx-font-size: 16; -fx-font-weight: bold;"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Button text="Importer" fx:id="importBtn">
+                <Button text="Importer" fx:id="importBtn" styleClass="btn-success btn-icon">
                     <graphic>
                         <ImageView fitWidth="14" fitHeight="14">
                             <Image url="@../images/downward_alt_16dp.png" />
                         </ImageView>
                     </graphic>
                 </Button>
-                <Button text="Exporter" fx:id="exportBtn">
+                <Button text="Exporter" fx:id="exportBtn" styleClass="btn-success btn-icon">
                     <graphic>
                         <ImageView fitWidth="14" fitHeight="14">
                             <Image url="@../images/export_16dp.png" />
                         </ImageView>
                     </graphic>
                 </Button>
-                <Button text="Ajouter" fx:id="addBtn">
+                <Button text="Ajouter" fx:id="addBtn" styleClass="btn-primary btn-icon">
                     <graphic>
                         <ImageView fitWidth="14" fitHeight="14">
                             <Image url="@../images/add_16dp.png" />
                         </ImageView>
                     </graphic>
                 </Button>
-                <Button text="Modifier" fx:id="editBtn">
+                <Button text="Modifier" fx:id="editBtn" styleClass="btn-warning btn-icon">
                     <graphic>
                         <ImageView fitWidth="14" fitHeight="14">
                             <Image url="@../images/edit_16dp.png" />
                         </ImageView>
                     </graphic>
                 </Button>
-                <Button text="Supprimer" fx:id="deleteBtn">
+                <Button text="Supprimer" fx:id="deleteBtn" styleClass="btn-danger btn-icon">
                     <graphic>
                         <ImageView fitWidth="14" fitHeight="14">
                             <Image url="@../images/delete_16dp.png" />
                         </ImageView>
                     </graphic>
                 </Button>
-                <Button text="Enregistrer" fx:id="saveBtn">
+                <Button text="Enregistrer" fx:id="saveBtn" styleClass="btn-primary btn-icon">
                     <graphic>
                         <ImageView fitWidth="14" fitHeight="14">
                             <Image url="@../images/save_16dp.png" />
