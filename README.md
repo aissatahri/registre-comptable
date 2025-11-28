@@ -72,6 +72,21 @@ java -Ddb.url="jdbc:sqlite:C:/chemin/mon_registre.db" -jar target/registre-compt
 - Les fichiers FXML sont compatibles avec les dépendances JavaFX configurées dans le `pom.xml`.
 - Lors de l’import Excel, fermez le classeur dans Excel avant d’importer pour éviter les erreurs d’accès.
 
+## Suppression de la fonctionnalité "Paiements"
+
+- La fonctionnalité "Paiements" (modèle, DAO, contrôleurs et vues) a été retirée du code base et les fichiers correspondants supprimés.
+- Si vous avez une base existante contenant la table `paiements`, un script de migration est fourni :
+
+  - `database-migrations/V2__drop_paiements_table.sql` — script SQL pour supprimer la table `paiements` si elle existe.
+
+- Pour appliquer la migration manuellement (SQLite) :
+
+```pwsh
+sqlite3 registre.db < database-migrations/V2__drop_paiements_table.sql
+```
+
+- Si vous préférez laisser la table en place (pour archivage), ne lancez pas le script.
+
 ## Licence
 Ce projet est destiné à un usage interne. Adaptez la licence selon vos besoins.
 
