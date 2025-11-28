@@ -9,9 +9,9 @@
 <BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.app.registre.controller.DesignationsController">
     <center>
-        <VBox spacing="10" style="-fx-padding: 16;">
+        <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20;" >
             <HBox spacing="10" alignment="CENTER_LEFT">
-                <Label text="Designations" style="-fx-font-size: 16; -fx-font-weight: bold;"/>
+                <Text styleClass="title" text="Designations" />
                 <Region HBox.hgrow="ALWAYS"/>
                 <Button text="Importer" fx:id="importBtn" styleClass="btn-success btn-icon">
                     <graphic>
@@ -56,7 +56,7 @@
                     </graphic>
                 </Button>
             </HBox>
-            <TableView fx:id="table" prefHeight="480" editable="true">
+            <TableView fx:id="table" prefHeight="480" editable="true" styleClass="table-view">
                 <columns>
                     <TableColumn fx:id="colImp" text="IMP" prefWidth="120" />
                     <TableColumn fx:id="colDesignation" text="Designation" prefWidth="600" />
