@@ -9,7 +9,6 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.text.Text?>
 
 <BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.app.registre.controller.MenuController" fx:id="rootPane">
@@ -41,18 +40,15 @@
                 <Button fx:id="btnRegistre" onAction="#showRegistre" styleClass="menu-button" text="Registre des OP" maxWidth="Infinity" />
                 <Button fx:id="btnRecap" onAction="#showRecap" styleClass="menu-button" text="Récapitulatif" maxWidth="Infinity" />
                 <Button fx:id="btnMois" onAction="#showMois" styleClass="menu-button" text="Par Mois" maxWidth="Infinity" />
+                <TitledPane text="Réglages" expanded="true">
+                    <content>
+                        <VBox spacing="4" style="-fx-padding: 6 0 6 0;">
+                            <Button fx:id="btnDesignations" onAction="#showDesignations" styleClass="menu-button" text="Designations" maxWidth="Infinity" />
+                        </VBox>
+                    </content>
+                </TitledPane>
                 <Button fx:id="btnInitialSolde" onAction="#showEditInitialSolde" styleClass="menu-button" text="Solde initial" maxWidth="Infinity" />
             </VBox>
-
-            <!-- Réglages group (collapsible) -->
-            <Separator opacity="0.0" />
-            <TitledPane fx:id="reglagesPane" text="Réglages" expanded="true" collapsible="false" style="-fx-text-fill: #bdc3c7; -fx-padding: 6 0 0 0;">
-                <content>
-                    <VBox spacing="4">
-                        <Button fx:id="btnDesignations" onAction="#showDesignations" styleClass="menu-button submenu-button" text="Designations" maxWidth="Infinity" />
-                    </VBox>
-                </content>
-            </TitledPane>
 
             <Separator opacity="0.3" />
 
