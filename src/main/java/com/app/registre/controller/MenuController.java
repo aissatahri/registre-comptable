@@ -31,6 +31,7 @@ public class MenuController {
     @FXML private Button btnRegistre;
     @FXML private Button btnRecap;
     @FXML private Button btnMois;
+    @FXML private Button btnDesignations;
     @FXML private Button btnInitialSolde;
     private boolean sidebarVisible = true;
     private final RecapDAO recapDAO = new RecapDAO();
@@ -181,6 +182,13 @@ public class MenuController {
         loadView("/view/mois.fxml");
         refreshMenuStats();
         setActive(btnMois);
+    }
+
+    @FXML
+    private void showDesignations() {
+        loadView("/view/designations.fxml");
+        refreshMenuStats();
+        setActive(btnDesignations);
     }
 
     private void loadView(String fxmlFile) {

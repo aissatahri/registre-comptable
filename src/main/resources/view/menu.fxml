@@ -40,6 +40,7 @@
                 <Button fx:id="btnRegistre" onAction="#showRegistre" styleClass="menu-button" text="Registre des OP" maxWidth="Infinity" />
                 <Button fx:id="btnRecap" onAction="#showRecap" styleClass="menu-button" text="Récapitulatif" maxWidth="Infinity" />
                 <Button fx:id="btnMois" onAction="#showMois" styleClass="menu-button" text="Par Mois" maxWidth="Infinity" />
+                <Button fx:id="btnDesignations" onAction="#showDesignations" styleClass="menu-button" text="Designations" maxWidth="Infinity" />
                     <Button fx:id="btnInitialSolde" onAction="#showEditInitialSolde" styleClass="menu-button" text="Solde initial" maxWidth="Infinity" />
             </VBox>
 

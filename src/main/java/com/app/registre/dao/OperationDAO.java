@@ -328,6 +328,28 @@ public class OperationDAO {
         return false;
     }
 
+    /**
+     * Retourne le nombre d'opérations pour un mois/année donnés.
+     */
+    public int getCountForMonthYear(int year, int month) {
+        String dateExpr = "CASE WHEN typeof(COALESCE(date_emission,date_visa)) = 'integer' "
+            + "THEN datetime(COALESCE(date_emission,date_visa)/1000, 'unixepoch', 'localtime') "
+            + "ELSE COALESCE(date_emission,date_visa) END";
+        String sql = "SELECT COUNT(*) as c FROM operations WHERE strftime('%Y', " + dateExpr + ") = ? "
+            + "AND strftime('%m', " + dateExpr + ") = printf('%02d', ?)";
+        try (Connection conn = Database.getInstance().getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, String.valueOf(year));
+            pstmt.setInt(2, month);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) return rs.getInt("c");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
     public int getCountByDecision(String decision) {
         String sql = "SELECT COUNT(*) as count FROM operations WHERE decision = ?";
 
@@ -356,6 +378,35 @@ public class OperationDAO {
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             if (rs.next()) return mapResultSetToOperation(rs);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Recherche un enregistrement d'initialisation de solde pour un mois/année donnés.
+     * On considère ici les opérations dont la désignation commence par 'solde initial' (insensible à la casse).
+     * Retourne la valeur de solde si trouvée, sinon null.
+     */
+    public Double getInitialSoldeForMonthYear(int year, int month) {
+        String dateExpr = "CASE WHEN typeof(COALESCE(date_emission,date_visa)) = 'integer' "
+            + "THEN datetime(COALESCE(date_emission,date_visa)/1000, 'unixepoch', 'localtime') "
+            + "ELSE COALESCE(date_emission,date_visa) END";
+        String sql = "SELECT solde FROM operations WHERE LOWER(TRIM(designation)) LIKE 'solde initial%' "
+            + "AND strftime('%Y', " + dateExpr + ") = ? "
+            + "AND strftime('%m', " + dateExpr + ") = printf('%02d', ?) "
+            + "ORDER BY " + dateExpr + " DESC LIMIT 1";
+        try (Connection conn = Database.getInstance().getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, String.valueOf(year));
+            pstmt.setInt(2, month);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    double v = rs.getDouble("solde");
+                    return rs.wasNull() ? null : v;
+                }
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }

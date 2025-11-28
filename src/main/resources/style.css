@@ -192,3 +192,59 @@
 .scroll-pane .viewport {
     -fx-background-color: transparent;
 }
+
+/* Month card styles for recap view */
+.month-card {
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-padding: 10;
+    -fx-alignment: center;
+    -fx-border-color: transparent;
+    -fx-border-width: 2;
+}
+.month-card .month-label {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #34495e;
+}
+.month-card .month-circle {
+    -fx-background-color: linear-gradient(#ffffff, #f7fbff);
+    -fx-border-radius: 999;
+}
+.month-card .month-count {
+    -fx-font-size: 11px;
+    -fx-text-fill: #7f8c8d;
+}
+
+/* Highlight when an explicit initial solde exists */
+.month-card.initial {
+    -fx-border-color: #f39c12; /* orange border */
+    -fx-border-radius: 8;
+    -fx-effect: dropshadow(three-pass-box, rgba(243,156,18,0.12), 8, 0, 0, 2);
+}
+
+/* small badge icon for initial solde (circle pseudo-element not directly supported in CSS),
+   we'll add a small Label with style class 'initial-badge' */
+.initial-badge {
+    -fx-background-color: #f39c12;
+    -fx-text-fill: white;
+    -fx-font-size: 10px;
+    -fx-padding: 4 6;
+    -fx-background-radius: 6;
+}
+
+/* Interactive affordance: pointer cursor and hover effect for month cards */
+.month-card {
+    -fx-cursor: hand;
+    -fx-transition: all 120ms ease-in-out;
+}
+.month-card:hover {
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.12), 12, 0, 0, 4);
+    -fx-border-color: rgba(0,0,0,0.06);
+}
+
+.month-count {
+    -fx-font-size: 11px;
+    -fx-text-fill: #7f8c8d;
+    -fx-padding: 6 0 0 0;
+}

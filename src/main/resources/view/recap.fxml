@@ -57,9 +57,15 @@
                 </HBox>
 
                 <HBox spacing="20">
-                    <VBox styleClass="card" spacing="15" prefWidth="400">
-                        <Text text="Répartition par Mois" style="-fx-font-weight: bold;"/>
-                        <PieChart fx:id="moisPieChart" prefHeight="300"/>
+                    <VBox styleClass="card" spacing="15" HBox.hgrow="ALWAYS">
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <Text text="Graphique annuel" style="-fx-font-weight: bold;"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <ComboBox fx:id="yearComboBox" prefWidth="120" />
+                        </HBox>
+                        <ScrollPane fitToWidth="true" prefHeight="360">
+                            <TilePane fx:id="monthCirclesPane" hgap="20" vgap="20" prefColumns="4" style="-fx-padding: 20; -fx-pref-width: 100%;" />
+                        </ScrollPane>
                     </VBox>
                 </HBox>
             </VBox>

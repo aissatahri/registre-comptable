@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.app.registre.controller.DesignationsController">
+    <center>
+        <VBox spacing="10" style="-fx-padding: 16;">
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Designations" style="-fx-font-size: 16; -fx-font-weight: bold;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="Ajouter" fx:id="addBtn"/>
+                <Button text="Modifier" fx:id="editBtn"/>
+                <Button text="Supprimer" fx:id="deleteBtn"/>
+                <Button text="Enregistrer" fx:id="saveBtn"/>
+            </HBox>
+            <TableView fx:id="table" prefHeight="480">
+                <columns>
+                    <TableColumn fx:id="colImp" text="IMP" prefWidth="120" />
+                    <TableColumn fx:id="colDesignation" text="Designation" prefWidth="600" />
+                </columns>
+            </TableView>
+        </VBox>
+    </center>
+</BorderPane>

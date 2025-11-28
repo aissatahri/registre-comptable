@@ -11,8 +11,9 @@ public class RecapDAO {
 
     public Map<String, Double> getTotauxParMois() {
         Map<String, Double> totaux = new HashMap<>();
-        // Derive month from date_emission or date_visa (SQLite strftime('%m',...))
-        String sql = "SELECT COALESCE(strftime('%m', date_emission), strftime('%m', date_visa)) as mois_num, SUM(solde) as total FROM operations GROUP BY mois_num ORDER BY mois_num";
+        // Derive month from date_emission or date_visa, normalizing integer epoch-ms to localtime
+        String dateExpr = "CASE WHEN typeof(COALESCE(date_emission,date_visa))='integer' THEN datetime(COALESCE(date_emission,date_visa)/1000,'unixepoch','localtime') ELSE COALESCE(date_emission,date_visa) END";
+        String sql = "SELECT strftime('%m', " + dateExpr + ") as mois_num, SUM(solde) as total FROM operations GROUP BY mois_num ORDER BY mois_num";
 
         try (Connection conn = Database.getInstance().getConnection();
              Statement stmt = conn.createStatement();
@@ -48,7 +49,8 @@ public class RecapDAO {
 
     public Map<String, Double> getRecetteParMois() {
         Map<String, Double> totaux = new HashMap<>();
-        String sql = "SELECT COALESCE(strftime('%m', date_emission), strftime('%m', date_visa)) as mois_num, SUM(recette) as total FROM operations GROUP BY mois_num ORDER BY mois_num";
+        String dateExpr = "CASE WHEN typeof(COALESCE(date_emission,date_visa))='integer' THEN datetime(COALESCE(date_emission,date_visa)/1000,'unixepoch','localtime') ELSE COALESCE(date_emission,date_visa) END";
+        String sql = "SELECT strftime('%m', " + dateExpr + ") as mois_num, SUM(recette) as total FROM operations GROUP BY mois_num ORDER BY mois_num";
 
         try (Connection conn = Database.getInstance().getConnection();
              Statement stmt = conn.createStatement();
@@ -65,9 +67,61 @@ public class RecapDAO {
         return totaux;
     }
 
+    public Map<Integer, Double> getRecetteParMoisForYear(int year) {
+        Map<Integer, Double> totaux = new HashMap<>();
+        String dateExpr = "CASE WHEN typeof(COALESCE(date_emission,date_visa))='integer' THEN datetime(COALESCE(date_emission,date_visa)/1000,'unixepoch','localtime') ELSE COALESCE(date_emission,date_visa) END";
+        String sql = "SELECT strftime('%m', " + dateExpr + ") as mois_num, SUM(recette) as total FROM operations WHERE strftime('%Y', " + dateExpr + ") = ? GROUP BY mois_num ORDER BY mois_num";
+
+        try (Connection conn = Database.getInstance().getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql.replace("?", String.format("'%04d'", year)))) {
+
+            while (rs.next()) {
+                int mois = Integer.parseInt(rs.getString("mois_num"));
+                totaux.put(mois, rs.getDouble("total"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return totaux;
+    }
+
+    public Map<Integer, Double> getDepenseParMoisForYear(int year) {
+        Map<Integer, Double> totaux = new HashMap<>();
+        String dateExpr = "CASE WHEN typeof(COALESCE(date_emission,date_visa))='integer' THEN datetime(COALESCE(date_emission,date_visa)/1000,'unixepoch','localtime') ELSE COALESCE(date_emission,date_visa) END";
+        String sql = "SELECT strftime('%m', " + dateExpr + ") as mois_num, SUM(COALESCE(depense, COALESCE(sur_ram,0) + COALESCE(sur_eng,0))) as total FROM operations WHERE strftime('%Y', " + dateExpr + ") = ? GROUP BY mois_num ORDER BY mois_num";
+
+        try (Connection conn = Database.getInstance().getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql.replace("?", String.format("'%04d'", year)))) {
+
+            while (rs.next()) {
+                int mois = Integer.parseInt(rs.getString("mois_num"));
+                totaux.put(mois, rs.getDouble("total"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return totaux;
+    }
+
+    public Double getLastSoldeBeforeYear(int year) {
+        String dateExpr = "CASE WHEN typeof(COALESCE(date_emission,date_visa))='integer' THEN datetime(COALESCE(date_emission,date_visa)/1000,'unixepoch','localtime') ELSE COALESCE(date_emission,date_visa) END";
+        String sql = "SELECT solde, " + dateExpr + " as d FROM operations WHERE strftime('%Y', " + dateExpr + ") < ? ORDER BY " + dateExpr + " DESC LIMIT 1";
+        try (Connection conn = Database.getInstance().getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql.replace("?", String.format("'%04d'", year)))) {
+            if (rs.next()) return rs.getDouble("solde");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0.0;
+    }
+
     public Map<String, Double> getDepenseParMois() {
         Map<String, Double> totaux = new HashMap<>();
-        String sql = "SELECT COALESCE(strftime('%m', date_emission), strftime('%m', date_visa)) as mois_num, SUM(COALESCE(depense, COALESCE(sur_ram,0) + COALESCE(sur_eng,0))) as total FROM operations GROUP BY mois_num ORDER BY mois_num";
+        String dateExpr = "CASE WHEN typeof(COALESCE(date_emission,date_visa))='integer' THEN datetime(COALESCE(date_emission,date_visa)/1000,'unixepoch','localtime') ELSE COALESCE(date_emission,date_visa) END";
+        String sql = "SELECT strftime('%m', " + dateExpr + ") as mois_num, SUM(COALESCE(depense, COALESCE(sur_ram,0) + COALESCE(sur_eng,0))) as total FROM operations GROUP BY mois_num ORDER BY mois_num";
 
         try (Connection conn = Database.getInstance().getConnection();
              Statement stmt = conn.createStatement();
@@ -195,7 +249,8 @@ public class RecapDAO {
      * Retourne le dernier solde enregistré (solde de la dernière opération selon date_emission/date_visa).
      */
     public double getDernierSolde() {
-        String sql = "SELECT solde FROM operations ORDER BY COALESCE(date_emission, date_visa) DESC LIMIT 1";
+        String dateExpr = "CASE WHEN typeof(COALESCE(date_emission,date_visa))='integer' THEN datetime(COALESCE(date_emission,date_visa)/1000,'unixepoch','localtime') ELSE COALESCE(date_emission,date_visa) END";
+        String sql = "SELECT solde FROM operations ORDER BY " + dateExpr + " DESC LIMIT 1";
         try (Connection conn = Database.getInstance().getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {

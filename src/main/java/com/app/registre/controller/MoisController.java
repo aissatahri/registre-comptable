@@ -93,6 +93,32 @@ public class MoisController {
         loadMoisData();
     }
 
+    /**
+     * Programmatically open this controller for a given year and month (1-12).
+     * This is intended for external callers that want to show the month view
+     * preselected for a specific month/year, e.g. when clicking a recap card.
+     */
+    public void openFor(int year, int month) {
+        try {
+            // ensure year list is populated
+            setupAnneeComboBox();
+        } catch (Exception ignored) {}
+        try {
+            String ys = String.valueOf(year);
+            if (anneeComboBox != null) {
+                if (!anneeComboBox.getItems().contains(ys)) anneeComboBox.getItems().add(0, ys);
+                anneeComboBox.setValue(ys);
+            }
+            if (moisComboBox != null && month >= 1 && month <= 12) {
+                String[] months = {"JANVIER", "FEVRIER", "MARS", "AVRIL", "MAI", "JUIN",
+                        "JUILLET", "AOUT", "SEPTEMBRE", "OCTOBRE", "NOVEMBRE", "DECEMBRE"};
+                moisComboBox.setValue(months[month - 1]);
+            }
+            // load data after selection
+            loadMoisData();
+        } catch (Exception ignored) {}
+    }
+
     private void setupMoisComboBox() {
         moisComboBox.getItems().addAll(
                 "JANVIER", "FEVRIER", "MARS", "AVRIL", "MAI", "JUIN",
