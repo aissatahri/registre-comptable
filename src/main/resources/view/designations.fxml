@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
@@ -11,12 +13,48 @@
             <HBox spacing="10" alignment="CENTER_LEFT">
                 <Label text="Designations" style="-fx-font-size: 16; -fx-font-weight: bold;"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Button text="Importer" fx:id="importBtn"/>
-                <Button text="Exporter" fx:id="exportBtn"/>
-                <Button text="Ajouter" fx:id="addBtn"/>
-                <Button text="Modifier" fx:id="editBtn"/>
-                <Button text="Supprimer" fx:id="deleteBtn"/>
-                <Button text="Enregistrer" fx:id="saveBtn"/>
+                <Button text="Importer" fx:id="importBtn">
+                    <graphic>
+                        <ImageView fitWidth="14" fitHeight="14">
+                            <Image url="@../images/icon.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Button text="Exporter" fx:id="exportBtn">
+                    <graphic>
+                        <ImageView fitWidth="14" fitHeight="14">
+                            <Image url="@../images/icon.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Button text="Ajouter" fx:id="addBtn">
+                    <graphic>
+                        <ImageView fitWidth="14" fitHeight="14">
+                            <Image url="@../images/icon.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Button text="Modifier" fx:id="editBtn">
+                    <graphic>
+                        <ImageView fitWidth="14" fitHeight="14">
+                            <Image url="@../images/icon.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Button text="Supprimer" fx:id="deleteBtn">
+                    <graphic>
+                        <ImageView fitWidth="14" fitHeight="14">
+                            <Image url="@../images/icon.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Button text="Enregistrer" fx:id="saveBtn">
+                    <graphic>
+                        <ImageView fitWidth="14" fitHeight="14">
+                            <Image url="@../images/icon.png" />
+                        </ImageView>
+                    </graphic>
+                </Button>
             </HBox>
             <TableView fx:id="table" prefHeight="480" editable="true">
                 <columns>
