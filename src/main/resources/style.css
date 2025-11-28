@@ -15,9 +15,11 @@
     -fx-text-fill: white;
     -fx-border-color: transparent;
     -fx-border-radius: 5;
-    -fx-padding: 10 15;
+    -fx-padding: 12 18;
     -fx-alignment: CENTER_LEFT;
-    -fx-font-weight: bold;
+    -fx-font-weight: 700;
+    -fx-font-size: 14px;
+    -fx-pref-width: 220;
 }
 
 .menu-button:hover {
@@ -26,11 +28,12 @@
 }
 
 .menu-button.active {
-    -fx-background-color: rgba(255,255,255,0.15);
-    -fx-text-fill: #3498db;
-    -fx-border-color: #3498db;
-    -fx-border-width: 0 0 0 3;
-    -fx-border-insets: 0;
+    -fx-background-color: rgba(255,255,255,0.06);
+    -fx-text-fill: #ecf0f1;
+    -fx-border-color: transparent;
+    -fx-border-width: 0 0 0 4;
+    -fx-border-insets: 0 6 0 0;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 6, 0, 0, 2);
 }
 
 .menu-button:pressed {
@@ -39,10 +42,12 @@
 
 /* Boîtes de statistiques */
 .stat-box {
-    -fx-background-color: rgba(255,255,255,0.1);
-    -fx-background-radius: 5;
-    -fx-padding: 10;
+    -fx-background-color: rgba(255,255,255,0.04);
+    -fx-background-radius: 8;
+    -fx-padding: 10 12;
     -fx-alignment: CENTER;
+    -fx-min-width: 88px;
+    -fx-min-height: 48px;
 }
 
 /* Tableaux */
@@ -149,6 +154,54 @@
     -fx-background-radius: 5;
     -fx-font-size: 12px;
     -fx-padding: 4;
+}
+
+/* Sidebar specific styles (target sidebar by id) */
+#sidebar {
+    -fx-background-color: #2c3e50;
+}
+
+/* TitledPane (Réglages) styling to look like a folded button */
+.titled-pane > .title {
+    -fx-background-color: linear-gradient(#f0f2f4, #dfe6e9);
+    -fx-padding: 8 12;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-font-weight: 700;
+    -fx-font-size: 16px;
+    -fx-text-fill: #2c3e50;
+}
+.titled-pane > .title > .arrow-button {
+    -fx-background-color: transparent;
+}
+.titled-pane > .title .arrow {
+    -fx-shape: "M 0 0 L 8 6 L 0 12 Z"; /* triangle */
+    -fx-background-color: #2c9dd6;
+    -fx-padding: 4;
+    -fx-translate-x: -6;
+}
+.titled-pane > .content {
+    -fx-padding: 6 0 0 0;
+}
+
+/* Make menu buttons inside titled pane more subtle */
+.titled-pane .menu-button {
+    -fx-font-size: 13px;
+    -fx-padding: 8 14;
+}
+
+/* Stat numbers inside stat-box */
+.stat-box .text {
+    -fx-fill: white;
+}
+.stat-box .label {
+    -fx-fill: #bdc3c7;
+    -fx-font-size: 11px;
+}
+
+/* Improve contrast of stat numbers */
+.stat-box > .text[style] {
+    -fx-font-weight: 700;
 }
 
 /* Champs de formulaire */
