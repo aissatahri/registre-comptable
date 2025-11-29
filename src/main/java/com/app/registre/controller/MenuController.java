@@ -557,7 +557,7 @@ public class MenuController {
 
     private void setActive(Button active) {
         if (active == null) return;
-        java.util.List<Button> all = java.util.Arrays.asList(btnRegistre, btnRecap, btnMois, btnInitialSolde, btnUserManagement);
+        java.util.List<Button> all = java.util.Arrays.asList(btnRegistre, btnRecap, btnMois, btnInitialSolde, btnDesignations, btnUserManagement);
         for (Button b : all) {
             if (b == null) continue;
             b.getStyleClass().remove("active");

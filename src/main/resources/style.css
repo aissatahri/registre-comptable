@@ -227,24 +227,34 @@
     -fx-background-color: transparent;
     -fx-text-fill: white; /* white text on dark background like original sidebar */
     -fx-font-weight: 600;
-    -fx-padding: 8 14;
+    -fx-padding: 8 16 10 16;
     -fx-background-radius: 4;
     -fx-border-color: transparent;
 }
+
+/* subtle hover underline */
 .top-bar .menu-button:hover {
-    -fx-background-color: rgba(255,255,255,0.06);
+    -fx-background-color: transparent;
     -fx-text-fill: white;
+    -fx-border-color: transparent transparent rgba(255,255,255,0.08) transparent;
+    -fx-border-width: 0 0 2 0;
+    -fx-border-radius: 6;
+    -fx-padding: 6 16 12 16; /* give room for underline */
 }
+
+/* active underline (as in mockup) */
 .top-bar .menu-button.active {
     -fx-border-color: transparent transparent rgba(255,255,255,0.22) transparent;
-    -fx-border-width: 0 0 2 0;
+    -fx-border-width: 0 0 3 0;
+    -fx-border-radius: 6;
     -fx-text-fill: white;
+    -fx-padding: 6 16 12 16;
 }
 
 /* Make the user menu visually consistent with the top-bar menu buttons */
 .top-bar .user-name {
     -fx-background-color: transparent;
-    -fx-text-fill: white;
+    -fx-text-fill: rgba(255,255,255,0.9);
     -fx-font-weight: 600;
     -fx-padding: 8 14;
     -fx-background-radius: 4;
@@ -252,6 +262,11 @@
 .top-bar .user-name:hover {
     -fx-background-color: rgba(255,255,255,0.06);
     -fx-text-fill: white;
+}
+
+/* slight dim text for user display to match mockup */
+.top-bar .user-name .label {
+    -fx-text-fill: rgba(255,255,255,0.85);
 }
 
 /* Brand styles: logo + title on left of top bar */
