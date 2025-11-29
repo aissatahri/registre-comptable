@@ -9,11 +9,19 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
+import com.app.registre.util.DialogUtils;
 
 public class UserManagementController {
 
     @FXML private TableView<User> usersTable;
     @FXML private TableColumn<User, String> colUsername;
+    @FXML private TableColumn<User, String> colDisplayName;
+    @FXML private TableColumn<User, String> colEmail;
 
     private final UserDAO userDAO = new UserDAO();
     private final ObservableList<User> users = FXCollections.observableArrayList();
@@ -21,6 +29,8 @@ public class UserManagementController {
     @FXML
     private void initialize() {
         colUsername.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getUsername()));
+        colDisplayName.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getDisplayName() != null ? c.getValue().getDisplayName() : ""));
+        colEmail.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getEmail() != null ? c.getValue().getEmail() : ""));
         usersTable.setItems(users);
         refreshList();
     }
@@ -52,8 +62,62 @@ public class UserManagementController {
                     Alert a = new Alert(Alert.AlertType.ERROR, "Impossible de créer l'utilisateur (existe déjà ?)" );
                     a.showAndWait();
                 }
-                refreshList();
+                else {
+                    // after creating user, ask for display name and email
+                    Dialog<ButtonType> infoDlg = new Dialog<>();
+                    DialogUtils.initOwner(infoDlg, null);
+                    infoDlg.setTitle("Profil utilisateur");
+                    GridPane grid = new GridPane();
+                    grid.setHgap(10);
+                    grid.setVgap(10);
+                    grid.setPadding(new javafx.geometry.Insets(10));
+                    TextField displayField = new TextField();
+                    TextField emailField = new TextField();
+                    grid.add(new Label("Nom affiché:"), 0, 0);
+                    grid.add(displayField, 1, 0);
+                    grid.add(new Label("Email:"), 0, 1);
+                    grid.add(emailField, 1, 1);
+                    infoDlg.getDialogPane().setContent(grid);
+                    infoDlg.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+                    java.util.Optional<ButtonType> answer = infoDlg.showAndWait();
+                    if (answer.isPresent() && answer.get() == ButtonType.OK) {
+                        String dn = displayField.getText();
+                        String em = emailField.getText();
+                        userDAO.updateProfile(username, dn, em);
+                    }
+                    refreshList();
+                }
             }
+        }
+    }
+
+    @FXML
+    private void handleEdit() {
+        User sel = usersTable.getSelectionModel().getSelectedItem();
+        if (sel == null) return;
+        Dialog<ButtonType> dlg = new Dialog<>();
+        DialogUtils.initOwner(dlg, null);
+        dlg.setTitle("Modifier profil");
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new javafx.geometry.Insets(10));
+        TextField displayField = new TextField(sel.getDisplayName() != null ? sel.getDisplayName() : "");
+        TextField emailField = new TextField(sel.getEmail() != null ? sel.getEmail() : "");
+        grid.add(new Label("Nom affiché:"), 0, 0);
+        grid.add(displayField, 1, 0);
+        grid.add(new Label("Email:"), 0, 1);
+        grid.add(emailField, 1, 1);
+        dlg.getDialogPane().setContent(grid);
+        dlg.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+        java.util.Optional<ButtonType> res = dlg.showAndWait();
+        if (res.isPresent() && res.get() == ButtonType.OK) {
+            boolean ok = userDAO.updateProfile(sel.getUsername(), displayField.getText(), emailField.getText());
+            if (!ok) {
+                Alert a = new Alert(Alert.AlertType.ERROR, "Impossible d'enregistrer le profil");
+                a.showAndWait();
+            }
+            refreshList();
         }
     }
 

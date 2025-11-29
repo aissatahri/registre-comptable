@@ -14,11 +14,14 @@
                 <Region HBox.hgrow="ALWAYS" />
                 <Button text="Ajouter" onAction="#handleAdd" />
                 <Button text="Supprimer" onAction="#handleDelete" />
+                <Button text="Modifier" onAction="#handleEdit" />
                 <Button text="Changer mot de passe" onAction="#handleChangePassword" />
             </HBox>
             <TableView fx:id="usersTable" prefHeight="400">
                 <columns>
-                    <TableColumn fx:id="colUsername" text="Nom d'utilisateur" prefWidth="200" />
+                    <TableColumn fx:id="colUsername" text="Nom d'utilisateur" prefWidth="180" />
+                    <TableColumn fx:id="colDisplayName" text="Nom affiché" prefWidth="220" />
+                    <TableColumn fx:id="colEmail" text="Email" prefWidth="240" />
                 </columns>
             </TableView>
         </VBox>
