@@ -8,6 +8,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.KeyCode;
 import javafx.animation.TranslateTransition;
@@ -25,6 +26,9 @@ public class MenuController {
     @FXML private StackPane contentArea;
     @FXML private BorderPane rootPane;
     @FXML private VBox sidebar;
+    @FXML private StackPane topBarStack;
+    @FXML private HBox topBar;
+    @FXML private HBox brand; 
     @FXML private Text opsCountMenuText;
     @FXML private Text recettesMenuText;
     @FXML private Text lastSoldeMenuText;
@@ -39,6 +43,9 @@ public class MenuController {
     private boolean sidebarVisible = true;
     private RecapDAO recapDAO = new RecapDAO();
     private com.app.registre.dao.OperationDAO operationDAO = new com.app.registre.dao.OperationDAO();
+    // Underline indicator for top menu (disabled)
+    private javafx.scene.shape.Rectangle underline;
+    private Button activeButtonForUnderline = null;
 
     @FXML
     private void showRegistre() {
@@ -170,6 +177,11 @@ public class MenuController {
     private void initialize() {
         rootPane.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene != null) {
+                // underline feature disabled: do not create underline nor attach hover handlers
+                try {
+                    // make brand clickable
+                    if (brand != null) brand.setOnMouseClicked(e -> showRegistre());
+                } catch (Exception ignore) {}
                 newScene.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
                     if (e.isControlDown() && e.getCode() == KeyCode.B) {
                         toggleSidebar();
@@ -563,6 +575,12 @@ public class MenuController {
             b.getStyleClass().remove("active");
         }
         active.getStyleClass().add("active");
+    }
+
+    // animate/move underline to the given button
+    private void moveUnderlineTo(Button target, boolean animate) {
+        // underline feature disabled: no-op
+        return;
     }
 
     private void showError(String message, Exception e) {
