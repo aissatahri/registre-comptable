@@ -18,27 +18,40 @@
 
     <top>
         <HBox alignment="CENTER_LEFT" spacing="12" styleClass="top-bar">
-            <HBox spacing="8" alignment="CENTER_LEFT">
-                <Button fx:id="btnRegistre" onAction="#showRegistre" styleClass="menu-button" text="Registre des OP" />
-                <Button fx:id="btnRecap" onAction="#showRecap" styleClass="menu-button" text="Récapitulatif" />
-                <Button fx:id="btnMois" onAction="#showMois" styleClass="menu-button" text="Par Mois" />
-                <Button fx:id="btnInitialSolde" onAction="#showEditInitialSolde" styleClass="menu-button" text="Solde initial" />
-                <Button fx:id="btnDesignations" onAction="#showDesignations" styleClass="menu-button" text="Designations" />
-                <Button fx:id="btnUserManagement" onAction="#showUserManagement" styleClass="menu-button" text="Gestion des utilisateurs" />
-            </HBox>
+                <!-- Brand (logo + title) -->
+                <HBox spacing="10" alignment="CENTER_LEFT" styleClass="brand">
+                    <ImageView fitWidth="36" fitHeight="36" preserveRatio="true">
+                        <Image url="@../images/icon.png" />
+                    </ImageView>
+                    <VBox>
+                        <Text style="-fx-font-weight: bold; -fx-fill: white; -fx-font-size: 14;" text="Registre" />
+                        <Text style="-fx-fill: #ecf0f1; -fx-font-size: 11;" text="Comptable" />
+                    </VBox>
+                </HBox>
 
-            <Region HBox.hgrow="ALWAYS" />
+                <HBox spacing="8" alignment="CENTER_LEFT">
+                    <Button fx:id="btnRegistre" onAction="#showRegistre" styleClass="menu-button" text="Registre des OP" />
+                    <Button fx:id="btnRecap" onAction="#showRecap" styleClass="menu-button" text="Récapitulatif" />
+                    <Button fx:id="btnMois" onAction="#showMois" styleClass="menu-button" text="Par Mois" />
+                    <Button fx:id="btnInitialSolde" onAction="#showEditInitialSolde" styleClass="menu-button" text="Solde initial" />
+                    <Button fx:id="btnDesignations" onAction="#showDesignations" styleClass="menu-button" text="Designations" />
+                    <Button fx:id="btnUserManagement" onAction="#showUserManagement" styleClass="menu-button" text="Gestion des utilisateurs" />
+                </HBox>
 
-            <HBox alignment="CENTER_RIGHT" spacing="8">
-                <Button fx:id="btnChangeDb" onAction="#handleChangeDatabase" styleClass="menu-button" text="Changer de base..." />
-                <MenuButton fx:id="userMenu" styleClass="user-name">
-                    <graphic>
-                        <ImageView fitWidth="20" fitHeight="20" preserveRatio="true">
-                            <Image url="@../images/account.png" />
-                        </ImageView>
-                    </graphic>
-                </MenuButton>
-            </HBox>
+                <Region HBox.hgrow="ALWAYS" />
+
+                <Separator orientation="VERTICAL" styleClass="top-separator" />
+
+                <HBox alignment="CENTER_RIGHT" spacing="8">
+                    <Button fx:id="btnChangeDb" onAction="#handleChangeDatabase" styleClass="menu-button" text="Changer de base..." />
+                    <MenuButton fx:id="userMenu" styleClass="user-name">
+                        <graphic>
+                            <ImageView fitWidth="20" fitHeight="20" preserveRatio="true">
+                                <Image url="@../images/account.png" />
+                            </ImageView>
+                        </graphic>
+                    </MenuButton>
+                </HBox>
         </HBox>
     </top>
 

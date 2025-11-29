@@ -254,6 +254,29 @@
     -fx-text-fill: white;
 }
 
+/* Brand styles: logo + title on left of top bar */
+.top-bar .brand {
+    -fx-alignment: CENTER_LEFT;
+    -fx-spacing: 8;
+    -fx-padding: 0 8 0 0;
+}
+.top-bar .brand ImageView {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 6, 0.2, 0, 2);
+}
+.top-bar .brand Text {
+    -fx-fill: white;
+}
+
+/* Visual separator between menus and actions */
+.top-separator {
+    -fx-pref-height: 32;
+    -fx-opacity: 0.25;
+    -fx-background-color: rgba(255,255,255,0.08);
+    -fx-border-width: 0 1 0 0;
+    -fx-border-color: rgba(255,255,255,0.08);
+    -fx-padding: 0 8;
+}
+
 /* User name/menu in top bar */
 .user-name {
     -fx-font-size: 14px;
