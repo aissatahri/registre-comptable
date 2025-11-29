@@ -31,7 +31,6 @@
 
             <HBox alignment="CENTER_RIGHT" spacing="8">
                 <Button fx:id="btnChangeDb" onAction="#handleChangeDatabase" styleClass="menu-button" text="Changer de base..." />
-                <Button fx:id="btnLogout" onAction="#handleLogout" styleClass="menu-button" text="Déconnexion" />
                 <MenuButton fx:id="userMenu" styleClass="user-name">
                     <graphic>
                         <ImageView fitWidth="20" fitHeight="20" preserveRatio="true">

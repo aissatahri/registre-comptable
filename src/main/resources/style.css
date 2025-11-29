@@ -241,6 +241,19 @@
     -fx-text-fill: white;
 }
 
+/* Make the user menu visually consistent with the top-bar menu buttons */
+.top-bar .user-name {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-font-weight: 600;
+    -fx-padding: 8 14;
+    -fx-background-radius: 4;
+}
+.top-bar .user-name:hover {
+    -fx-background-color: rgba(255,255,255,0.06);
+    -fx-text-fill: white;
+}
+
 /* User name/menu in top bar */
 .user-name {
     -fx-font-size: 14px;

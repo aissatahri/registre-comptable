@@ -208,7 +208,7 @@ public class MenuController {
     private void showUserManagement() {
         try {
             loadView("/view/user_management.fxml");
-            setActive(null);
+            setActive(btnUserManagement);
         } catch (Exception e) {
             e.printStackTrace();
             showError("Erreur lors de l'ouverture de la gestion des utilisateurs", e);
@@ -557,7 +557,7 @@ public class MenuController {
 
     private void setActive(Button active) {
         if (active == null) return;
-        java.util.List<Button> all = java.util.Arrays.asList(btnRegistre, btnRecap, btnMois, btnInitialSolde);
+        java.util.List<Button> all = java.util.Arrays.asList(btnRegistre, btnRecap, btnMois, btnInitialSolde, btnUserManagement);
         for (Button b : all) {
             if (b == null) continue;
             b.getStyleClass().remove("active");
