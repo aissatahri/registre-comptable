@@ -146,6 +146,7 @@ public class MenuController {
 
     @FXML
     private void toggleSidebar() {
+        if (sidebar == null) return; // sidebar removed in new horizontal layout
         double w = sidebar.getWidth() > 0 ? sidebar.getWidth() : sidebar.getPrefWidth();
         if (sidebarVisible) {
             TranslateTransition tt = new TranslateTransition(Duration.millis(220), sidebar);

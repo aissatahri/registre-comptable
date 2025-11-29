@@ -17,74 +17,31 @@
 <BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.app.registre.controller.MenuController" fx:id="rootPane">
 
     <top>
-        <HBox alignment="CENTER_LEFT" spacing="10" styleClass="top-bar">
-            <Button text="☰" onAction="#toggleSidebar" styleClass="btn-primary btn-icon"/>
-            <Text text="Menu" style="-fx-fill: #7f8c8d; -fx-font-size: 12;"/>
-            <Region HBox.hgrow="ALWAYS" />
-            <MenuButton fx:id="userMenu" styleClass="user-name">
-                <graphic>
-                    <ImageView fitWidth="20" fitHeight="20" preserveRatio="true">
-                        <Image url="@../images/account.png" />
-                    </ImageView>
-                </graphic>
-            </MenuButton>
-        </HBox>
-    </top>
-
-    <left>
-        <VBox fx:id="sidebar" prefWidth="250" spacing="10" styleClass="sidebar">
-            <padding><Insets bottom="20" left="10" right="10" top="20" /></padding>
-
-            <HBox alignment="CENTER_LEFT" spacing="10">
-                <ImageView fitHeight="40" fitWidth="40">
-                    <Image url="@../images/icon.png" />
-                </ImageView>
-                <VBox>
-                    <Text fill="white" style="-fx-font-weight: bold;" text="Registre" />
-                    <Text fill="#ecf0f1" style="-fx-font-size: 10;" text="Comptable" />
-                </VBox>
+        <HBox alignment="CENTER_LEFT" spacing="12" styleClass="top-bar">
+            <HBox spacing="8" alignment="CENTER_LEFT">
+                <Button fx:id="btnRegistre" onAction="#showRegistre" styleClass="menu-button" text="Registre des OP" />
+                <Button fx:id="btnRecap" onAction="#showRecap" styleClass="menu-button" text="Récapitulatif" />
+                <Button fx:id="btnMois" onAction="#showMois" styleClass="menu-button" text="Par Mois" />
+                <Button fx:id="btnInitialSolde" onAction="#showEditInitialSolde" styleClass="menu-button" text="Solde initial" />
+                <Button fx:id="btnDesignations" onAction="#showDesignations" styleClass="menu-button" text="Designations" />
+                <Button fx:id="btnUserManagement" onAction="#showUserManagement" styleClass="menu-button" text="Gestion des utilisateurs" />
             </HBox>
 
-            <Separator opacity="0.3" />
+            <Region HBox.hgrow="ALWAYS" />
 
-            <VBox spacing="5" fillWidth="true">
-                <Button fx:id="btnRegistre" onAction="#showRegistre" styleClass="menu-button" text="Registre des OP" maxWidth="Infinity" />
-                <Button fx:id="btnRecap" onAction="#showRecap" styleClass="menu-button" text="Récapitulatif" maxWidth="Infinity" />
-                <Button fx:id="btnMois" onAction="#showMois" styleClass="menu-button" text="Par Mois" maxWidth="Infinity" />
-                <Button fx:id="btnInitialSolde" onAction="#showEditInitialSolde" styleClass="menu-button" text="Solde initial" maxWidth="Infinity" />
-                <Button text="Réglages" styleClass="menu-button" disable="true" maxWidth="Infinity" />
-                <VBox spacing="4" style="-fx-padding: 0 0 0 8;">
-                    <Button fx:id="btnDesignations" onAction="#showDesignations" styleClass="menu-button" text="Designations" maxWidth="Infinity" />
-                    <Button fx:id="btnUserManagement" onAction="#showUserManagement" styleClass="menu-button" text="Gestion des utilisateurs" maxWidth="Infinity" />
-                </VBox>
-            </VBox>
-
-            <Separator opacity="0.3" />
-
-            <VBox spacing="5">
-                <Text fill="#bdc3c7" style="-fx-font-size: 12;" text="Statistiques" />
-                <HBox spacing="10">
-                    <VBox styleClass="stat-box">
-                        <Text fx:id="opsCountMenuText" id="opsCountMenuText" fill="white" style="-fx-font-weight: bold;" text="0" />
-                        <Text fill="#bdc3c7" style="-fx-font-size: 10;" text="Opérations" />
-                    </VBox>
-                    <VBox styleClass="stat-box">
-                        <Text fx:id="recettesMenuText" id="recettesMenuText" fill="white" style="-fx-font-weight: bold;" text="0.00" />
-                        <Text fill="#bdc3c7" style="-fx-font-size: 10;" text="Recettes" />
-                    </VBox>
-                    <VBox styleClass="stat-box">
-                        <Text fx:id="lastSoldeMenuText" fill="white" style="-fx-font-weight: bold;" text="0.00" />
-                        <Text fill="#bdc3c7" style="-fx-font-size: 10;" text="Dernier solde" />
-                    </VBox>
-                </HBox>
-            </VBox>
-            <Separator opacity="0.3" />
-            <VBox spacing="5">
-                <Button fx:id="btnChangeDb" onAction="#handleChangeDatabase" styleClass="menu-button" text="Changer de base..." maxWidth="Infinity" />
-                <Button fx:id="btnLogout" onAction="#handleLogout" styleClass="menu-button" text="Déconnexion" maxWidth="Infinity" />
-            </VBox>
-        </VBox>
-    </left>
+            <HBox alignment="CENTER_RIGHT" spacing="8">
+                <Button fx:id="btnChangeDb" onAction="#handleChangeDatabase" styleClass="menu-button" text="Changer de base..." />
+                <Button fx:id="btnLogout" onAction="#handleLogout" styleClass="menu-button" text="Déconnexion" />
+                <MenuButton fx:id="userMenu" styleClass="user-name">
+                    <graphic>
+                        <ImageView fitWidth="20" fitHeight="20" preserveRatio="true">
+                            <Image url="@../images/account.png" />
+                        </ImageView>
+                    </graphic>
+                </MenuButton>
+            </HBox>
+        </HBox>
+    </top>
 
     <center>
         <StackPane fx:id="contentArea">
