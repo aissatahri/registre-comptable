@@ -35,7 +35,7 @@ public class OperationDAOTest {
 
         Operation op = new Operation();
         op.setOp("OP-001");
-        op.setOvCheq("OV1");
+        op.setOvCheqType("OV1");
         op.setImp("IMP1");
         op.setNature("BC");
         op.setBudg("B1");

@@ -1,0 +1,124 @@
+/* Dark theme overrides: provide explicit backgrounds for common controls to avoid
+   white-on-white issues (TableView, headers, toolbars, menu areas) and ensure
+   the app can switch back to the light theme. */
+
+/* Base backgrounds */
+.root, .border-pane, .pane, .stack-pane, .hbox, .vbox {
+    -fx-background-color: #2b2b2b;
+    -fx-text-fill: #e8e8e8;
+}
+
+/* Top bar where username/menu sits */
+.top-bar {
+    -fx-background-color: #232323;
+    -fx-padding: 6 12;
+}
+.top-bar .text {
+    -fx-fill: #dfe6e9;
+}
+
+/* Menu button / user name styling */
+.menu-button, .menu-button .label, .user-name {
+    -fx-background-color: transparent;
+    -fx-text-fill: #e8e8e8;
+}
+
+/* Buttons */
+.button {
+    -fx-background-color: #333333;
+    -fx-text-fill: #e8e8e8;
+    -fx-border-color: transparent;
+}
+.button:hover {
+    -fx-background-color: #3f3f3f;
+}
+.button.active {
+    -fx-background-color: #3f6fb2;
+    -fx-text-fill: white;
+}
+
+/* Text input controls */
+.text-field, .password-field, .combo-box, .text-area {
+    -fx-background-color: #3a3a3a;
+    -fx-text-fill: #e8e8e8;
+    -fx-prompt-text-fill: derive(#e8e8e8, -40%);
+}
+
+/* Separator */
+.separator {
+    -fx-background-color: #444444;
+}
+
+/* TableView / TableCell styling to avoid white text on white backgrounds */
+.table-view {
+    -fx-background-color: transparent;
+    -fx-control-inner-background: transparent;
+}
+.table-view .column-header-background {
+    -fx-background-color: #2f2f2f;
+}
+.table-view .column-header, .table-view .column-header .label {
+    -fx-text-fill: #e8e8e8;
+}
+.table-row-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #e8e8e8;
+}
+.table-row-cell:filled:selected, .table-row-cell:selected {
+    -fx-background-color: -fx-selection-bar;
+    -fx-background-insets: 0;
+}
+.table-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #e8e8e8;
+}
+
+/* Ensure the TableView viewport and virtual flow have dark backgrounds so rows
+   don't sit on a light canvas causing white text to disappear. */
+.table-view .virtual-flow, .table-view .virtual-flow .viewport {
+    -fx-background-color: #2b2b2b;
+}
+.table-view .filler {
+    -fx-background-color: #2b2b2b;
+}
+
+/* ComboBox: ensure button text and popup list are dark with readable text */
+.combo-box, .combo-box .combo-box-base {
+    -fx-background-color: #323232;
+    -fx-text-fill: #e8e8e8;
+}
+.combo-box .arrow-button {
+    -fx-background-color: transparent;
+}
+.combo-box .list-view {
+    -fx-background-color: #2b2b2b;
+    -fx-control-inner-background: #2b2b2b;
+}
+.combo-box .list-view .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #e8e8e8;
+}
+.combo-box .list-view .list-cell:filled:selected, .combo-box .list-view .list-cell:selected {
+    -fx-background-color: -fx-selection-bar;
+    -fx-text-fill: -fx-selection-bar-text;
+}
+.combo-box .button-cell {
+    -fx-text-fill: #e8e8e8;
+}
+
+/* Selection colors: use system selection variants if present, else fallback */
+.root {
+    -fx-selection-bar: #3f6fb2;
+    -fx-selection-bar-text: white;
+}
+
+/* Menu / Toolbars */
+.menu-bar, .tool-bar {
+    -fx-background-color: #232323;
+    -fx-text-fill: #e8e8e8;
+}
+
+/* Misc */
+.stat-box .text, .stat-box .label {
+    -fx-fill: #e8e8e8;
+}

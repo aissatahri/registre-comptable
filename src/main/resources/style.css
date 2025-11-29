@@ -99,6 +99,21 @@
     -fx-fill: #7f8c8d;
 }
 
+/* Login specific styles */
+.error-label {
+    -fx-text-fill: #e74c3c;
+    -fx-font-size: 12px;
+    -fx-padding: 6 0 0 0;
+    -fx-alignment: CENTER;
+    -fx-wrap-text: true;
+}
+
+.card ImageView {
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.12), 8, 0, 0, 2);
+}
+
+.card .subtitle { -fx-opacity: 0.85; }
+
 /* Boutons */
 .btn-primary {
     -fx-background-color: #3498db;
@@ -200,6 +215,25 @@
 .page-footer { -fx-background-color: #f8f9fa; -fx-padding: 15; }
 .top-bar { -fx-background-color: #ffffff; -fx-padding: 8 12; -fx-border-color: #ecf0f1; -fx-border-width: 0 0 1 0; }
 .sidebar { -fx-background-color: #2c3e50; }
+
+/* User name/menu in top bar */
+.user-name {
+    -fx-font-size: 14px;
+    -fx-text-fill: #2c3e50;
+    -fx-font-weight: 600;
+    -fx-padding: 6 10;
+    -fx-background-color: transparent;
+    -fx-background-radius: 4;
+    -fx-cursor: hand;
+}
+.user-name .graphic {
+    -fx-padding: 0 6 0 0; /* space between icon and text */
+}
+
+.user-name:hover {
+    -fx-background-color: rgba(52,152,219,0.06);
+    -fx-text-fill: #2980b9;
+}
 
 /* Restore menu-button appearance inside the sidebar (override global .button) */
 .sidebar .menu-button {

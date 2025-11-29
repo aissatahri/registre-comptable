@@ -17,7 +17,10 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         try {
-            // Before loading the main UI, ensure there is at least one user and show login dialog
+            // Before loading the main UI, ask the user where to store/load the database
+            chooseDatabaseLocation(primaryStage);
+
+            // After DB URL is set, ensure there is at least one user and show login dialog
             log.info("Initialisation des utilisateurs et affichage de la fenêtre de connexion...");
             com.app.registre.dao.UserDAO userDAO = new com.app.registre.dao.UserDAO();
             if (userDAO.getUserCount() == 0) {
@@ -35,6 +38,13 @@ public class Main extends Application {
             loginStage.initModality(javafx.stage.Modality.WINDOW_MODAL);
             loginStage.setResizable(false);
             loginStage.setTitle("Connexion");
+            // Set the same application icon on the login dialog
+            try {
+                Image loginIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/icon.png")));
+                loginStage.getIcons().add(loginIcon);
+            } catch (Exception ex) {
+                log.warn("Unable to load login icon: {}", ex.getMessage());
+            }
             loginStage.setScene(loginScene);
             // Apply stylesheet so login looks consistent
             String cssLogin = Objects.requireNonNull(getClass().getResource("/style.css")).toExternalForm();
@@ -81,6 +91,154 @@ public class Main extends Application {
 
             // Fallback: afficher une erreur
             showErrorScreen(primaryStage, "Erreur: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Show a small dialog at startup to let the user choose to create a new DB file,
+     * open an existing one, or use the default location.
+     */
+    private void chooseDatabaseLocation(Stage owner) {
+        try {
+            // Check for saved config in %LOCALAPPDATA%\RegistreComptable\config.properties
+            String localApp = System.getenv("LOCALAPPDATA");
+            if (localApp == null || localApp.isBlank()) localApp = System.getProperty("user.home");
+            java.nio.file.Path cfgDir = java.nio.file.Paths.get(localApp, "RegistreComptable");
+            java.nio.file.Path cfgFile = cfgDir.resolve("config.properties");
+            if (java.nio.file.Files.exists(cfgFile)) {
+                try (java.io.InputStream in = java.nio.file.Files.newInputStream(cfgFile)) {
+                    java.util.Properties p = new java.util.Properties();
+                    p.load(in);
+                    String saved = p.getProperty("db.path");
+                    if (saved != null && !saved.isBlank()) {
+                        // Trim whitespace and remove surrounding quotes if present
+                        saved = saved.trim();
+                        if ((saved.startsWith("\"") && saved.endsWith("\"")) || (saved.startsWith("'") && saved.endsWith("'"))) {
+                            saved = saved.substring(1, saved.length() - 1);
+                        }
+
+                        // Support both forms: either the stored value is a plain file path
+                        // (e.g. C:\Users\\...\\registre.db) or a full JDBC URL
+                        // If the installer wrote a full JDBC URL, migrate it to store only the path
+                        if (saved.startsWith("jdbc:sqlite:")) {
+                            String extracted = saved.substring("jdbc:sqlite:".length());
+                            try {
+                                // overwrite stored config with the plain path for future runs
+                                saveConfig(cfgDir, cfgFile, extracted);
+                                saved = extracted;
+                            } catch (Exception ex) {
+                                log.warn("Unable to migrate stored JDBC URL to plain path: {}", ex.getMessage());
+                            }
+                        }
+
+                        String url = saved.startsWith("jdbc:sqlite:") ? saved : "jdbc:sqlite:" + saved;
+                        com.app.registre.dao.Database.setDbUrl(url);
+
+                        // Validate the connection — if it fails, remove the bad config and continue
+                        try {
+                            java.sql.Connection testConn = com.app.registre.dao.Database.getInstance().getConnection();
+                            if (testConn == null || testConn.isClosed()) throw new Exception("Unable to open DB connection");
+                            // connection OK: skip the chooser dialog
+                            return;
+                        } catch (Exception ex) {
+                            log.warn("Saved db.path appears invalid ({}): {}.", saved, ex.getMessage());
+
+                            // Ask the user if they want to choose a different DB now
+                            javafx.application.Platform.runLater(() -> {
+                                javafx.scene.control.ButtonType choose = new javafx.scene.control.ButtonType("Choisir une base", javafx.scene.control.ButtonBar.ButtonData.OK_DONE);
+                                javafx.scene.control.ButtonType ignore = new javafx.scene.control.ButtonType("Ignorer", javafx.scene.control.ButtonBar.ButtonData.CANCEL_CLOSE);
+                                javafx.scene.control.Alert a = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR,
+                                        "Le chemin enregistré vers la base de données est invalide. Voulez-vous choisir un autre fichier de base de données ?",
+                                        choose, ignore);
+                                a.initOwner(owner);
+                                a.setTitle("Base de données invalide");
+                                java.util.Optional<javafx.scene.control.ButtonType> r = a.showAndWait();
+                                if (r.isPresent() && r.get() == choose) {
+                                    javafx.stage.FileChooser fc = new javafx.stage.FileChooser();
+                                    fc.getExtensionFilters().add(new javafx.stage.FileChooser.ExtensionFilter("Fichier SQLite (*.db)", "*.db"));
+                                    java.io.File initial = new java.io.File(System.getenv("LOCALAPPDATA") != null ? System.getenv("LOCALAPPDATA") : System.getProperty("user.home"));
+                                    if (initial.exists()) fc.setInitialDirectory(initial);
+                                    java.io.File chosen = fc.showOpenDialog(owner);
+                                    if (chosen != null) {
+                                        String abs = chosen.getAbsolutePath();
+                                        String newUrl = "jdbc:sqlite:" + abs;
+                                        com.app.registre.dao.Database.setDbUrl(newUrl);
+                                        // persist the chosen path
+                                        try { saveConfig(cfgDir, cfgFile, abs); } catch (Exception saveEx) { log.warn("Unable to save chosen DB path: {}", saveEx.getMessage()); }
+                                    }
+                                } else {
+                                    // user ignored: remove the bad config so chooser will appear below
+                                    try { java.nio.file.Files.deleteIfExists(cfgFile); } catch (Exception delEx) { log.warn("Could not delete bad config file: {}", delEx.getMessage()); }
+                                }
+                            });
+                            // fall through to show chooser dialog
+                        }
+                    }
+                } catch (Exception ex) {
+                    log.warn("Impossible de lire le fichier de config, continuer: {}", ex.getMessage());
+                }
+            }
+            javafx.scene.control.ButtonType create = new javafx.scene.control.ButtonType("Créer une nouvelle", javafx.scene.control.ButtonBar.ButtonData.OK_DONE);
+            javafx.scene.control.ButtonType open = new javafx.scene.control.ButtonType("Ouvrir existante", javafx.scene.control.ButtonBar.ButtonData.OTHER);
+            javafx.scene.control.ButtonType useDefault = new javafx.scene.control.ButtonType("Utiliser emplacement par défaut", javafx.scene.control.ButtonBar.ButtonData.CANCEL_CLOSE);
+
+            javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.CONFIRMATION,
+                    "Choisissez où stocker ou charger la base de données.", create, open, useDefault);
+            alert.initOwner(owner);
+            alert.setTitle("Emplacement de la base de données");
+            alert.setHeaderText("Sélectionnez une option");
+
+            java.util.Optional<javafx.scene.control.ButtonType> opt = alert.showAndWait();
+            if (opt.isPresent()) {
+                // Add a remember checkbox to the dialog content area
+                javafx.scene.control.CheckBox remember = new javafx.scene.control.CheckBox("Se souvenir de ce choix");
+                // place checkbox under the alert content
+                javafx.scene.layout.VBox contentBox = new javafx.scene.layout.VBox();
+                contentBox.setSpacing(10);
+                contentBox.getChildren().addAll(new javafx.scene.control.Label("Choisissez où stocker ou charger la base de données."), remember);
+                alert.getDialogPane().setContent(contentBox);
+
+                javafx.stage.FileChooser fc = new javafx.stage.FileChooser();
+                fc.getExtensionFilters().add(new javafx.stage.FileChooser.ExtensionFilter("Fichier SQLite (*.db)", "*.db"));
+                java.io.File initial = new java.io.File(localApp);
+                if (initial.exists()) fc.setInitialDirectory(initial);
+
+                if (opt.get() == create) {
+                    fc.setInitialFileName("registre.db");
+                    java.io.File chosen = fc.showSaveDialog(owner);
+                    if (chosen != null) {
+                        String abs = chosen.getAbsolutePath();
+                        String url = "jdbc:sqlite:" + abs;
+                        com.app.registre.dao.Database.setDbUrl(url);
+                        if (remember.isSelected()) saveConfig(cfgDir, cfgFile, abs);
+                    }
+                } else if (opt.get() == open) {
+                    java.io.File chosen = fc.showOpenDialog(owner);
+                    if (chosen != null) {
+                        String abs = chosen.getAbsolutePath();
+                        String url = "jdbc:sqlite:" + abs;
+                        com.app.registre.dao.Database.setDbUrl(url);
+                        if (remember.isSelected()) saveConfig(cfgDir, cfgFile, abs);
+                    }
+                } else {
+                    // use default: do nothing, Database will use default or -Ddb.url
+                }
+            }
+        } catch (Exception e) {
+            log.warn("Erreur lors du choix de l'emplacement DB, utilisation de la valeur par défaut: {}", e.getMessage());
+        }
+    }
+
+    private void saveConfig(java.nio.file.Path cfgDir, java.nio.file.Path cfgFile, String absolutePath) {
+        try {
+            if (!java.nio.file.Files.exists(cfgDir)) java.nio.file.Files.createDirectories(cfgDir);
+            java.util.Properties p = new java.util.Properties();
+            p.setProperty("db.path", absolutePath);
+            try (java.io.OutputStream out = java.nio.file.Files.newOutputStream(cfgFile)) {
+                p.store(out, "RegistreComptable configuration");
+            }
+        } catch (Exception ex) {
+            log.warn("Impossible d'enregistrer la configuration: {}", ex.getMessage());
         }
     }
 

@@ -10,20 +10,84 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Database {
-    private static final String DEFAULT_URL = "jdbc:sqlite:registre.db";
+    private static final Logger log = LoggerFactory.getLogger(Database.class);
+    // Default to a file under %LOCALAPPDATA%/RegistreComptable/registre.db (or user.home if LOCALAPPDATA missing)
+    private static final String DEFAULT_URL = computeDefaultUrl();
     private static Database instance;
     private Connection connection;
-    private final String dbUrl = System.getProperty("db.url", DEFAULT_URL);
+    // Allow programmatic override before instance creation
+    private static String dbUrl = System.getProperty("db.url", DEFAULT_URL);
+
+    private static String computeDefaultUrl() {
+        String localApp = System.getenv("LOCALAPPDATA");
+        if (localApp == null || localApp.isBlank()) localApp = System.getProperty("user.home");
+        java.nio.file.Path appDir = java.nio.file.Paths.get(localApp, "RegistreComptable");
+        try {
+            java.nio.file.Files.createDirectories(appDir);
+        } catch (Exception ignored) {
+        }
+        java.nio.file.Path db = appDir.resolve("registre.db");
+        return "jdbc:sqlite:" + db.toAbsolutePath().toString();
+    }
 
     private Database() {
         try {
+            log.debug("Opening database connection to: {}", dbUrl);
             connection = DriverManager.getConnection(dbUrl);
             createTables();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new IllegalStateException("Unable to open DB connection to " + dbUrl + ": " + e.getMessage(), e);
         }
+    }
+
+    /**
+     * Programmatically set the JDBC URL used by the Database singleton.
+     * Must be called before Database.getInstance() to take effect.
+     */
+    public static synchronized void setDbUrl(String url) {
+        if (url == null || url.isBlank()) return;
+        // sanitize input: trim and remove surrounding quotes
+        String cleaned = url.trim();
+        if ((cleaned.startsWith("\"") && cleaned.endsWith("\"")) || (cleaned.startsWith("'") && cleaned.endsWith("'"))) {
+            cleaned = cleaned.substring(1, cleaned.length() - 1).trim();
+        }
+
+        // Remove any control characters (BOM or stray non-printables)
+        cleaned = cleaned.replaceAll("\\p{C}", "");
+
+        // If a full JDBC URL was provided (possibly repeated), strip all leading jdbc:sqlite: prefixes
+        while (cleaned.startsWith("jdbc:sqlite:")) {
+            cleaned = cleaned.substring("jdbc:sqlite:".length());
+        }
+
+        if (cleaned.isBlank()) return;
+
+        // If the cleaned value is not an absolute path, resolve it under %LOCALAPPDATA%/RegistreComptable
+        java.nio.file.Path candidate = java.nio.file.Paths.get(cleaned);
+        if (!candidate.isAbsolute()) {
+            String localApp = System.getenv("LOCALAPPDATA");
+            if (localApp == null || localApp.isBlank()) localApp = System.getProperty("user.home");
+            java.nio.file.Path appDir = java.nio.file.Paths.get(localApp, "RegistreComptable");
+            try { java.nio.file.Files.createDirectories(appDir); } catch (Exception ignored) {}
+            candidate = appDir.resolve(cleaned);
+        }
+
+        // Now construct a proper JDBC URL
+        String finalUrl = "jdbc:sqlite:" + candidate.toAbsolutePath().toString();
+
+        // If an instance exists, reset it to allow switching DB at runtime
+        if (instance != null) {
+            try {
+                instance.getConnection().close();
+            } catch (Exception ignored) {}
+            instance = null;
+        }
+        dbUrl = finalUrl;
+        log.info("Database URL set to: {}", dbUrl);
     }
 
     public static Database getInstance() {
@@ -38,10 +102,10 @@ public class Database {
             if (connection == null || connection.isClosed()) {
                 connection = DriverManager.getConnection(dbUrl);
             }
+            return connection;
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new IllegalStateException("Unable to open DB connection to " + dbUrl + ": " + e.getMessage(), e);
         }
-        return connection;
     }
 
     public static void reset() {
@@ -82,6 +146,8 @@ public class Database {
 
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(createOperationsTable);
+            // Ensure users table exists for authentication
+            ensureUsersTable();
             // Run migrations to normalize older schemas into the cleaned form
             migrateRemoveOpColumn();
             migrateToFormSchema();
@@ -302,6 +368,49 @@ public class Database {
                 String col = sql.substring(sql.indexOf("ADD COLUMN") + 10).trim().split(" ")[0];
                 if (!cols.contains(col)) {
                     try (java.sql.Statement s2 = connection.createStatement()) { s2.execute(sql); }
+                    cols.add(col);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Create a simple users table for authentication if it does not exist.
+     * Columns: id, username (unique), password_hash
+     */
+    private void ensureUsersTable() {
+        String sql = """
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT NOT NULL UNIQUE,
+                password_hash TEXT NOT NULL,
+                display_name TEXT,
+                email TEXT
+            )
+            """;
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute(sql);
+            ensureUsersNewColumns();
+        } catch (SQLException e) {
+            System.err.println("Warning: unable to create users table: " + e.getMessage());
+        }
+    }
+
+    private void ensureUsersNewColumns() {
+        String[] alters = new String[]{
+                "ALTER TABLE users ADD COLUMN display_name TEXT",
+                "ALTER TABLE users ADD COLUMN email TEXT"
+        };
+        try (Statement stmt = connection.createStatement();
+             java.sql.ResultSet rs = stmt.executeQuery("PRAGMA table_info('users')")) {
+            java.util.Set<String> cols = new java.util.HashSet<>();
+            while (rs.next()) cols.add(rs.getString("name"));
+            for (String sql : alters) {
+                String col = sql.substring(sql.indexOf("ADD COLUMN") + 10).trim().split(" ")[0];
+                if (!cols.contains(col)) {
+                    try (Statement s2 = connection.createStatement()) { s2.execute(sql); }
                     cols.add(col);
                 }
             }

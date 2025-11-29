@@ -15,7 +15,7 @@ public class ExcelUtilTest {
     void exportThenImportOperations() throws Exception {
         Operation op = new Operation();
         op.setOp("OP-X");
-        op.setOvCheq("OV-X");
+        op.setOvCheqType("OV-X");
         op.setImp("IMP-X");
         op.setNature("BC");
         op.setBudg("B1");

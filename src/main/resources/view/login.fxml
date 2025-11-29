@@ -2,21 +2,59 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.app.registre.controller.LoginController" spacing="10" alignment="CENTER" stylesheets="/style.css" styleClass="card" prefWidth="420">
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.app.registre.controller.LoginController" fx:id="root" spacing="12" alignment="CENTER" stylesheets="/style.css" styleClass="card" prefWidth="420">
     <padding>
-        <Insets top="16" right="20" bottom="16" left="20" />
+        <Insets top="18" right="24" bottom="18" left="24" />
     </padding>
-    <Text styleClass="title" text="Connexion" />
-    <GridPane hgap="10" vgap="10">
+    <VBox alignment="CENTER" spacing="8">
+        <ImageView fitHeight="64" fitWidth="64" preserveRatio="true">
+            <image>
+                <Image url="/images/icon.png" />
+            </image>
+        </ImageView>
+        <Label styleClass="title" text="Connexion" />
+        <Label styleClass="subtitle" text="Accédez à votre registre comptable" />
+    </VBox>
+
+    <GridPane hgap="10" vgap="12">
+        <columnConstraints>
+            <ColumnConstraints halignment="RIGHT" minWidth="120" />
+            <ColumnConstraints hgrow="ALWAYS" />
+        </columnConstraints>
+
         <Label text="Nom d'utilisateur:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
-        <TextField fx:id="usernameField" text="admin" promptText="admin" GridPane.rowIndex="0" GridPane.columnIndex="1" onAction="#handleLogin" />
+        <HBox spacing="8" alignment="CENTER_LEFT" GridPane.rowIndex="0" GridPane.columnIndex="1">
+            <ImageView fitWidth="18" fitHeight="18" preserveRatio="true">
+                <image>
+                    <Image url="/images/user-icon.png" />
+                </image>
+            </ImageView>
+            <TextField fx:id="usernameField" promptText="" HBox.hgrow="ALWAYS" onAction="#handleLogin" />
+        </HBox>
 
         <Label text="Mot de passe:" GridPane.rowIndex="1" GridPane.columnIndex="0" />
-        <PasswordField fx:id="passwordField" text="admin" promptText="••••••" GridPane.rowIndex="1" GridPane.columnIndex="1" onAction="#handleLogin" />
+        <HBox spacing="8" alignment="CENTER_LEFT" GridPane.rowIndex="1" GridPane.columnIndex="1">
+            <ImageView fitWidth="18" fitHeight="18" preserveRatio="true">
+                <image>
+                    <Image url="/images/lock-icon.png" />
+                </image>
+            </ImageView>
+            <PasswordField fx:id="passwordField" promptText="" HBox.hgrow="ALWAYS" onAction="#handleLogin" />
+        </HBox>
+
+        <HBox spacing="8" alignment="CENTER_LEFT" GridPane.rowIndex="2" GridPane.columnIndex="1">
+            <CheckBox fx:id="rememberCheck" text="Se souvenir" />
+            <Hyperlink fx:id="forgotLink" text="Mot de passe oublié?" />
+        </HBox>
     </GridPane>
-    <Label fx:id="errorLabel" textFill="red" />
-    <HBox spacing="10">
-        <Button fx:id="btnLogin" text="Se connecter" onAction="#handleLogin" defaultButton="true" styleClass="btn-primary" />
-        <Button fx:id="btnCancel" text="Annuler" onAction="#handleCancel" styleClass="btn-warning" />
+
+    <Label fx:id="errorLabel" styleClass="error-label" wrapText="true" />
+
+    <HBox spacing="12" alignment="CENTER">
+        <Button fx:id="btnLogin" text="Se connecter" onAction="#handleLogin" defaultButton="true" styleClass="btn-primary" prefWidth="160" />
+        <Button fx:id="btnCancel" text="Annuler" onAction="#handleCancel" styleClass="btn-warning" prefWidth="120" />
     </HBox>
+    <Label styleClass="subtitle" text="Version 1.0.0" />
 </VBox>
