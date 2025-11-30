@@ -13,9 +13,9 @@ public class OperationDAO {
 
     public void insert(Operation operation) {
         String sql = """
-            INSERT INTO operations(imp, designation, nature, n, budg, exercice, beneficiaire,
-                                   date_emission, date_visa, op_or, ov_cheq_type, ov_cheq, recette, sur_ram, sur_eng, depense, solde)
-            VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+            INSERT INTO operations(op, imp, designation, nature, n, budg, exercice, beneficiaire,
+                                   date_emission, date_entree, date_visa, op_or, ov_cheq_type, ov_cheq, recette, sur_ram, sur_eng, depense, solde, montant, decision, mois)
+            VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
             """;
 
         try (Connection conn = Database.getInstance().getConnection();
@@ -27,6 +27,8 @@ public class OperationDAO {
 
                 // Parameters correspond to the VALUES(...) above
                 int idx = 1;
+                // legacy 'op' field
+                pstmt.setString(idx++, operation.getOp());
                 pstmt.setString(idx++, operation.getImp());
                 pstmt.setString(idx++, operation.getDesignation());
                 pstmt.setString(idx++, operation.getNature());
@@ -35,6 +37,7 @@ public class OperationDAO {
                 pstmt.setString(idx++, operation.getExercice());
                 pstmt.setString(idx++, operation.getBeneficiaire());
                 pstmt.setDate(idx++, operation.getDateEmission() != null ? Date.valueOf(operation.getDateEmission()) : null);
+                pstmt.setDate(idx++, operation.getDateEntree() != null ? Date.valueOf(operation.getDateEntree()) : null);
                 pstmt.setDate(idx++, operation.getDateVisa() != null ? Date.valueOf(operation.getDateVisa()) : null);
                 if (operation.getOpOr() != null) pstmt.setInt(idx++, operation.getOpOr()); else { pstmt.setNull(idx++, java.sql.Types.INTEGER); }
                 // ov_cheq_type (TEXT)
@@ -46,6 +49,13 @@ public class OperationDAO {
                 if (operation.getSurEng() != null) pstmt.setDouble(idx++, operation.getSurEng()); else { pstmt.setNull(idx++, java.sql.Types.REAL); }
                 if (operation.getDepense() != null) pstmt.setDouble(idx++, operation.getDepense()); else { pstmt.setNull(idx++, java.sql.Types.REAL); }
                 if (operation.getSolde() != null) pstmt.setDouble(idx++, operation.getSolde()); else { pstmt.setNull(idx++, java.sql.Types.REAL); }
+                // montant (legacy) - mirror solde if set
+                if (operation.getSolde() != null) pstmt.setDouble(idx++, operation.getSolde()); else { pstmt.setNull(idx++, java.sql.Types.REAL); }
+                pstmt.setString(idx++, operation.getDecision());
+                pstmt.setString(idx++, operation.getMois());
+                // Log the key values and DB URL that will be used to help debug test failures
+                log.info("DB URL: {}", System.getProperty("db.url"));
+                log.info("Inserting operation: op='{}' montant={} mois='{}' solde={}", operation.getOp(), operation.getMontant(), operation.getMois(), operation.getSolde());
 
             int rows = pstmt.executeUpdate();
             log.info("Insert completed, rows affected={}", rows);
@@ -57,8 +67,8 @@ public class OperationDAO {
     public void update(Operation operation) {
             String sql = """
             UPDATE operations SET
-            imp = ?, designation = ?, nature = ?, n = ?, budg = ?, exercice = ?, beneficiaire = ?,
-            date_emission = ?, date_visa = ?, op_or = ?, ov_cheq_type = ?, ov_cheq = ?, recette = ?, sur_ram = ?, sur_eng = ?, depense = ?, solde = ?
+            op = ?, imp = ?, designation = ?, nature = ?, n = ?, budg = ?, exercice = ?, beneficiaire = ?,
+            date_emission = ?, date_entree = ?, date_visa = ?, op_or = ?, ov_cheq_type = ?, ov_cheq = ?, recette = ?, sur_ram = ?, sur_eng = ?, depense = ?, solde = ?, montant = ?, decision = ?, mois = ?
             WHERE id = ?
             """;
 
@@ -66,6 +76,7 @@ public class OperationDAO {
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             int idx2 = 1;
+            pstmt.setString(idx2++, operation.getOp());
             pstmt.setString(idx2++, operation.getImp());
             pstmt.setString(idx2++, operation.getDesignation());
             pstmt.setString(idx2++, operation.getNature());
@@ -74,6 +85,7 @@ public class OperationDAO {
             pstmt.setString(idx2++, operation.getExercice());
             pstmt.setString(idx2++, operation.getBeneficiaire());
             pstmt.setDate(idx2++, operation.getDateEmission() != null ? Date.valueOf(operation.getDateEmission()) : null);
+            pstmt.setDate(idx2++, operation.getDateEntree() != null ? Date.valueOf(operation.getDateEntree()) : null);
             pstmt.setDate(idx2++, operation.getDateVisa() != null ? Date.valueOf(operation.getDateVisa()) : null);
             if (operation.getOpOr() != null) pstmt.setInt(idx2++, operation.getOpOr()); else { pstmt.setNull(idx2++, java.sql.Types.INTEGER); }
             // ov_cheq_type
@@ -85,6 +97,9 @@ public class OperationDAO {
             if (operation.getSurEng() != null) pstmt.setDouble(idx2++, operation.getSurEng()); else { pstmt.setNull(idx2++, java.sql.Types.REAL); }
             if (operation.getDepense() != null) pstmt.setDouble(idx2++, operation.getDepense()); else { pstmt.setNull(idx2++, java.sql.Types.REAL); }
             if (operation.getSolde() != null) pstmt.setDouble(idx2++, operation.getSolde()); else { pstmt.setNull(idx2++, java.sql.Types.REAL); }
+            if (operation.getSolde() != null) pstmt.setDouble(idx2++, operation.getSolde()); else { pstmt.setNull(idx2++, java.sql.Types.REAL); }
+            pstmt.setString(idx2++, operation.getDecision());
+            pstmt.setString(idx2++, operation.getMois());
             pstmt.setInt(idx2++, operation.getId());
 
             pstmt.executeUpdate();
@@ -466,12 +481,14 @@ public class OperationDAO {
     private Operation mapResultSetToOperation(ResultSet rs) throws SQLException {
         Operation operation = new Operation();
         operation.setId(rs.getInt("id"));
+        try { operation.setOp(rs.getString("op")); } catch (SQLException ignored) {}
         try { operation.setOvCheqType(rs.getString("ov_cheq_type")); } catch (SQLException ignored) {}
         try { int ov = rs.getInt("ov_cheq"); operation.setOvCheq(rs.wasNull() ? null : ov); } catch (SQLException ignored) {}
         operation.setImp(rs.getString("imp"));
         operation.setNature(rs.getString("nature"));
         operation.setBudg(rs.getString("budg"));
         try { operation.setSolde(rs.getDouble("solde")); } catch (SQLException ignored) {}
+        try { double mont = rs.getDouble("montant"); if (!rs.wasNull()) operation.setSolde(mont); } catch (SQLException ignored) {}
         try { Date dateEntree = rs.getDate("date_entree"); if (dateEntree != null) operation.setDateEntree(dateEntree.toLocalDate()); } catch (SQLException ignored) {}
         try { Date dateVisa = rs.getDate("date_visa"); if (dateVisa != null) operation.setDateVisa(dateVisa.toLocalDate()); } catch (SQLException ignored) {}
         try { Date dateRejet = rs.getDate("date_rejet"); if (dateRejet != null) operation.setDateRejet(dateRejet.toLocalDate()); } catch (SQLException ignored) {}

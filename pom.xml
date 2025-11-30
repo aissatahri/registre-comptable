@@ -120,13 +120,41 @@
                         </goals>
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
-                            <finalName>${project.artifactId}-${project.version}-all</finalName>
+                            <!-- Make the shaded (fat) jar replace the main artifact so `target/<artifact>-<version>.jar` is executable -->
+                            <shadedArtifactAttached>false</shadedArtifactAttached>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>com.app.registre.Main</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Copy the built jar into IntelliJ's out/artifacts so IDE artifacts can reuse it -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>copy-to-intellij-out</id>
+                        <phase>package</phase>
+                        <configuration>
+                            <target>
+                                <mkdir dir="${project.basedir}/out/artifacts/RegistreComptable-1.1.0" />
+                                <copy file="${project.build.directory}/${project.build.finalName}.jar" todir="${project.basedir}/out/artifacts/RegistreComptable-1.1.0" overwrite="true"/>
+                                <!-- Provide a consistently named jar for older IntelliJ setups -->
+                                <copy file="${project.build.directory}/${project.build.finalName}.jar" tofile="${project.basedir}/out/artifacts/RegistreComptable-1.1.0/RegistreComptable-1.1.0.jar" overwrite="true"/>
+                                <!-- Also copy to older IntelliJ artifact layout expected by some dev environments -->
+                                <mkdir dir="${project.basedir}/out/artifact/registre_comptable_jar" />
+                                <copy file="${project.build.directory}/${project.build.finalName}.jar" tofile="${project.basedir}/out/artifact/registre_comptable_jar/registre-comptable.jar" overwrite="true"/>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>

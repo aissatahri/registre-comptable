@@ -27,6 +27,24 @@ public class Main extends Application {
                 // create default admin/admin - user should change this later
                 userDAO.createUser("admin", "admin");
                 log.info("Compte administrateur par défaut créé: admin / admin (changez le mot de passe)");
+                // Persist first-run flags so UI and installer can detect this state
+                try {
+                    String localApp2 = System.getenv("LOCALAPPDATA");
+                    if (localApp2 == null || localApp2.isBlank()) localApp2 = System.getProperty("user.home");
+                    java.nio.file.Path cfgDir2 = java.nio.file.Paths.get(localApp2, "RegistreComptable");
+                    java.nio.file.Path cfgFile2 = cfgDir2.resolve("config.properties");
+                    if (!java.nio.file.Files.exists(cfgDir2)) java.nio.file.Files.createDirectories(cfgDir2);
+                    java.util.Properties props = new java.util.Properties();
+                    if (java.nio.file.Files.exists(cfgFile2)) {
+                        try (java.io.InputStream in = java.nio.file.Files.newInputStream(cfgFile2)) { props.load(in); }
+                    }
+                    props.setProperty("firstRun.adminCreated", "true");
+                    props.setProperty("firstRun.forceChange", "true");
+                    props.setProperty("firstRun.autoLogin", "false");
+                    try (java.io.OutputStream out = java.nio.file.Files.newOutputStream(cfgFile2)) { props.store(out, "RegistreComptable configuration"); }
+                } catch (Exception ex) {
+                    log.warn("Unable to persist first-run flags: {}", ex.getMessage());
+                }
             }
 
             // Load login dialog
@@ -46,9 +64,15 @@ public class Main extends Application {
                 log.warn("Unable to load login icon: {}", ex.getMessage());
             }
             loginStage.setScene(loginScene);
-            // Apply stylesheet so login looks consistent
-            String cssLogin = Objects.requireNonNull(getClass().getResource("/style.css")).toExternalForm();
-            loginScene.getStylesheets().add(cssLogin);
+            // Apply stylesheet so login looks consistent (guard against missing resource)
+            java.net.URL cssLoginUrl = getClass().getResource("/style.css");
+            if (loginScene != null && cssLoginUrl != null) {
+                try {
+                    loginScene.getStylesheets().add(cssLoginUrl.toExternalForm());
+                } catch (Exception ex) {
+                    log.warn("Unable to apply login stylesheet: {}", ex.getMessage());
+                }
+            }
             // Show and wait for authentication
             loginStage.showAndWait();
             com.app.registre.controller.LoginController loginController = loginLoader.getController();
@@ -67,9 +91,17 @@ public class Main extends Application {
 
             Scene scene = new Scene(root, 1200, 800);
 
-            String css = Objects.requireNonNull(getClass().getResource("/style.css")).toExternalForm();
-            scene.getStylesheets().add(css);
-            log.info("CSS chargé");
+            java.net.URL cssUrl = getClass().getResource("/style.css");
+            if (scene != null && cssUrl != null) {
+                try {
+                    scene.getStylesheets().add(cssUrl.toExternalForm());
+                    log.info("CSS chargé");
+                } catch (Exception ex) {
+                    log.warn("Unable to apply main stylesheet: {}", ex.getMessage());
+                }
+            } else {
+                log.warn("Main stylesheet not found or scene is null");
+            }
 
             primaryStage.setTitle("Système de Gestion Comptable - Registre");
 
@@ -188,21 +220,21 @@ public class Main extends Application {
             alert.setTitle("Emplacement de la base de données");
             alert.setHeaderText("Sélectionnez une option");
 
+            // Add a remember checkbox to the dialog content area BEFORE showing it
+            javafx.scene.control.CheckBox remember = new javafx.scene.control.CheckBox("Se souvenir de ce choix");
+            // place checkbox under the alert content
+            javafx.scene.layout.VBox contentBox = new javafx.scene.layout.VBox();
+            contentBox.setSpacing(10);
+            contentBox.getChildren().addAll(new javafx.scene.control.Label("Choisissez où stocker ou charger la base de données."), remember);
+            alert.getDialogPane().setContent(contentBox);
+
+            javafx.stage.FileChooser fc = new javafx.stage.FileChooser();
+            fc.getExtensionFilters().add(new javafx.stage.FileChooser.ExtensionFilter("Fichier SQLite (*.db)", "*.db"));
+            java.io.File initial = new java.io.File(localApp);
+            if (initial.exists()) fc.setInitialDirectory(initial);
+
             java.util.Optional<javafx.scene.control.ButtonType> opt = alert.showAndWait();
             if (opt.isPresent()) {
-                // Add a remember checkbox to the dialog content area
-                javafx.scene.control.CheckBox remember = new javafx.scene.control.CheckBox("Se souvenir de ce choix");
-                // place checkbox under the alert content
-                javafx.scene.layout.VBox contentBox = new javafx.scene.layout.VBox();
-                contentBox.setSpacing(10);
-                contentBox.getChildren().addAll(new javafx.scene.control.Label("Choisissez où stocker ou charger la base de données."), remember);
-                alert.getDialogPane().setContent(contentBox);
-
-                javafx.stage.FileChooser fc = new javafx.stage.FileChooser();
-                fc.getExtensionFilters().add(new javafx.stage.FileChooser.ExtensionFilter("Fichier SQLite (*.db)", "*.db"));
-                java.io.File initial = new java.io.File(localApp);
-                if (initial.exists()) fc.setInitialDirectory(initial);
-
                 if (opt.get() == create) {
                     fc.setInitialFileName("registre.db");
                     java.io.File chosen = fc.showSaveDialog(owner);
@@ -221,7 +253,16 @@ public class Main extends Application {
                         if (remember.isSelected()) saveConfig(cfgDir, cfgFile, abs);
                     }
                 } else {
-                    // use default: do nothing, Database will use default or -Ddb.url
+                    // use default: create default path under %LOCALAPPDATA%\RegistreComptable\registre.db
+                    try {
+                        java.nio.file.Path defaultDb = cfgDir.resolve("registre.db");
+                        String abs = defaultDb.toAbsolutePath().toString();
+                        String url = "jdbc:sqlite:" + abs;
+                        com.app.registre.dao.Database.setDbUrl(url);
+                        if (remember.isSelected()) saveConfig(cfgDir, cfgFile, abs);
+                    } catch (Exception ex) {
+                        log.warn("Unable to set default DB path: {}", ex.getMessage());
+                    }
                 }
             }
         } catch (Exception e) {

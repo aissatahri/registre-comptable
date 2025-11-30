@@ -56,5 +56,6 @@
         <Button fx:id="btnLogin" text="Se connecter" onAction="#handleLogin" defaultButton="true" styleClass="btn-primary" prefWidth="160" />
         <Button fx:id="btnCancel" text="Annuler" onAction="#handleCancel" styleClass="btn-warning" prefWidth="120" />
     </HBox>
-    <Label styleClass="subtitle" text="Version 1.0.0" />
+    <Label styleClass="subtitle" text="© A.Tahri — Novembre 2025" />
+    <Label fx:id="versionLabel" styleClass="subtitle" text="" />
 </VBox>

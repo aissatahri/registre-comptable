@@ -49,6 +49,8 @@ public class RegistreController {
     @FXML private javafx.scene.control.MenuButton columnsMenu;
     @FXML private Text totalOperationsText;
     @FXML private Text totalMontantText;
+    @FXML private Text dossiersPayesText;
+    @FXML private Text dossiersRejetesText;
 
     private ObservableList<Operation> operations;
     private OperationDAO operationDAO;
@@ -312,6 +314,7 @@ public class RegistreController {
     }
 
     private boolean containsSearch(Operation op, String search) {
+        if (op.getOp() != null && op.getOp().toLowerCase().contains(search)) return true;
         return (op.getDesignation() != null && op.getDesignation().toLowerCase().contains(search)) ||
             (op.getNature() != null && op.getNature().toLowerCase().contains(search)) ||
             (op.getImp() != null && op.getImp().toLowerCase().contains(search)) ||
@@ -354,6 +357,8 @@ public class RegistreController {
 
         totalOperationsText.setText(String.valueOf(totalOps));
         totalMontantText.setText(nf.format(displaySolde));
+        if (dossiersPayesText != null) dossiersPayesText.setText(String.valueOf(payes));
+        if (dossiersRejetesText != null) dossiersRejetesText.setText(String.valueOf(rejetes));
     }
 
     private int countDecision(List<Operation> items, String[] tokens) {

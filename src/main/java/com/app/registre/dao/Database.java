@@ -36,6 +36,11 @@ public class Database {
 
     private Database() {
         try {
+            // If a system property 'db.url' is present at instantiation time, prefer it (tests set it after reset)
+            String prop = System.getProperty("db.url");
+            if (prop != null && !prop.isBlank()) {
+                dbUrl = prop;
+            }
             log.debug("Opening database connection to: {}", dbUrl);
             connection = DriverManager.getConnection(dbUrl);
             createTables();
@@ -117,6 +122,12 @@ public class Database {
             } catch (SQLException ignored) {}
             instance = null;
         }
+        // Re-read system property in case tests or runtime changed it.
+        // Only override the current dbUrl if a specific system property was provided.
+        String prop = System.getProperty("db.url");
+        if (prop != null && !prop.isBlank()) {
+            dbUrl = prop;
+        }
     }
 
     private void createTables() {
@@ -124,6 +135,7 @@ public class Database {
         String createOperationsTable = """
             CREATE TABLE IF NOT EXISTS operations (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+                op TEXT,
                 imp TEXT,
                 designation TEXT,
                 nature TEXT,
@@ -132,7 +144,14 @@ public class Database {
                 exercice TEXT,
                 beneficiaire TEXT,
                 date_emission DATE,
+                date_entree DATE,
                 date_visa DATE,
+                date_rejet DATE,
+                decision TEXT,
+                motif_rejet TEXT,
+                date_reponse DATE,
+                contenu_reponse TEXT,
+                mois TEXT,
                 op_or INTEGER,
                 ov_cheq_type TEXT,
                 ov_cheq INTEGER,
@@ -140,7 +159,8 @@ public class Database {
                 sur_ram REAL,
                 sur_eng REAL,
                 depense REAL,
-                solde REAL
+                solde REAL,
+                montant REAL
             )
             """;
 
@@ -149,7 +169,8 @@ public class Database {
             // Ensure users table exists for authentication
             ensureUsersTable();
             // Run migrations to normalize older schemas into the cleaned form
-            migrateRemoveOpColumn();
+            // NOTE: do not remove legacy `op` column here — keep it for compatibility
+            // with older data and the DAO which may still reference it.
             migrateToFormSchema();
             // Ensure any missing columns are added (safe no-op if schema already matches)
             ensureOperationNewColumns();
@@ -187,9 +208,15 @@ public class Database {
             java.util.List<String> existing = new java.util.ArrayList<>();
             while (rs.next()) existing.add(rs.getString("name"));
 
-            // Desired schema exactly as requested by the user
-            String[] desired = new String[]{
+            // Diagnostic: log existing columns to help debug unexpected migrations/duplicates
+            log.info("Existing operations columns before migration: {}", existing);
+
+                // Desired schema: include current form fields AND preserve legacy columns
+                // such as `op`, `montant`, `date_entree`, `decision`, `mois` to
+                // maintain compatibility with older imports/tests that expect them.
+                String[] desired = new String[]{
                     "id",
+                    "op",
                     "imp",
                     "designation",
                     "nature",
@@ -198,7 +225,14 @@ public class Database {
                     "exercice",
                     "beneficiaire",
                     "date_emission",
+                    "date_entree",
                     "date_visa",
+                    "date_rejet",
+                    "decision",
+                    "motif_rejet",
+                    "date_reponse",
+                    "contenu_reponse",
+                    "mois",
                     "op_or",
                     "ov_cheq_type",
                     "ov_cheq",
@@ -206,15 +240,20 @@ public class Database {
                     "sur_ram",
                     "sur_eng",
                     "depense",
+                    "montant",
                     "solde"
-            };
+                };
 
             java.util.Set<String> existSet = new java.util.HashSet<>(existing);
 
             // If the table already has exactly these columns (ignoring order of columns), skip
             boolean allPresent = true;
             for (String d : desired) if (!existSet.contains(d)) { allPresent = false; break; }
-            if (allPresent && existSet.size() == desired.length) return;
+            if (allPresent && existSet.size() == desired.length) {
+                log.info("No migration needed for operations table (columns match desired schema)");
+                return;
+            }
+            log.info("Migration will run: desired size={}, existing size={}, allPresent={}", desired.length, existSet.size(), allPresent);
 
             // Backup the DB file before destructive migration
             try {
@@ -238,6 +277,7 @@ public class Database {
             String createNew = """
                 CREATE TABLE operations_new (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    op TEXT,
                     imp TEXT,
                     designation TEXT,
                     nature TEXT,
@@ -246,7 +286,14 @@ public class Database {
                     exercice TEXT,
                     beneficiaire TEXT,
                     date_emission DATE,
+                    date_entree DATE,
                     date_visa DATE,
+                    date_rejet DATE,
+                    decision TEXT,
+                    motif_rejet TEXT,
+                    date_reponse DATE,
+                    contenu_reponse TEXT,
+                    mois TEXT,
                     op_or INTEGER,
                     ov_cheq_type TEXT,
                     ov_cheq INTEGER,
@@ -254,6 +301,7 @@ public class Database {
                     sur_ram REAL,
                     sur_eng REAL,
                     depense REAL,
+                    montant REAL,
                     solde REAL
                 )
                 """;

@@ -432,6 +432,9 @@ public class MenuController {
             settings.setOnAction(e -> showSettingsDialog());
             // accessibility handled on the menu button and tooltip
 
+            javafx.scene.control.MenuItem about = new javafx.scene.control.MenuItem("À propos");
+            about.setOnAction(e -> showAbout());
+
             javafx.scene.control.MenuItem logout = new javafx.scene.control.MenuItem("Déconnexion");
             logout.setOnAction(e -> {
                 // reuse existing logout handler
@@ -451,10 +454,42 @@ public class MenuController {
                 userMenu.setAccessibleText(label);
             } catch (Exception ignore) {}
 
-            userMenu.getItems().addAll(profile, settings, new javafx.scene.control.SeparatorMenuItem(), logout);
+            userMenu.getItems().addAll(profile, settings, new javafx.scene.control.SeparatorMenuItem(), about, new javafx.scene.control.SeparatorMenuItem(), logout);
         } catch (Exception ignore) {}
     }
 
+    @FXML
+    private void showAbout() {
+        try {
+            String version = getAppVersion();
+            if (version == null) version = "dev";
+                String monthYear = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("MMMM yyyy", java.util.Locale.FRENCH));
+                String text = "Registre Comptable\nVersion: " + version + " — " + monthYear + "\n\nUne application de gestion comptable simple.\n\u00A9 A.Tahri — " + monthYear;
+            Alert a = new Alert(Alert.AlertType.INFORMATION, text, javafx.scene.control.ButtonType.OK);
+            DialogUtils.initOwner(a, rootPane);
+            a.setTitle("À propos");
+            a.setHeaderText("Registre Comptable");
+            a.showAndWait();
+        } catch (Exception e) { /* ignore */ }
+    }
+
+    private String getAppVersion() {
+        try {
+            String v = getClass().getPackage().getImplementationVersion();
+            if (v != null && !v.isBlank()) return v;
+            try (java.io.InputStream in = getClass().getResourceAsStream("/META-INF/maven/com.app/registre-comptable/pom.properties")) {
+                if (in != null) {
+                    java.util.Properties p = new java.util.Properties();
+                    p.load(in);
+                    String pv = p.getProperty("version");
+                    if (pv != null && !pv.isBlank()) return pv;
+                }
+            } catch (Exception ignore) {}
+        } catch (Exception ignore) {}
+        return null;
+    }
+
+    @FXML
     private void showProfileDialog() {
         try {
             String current = com.app.registre.Session.getCurrentUser();
@@ -522,6 +557,7 @@ public class MenuController {
         }
     }
 
+    @FXML
     private void showSettingsDialog() {
         try {
             javafx.scene.layout.GridPane grid = new javafx.scene.layout.GridPane();

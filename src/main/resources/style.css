@@ -217,6 +217,8 @@
 .top-bar { -fx-background-color: #2c3e50; -fx-padding: 10 16; -fx-border-color: transparent; -fx-border-width: 0; }
 .sidebar { -fx-background-color: #2c3e50; }
 
+
+
 /* Application content background (light) to match original design */
 .root, .content-area, .stack-pane {
     -fx-background-color: #f6f8fa;
@@ -267,6 +269,20 @@
 /* slight dim text for user display to match mockup */
 .top-bar .user-name .label {
     -fx-text-fill: rgba(255,255,255,0.85);
+}
+
+/* Ensure popup menu items (from MenuButton) have readable text/background */
+.menu-button .context-menu, .menu-button .menu {
+    -fx-background-color: white;
+}
+.menu-button .menu-item, .menu-button .menu-item .label,
+.context-menu .menu-item, .context-menu .menu-item .label,
+.menu .menu-item, .menu .menu-item .label {
+    -fx-text-fill: #2c3e50; /* dark text for readability */
+    -fx-font-size: 13px;
+}
+.context-menu .menu-item:selected, .menu-button .menu-item:selected {
+    -fx-background-color: rgba(52,152,219,0.08);
 }
 
 /* Brand styles: logo + title on left of top bar */
@@ -438,3 +454,6 @@
 .button .graphic {
     -fx-padding: 0 8 0 0;
 }
+
+/* Floating hamburger button (overlay) */
+

@@ -6,23 +6,63 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RecapDAO {
+    private static final Logger log = LoggerFactory.getLogger(RecapDAO.class);
 
     public Map<String, Double> getTotauxParMois() {
         Map<String, Double> totaux = new HashMap<>();
-        // Derive month from date_emission or date_visa, normalizing integer epoch-ms to localtime
-        String dateExpr = "CASE WHEN typeof(COALESCE(date_emission,date_visa))='integer' THEN datetime(COALESCE(date_emission,date_visa)/1000,'unixepoch','localtime') ELSE COALESCE(date_emission,date_visa) END";
-        String sql = "SELECT strftime('%m', " + dateExpr + ") as mois_num, SUM(solde) as total FROM operations GROUP BY mois_num ORDER BY mois_num";
+        // If explicit textual 'mois' values exist in the table, prefer grouping by that column
+        String countMoisSql = "SELECT COUNT(*) as c FROM operations WHERE mois IS NOT NULL AND TRIM(mois) <> ''";
+        try (Connection conn = Database.getInstance().getConnection()) {
 
-        try (Connection conn = Database.getInstance().getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+            // Log total rows for diagnostics
+            try (Statement stmtCount = conn.createStatement(); ResultSet totalRs = stmtCount.executeQuery("SELECT COUNT(*) as c FROM operations")) {
+                if (totalRs.next()) log.info("Total operations rows in DB: {}", totalRs.getInt("c"));
+            } catch (SQLException ex) {
+                log.warn("Unable to query operations count: {}", ex.getMessage());
+            }
 
-            while (rs.next()) {
-                String moisNum = rs.getString("mois_num");
-                String moisName = monthNameFromNumber(moisNum);
-                totaux.put(moisName, rs.getDouble("total"));
+            // Dump all rows for debugging using a dedicated statement (avoid multiple open ResultSets on same Statement)
+            try (Statement stmtDump = conn.createStatement(); ResultSet all = stmtDump.executeQuery("SELECT id, op, mois, montant, solde, depense, recette FROM operations ORDER BY id")) {
+                while (all.next()) {
+                    log.info("ROW id={} op={} mois={} montant={} solde={} depense={} recette={}", all.getInt("id"), all.getString("op"), all.getString("mois"), all.getObject("montant"), all.getObject("solde"), all.getObject("depense"), all.getObject("recette"));
+                }
+            } catch (SQLException ex) {
+                log.warn("Unable to dump operations rows: {}", ex.getMessage());
+            }
+
+            int c = 0;
+            try (Statement stmt = conn.createStatement(); ResultSet cnt = stmt.executeQuery(countMoisSql)) {
+                if (cnt.next()) c = cnt.getInt("c");
+            }
+
+            if (c > 0) {
+                // Group by textual mois column (e.g. 'JANVIER'). Use Java aggregation to avoid SQLite strangeness on grouping.
+                String sql = "SELECT mois, COALESCE(montant, solde) as val FROM operations";
+                try (Statement stmt2 = conn.createStatement(); ResultSet rs = stmt2.executeQuery(sql)) {
+                    while (rs.next()) {
+                        String m = rs.getString("mois");
+                        double v = rs.getDouble("val");
+                        log.info("Row read for mois='{}' val={}", m, v);
+                        totaux.put(m, totaux.getOrDefault(m, 0.0) + v);
+                    }
+                }
+                log.info("Computed months totals (from textual mois): {}", totaux);
+                return totaux;
+            }
+
+            // Fallback: derive month from date_emission or date_visa, normalizing integer epoch-ms to localtime
+            String dateExpr = "CASE WHEN typeof(COALESCE(date_emission,date_visa))='integer' THEN datetime(COALESCE(date_emission,date_visa)/1000,'unixepoch','localtime') ELSE COALESCE(date_emission,date_visa) END";
+            String sql = "SELECT strftime('%m', " + dateExpr + ") as mois_num, SUM(solde) as total FROM operations GROUP BY mois_num ORDER BY mois_num";
+            try (Statement stmt3 = conn.createStatement(); ResultSet rs = stmt3.executeQuery(sql)) {
+                while (rs.next()) {
+                    String moisNum = rs.getString("mois_num");
+                    String moisName = monthNameFromNumber(moisNum);
+                    totaux.put(moisName, rs.getDouble("total"));
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -139,8 +179,8 @@ public class RecapDAO {
     }
 
     public double getTotalRecettes() {
-        // Sum the 'recette' column (not 'solde') for operations that are recettes/subventions
-        String sql = "SELECT SUM(recette) as total FROM operations WHERE nature IN ('SUBVENTION', 'RECETTE')";
+        // Sum recettes: prefer stored 'recette' but fallback to montant or solde when recette is NULL
+        String sql = "SELECT SUM(COALESCE(recette, COALESCE(montant, solde))) as total FROM operations WHERE nature IN ('SUBVENTION', 'RECETTE')";
 
         try (Connection conn = Database.getInstance().getConnection();
              Statement stmt = conn.createStatement();
@@ -195,9 +235,9 @@ public class RecapDAO {
     }
 
     public double getTotalDepenses() {
-        // Sum depense: prefer stored 'depense' but fallback to (sur_ram + sur_eng) when depense is NULL
-        // Sum depense across all operations (use sur_ram+sur_eng when depense is NULL)
-        String sql = "SELECT SUM(COALESCE(depense, COALESCE(sur_ram,0) + COALESCE(sur_eng,0))) as total FROM operations";
+        // Sum depense: prefer stored 'depense', fallback to montant for expense natures, or sur_ram+sur_eng when depense is NULL
+        // Only consider operations that are not recettes/subventions
+        String sql = "SELECT SUM(COALESCE(depense, COALESCE(montant, COALESCE(sur_ram,0) + COALESCE(sur_eng,0)))) as total FROM operations WHERE COALESCE(nature,'') NOT IN ('SUBVENTION','RECETTE')";
 
         try (Connection conn = Database.getInstance().getConnection();
              Statement stmt = conn.createStatement();
