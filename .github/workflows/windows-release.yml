@@ -29,7 +29,18 @@ jobs:
             ${{ runner.os }}-m2-
 
       - name: Build shaded jar
-        run: .\mvnw.cmd -DskipTests package
+        shell: pwsh
+        run: |
+          # Run Maven and tee output to build.log so we can upload it on failure
+          & .\mvnw.cmd -DskipTests package *>&1 | Tee-Object -FilePath build.log
+          exit $LASTEXITCODE
+
+      - name: Upload build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: build.log
 
       - name: Install Launch4j (choco)
         run: choco install launch4j -y
