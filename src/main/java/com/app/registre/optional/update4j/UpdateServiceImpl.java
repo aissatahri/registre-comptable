@@ -197,21 +197,21 @@ public final class UpdateServiceImpl {
         Pattern p = Pattern.compile("\"name\"\\s*:\\s*\"update4j\\.xml\"[^{]*?\"browser_download_url\"\\s*:\\s*\"([^\"]+)\"", Pattern.DOTALL);
         Matcher m = p.matcher(body);
         if (m.find()) {
-            return m.group(1).replaceAll("\\\\/", "/");
+            return m.group(1).replace("\\/", "/");
         }
 
         // Fallback: find any asset whose name contains 'update4j' and return its browser_download_url
         p = Pattern.compile("\"name\"\\s*:\\s*\"([^"]*update4j[^"]*)\"[^{]*?\"browser_download_url\"\\s*:\\s*\"([^\"]+)\"", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
         m = p.matcher(body);
         if (m.find()) {
-            return m.group(2).replaceAll("\\\\/", "/");
+            return m.group(2).replace("\\/", "/");
         }
 
         // As a last resort, try to pick any asset with .xml in the name and hope it's the manifest
         p = Pattern.compile("\"name\"\\s*:\\s*\"([^"]+\\.xml)\"[^{]*?\"browser_download_url\"\\s*:\\s*\"([^\"]+)\"", Pattern.DOTALL);
         m = p.matcher(body);
         if (m.find()) {
-            return m.group(2).replaceAll("\\\\/", "/");
+            return m.group(2).replace("\\/", "/");
         }
 
         return null;
