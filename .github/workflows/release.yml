@@ -1,5 +1,8 @@
 name: Build and Release
 
+permissions:
+  contents: write
+
 on:
   push:
     tags: ['v*.*.*']
@@ -75,6 +78,16 @@ EOF
 }
 EOF
           echo "Generated version.json"
+
+      - name: Debug generated files
+        run: |
+          echo "JAR from env: $JAR"
+          echo "Listing target/"
+          ls -la target || true
+          echo '--- update4j.xml ---'
+          if [ -f update4j.xml ]; then cat update4j.xml; else echo 'update4j.xml not found'; fi
+          echo '--- version.json ---'
+          if [ -f version.json ]; then cat version.json; else echo 'version.json not found'; fi
 
       - name: Create GitHub Release and upload assets
         uses: ncipollo/release-action@v1
