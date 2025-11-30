@@ -17,8 +17,21 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Build package
-        run: mvn -DskipTests=true package
+      - name: Build package (debug)
+        run: |
+          mvn -DskipTests=true -U -e package
+
+      - name: List target directory
+        run: |
+          echo "Contents of target/ after build:" 
+          ls -la target || true
+
+      - name: Upload built jar (artifact for debug)
+        uses: actions/upload-artifact@v4
+        with:
+          name: built-jar
+          path: |
+            target/*.jar
 
       - name: Find built jar
         id: findjar
