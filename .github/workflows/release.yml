@@ -52,7 +52,7 @@ jobs:
           VERSION=${GITHUB_REF_NAME#v}
           BASE="https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}/"
           JARNAME=$(basename "$JAR")
-          cat > update4j.xml <<'EOF'
+          cat > update4j.xml <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration base="${BASE}">
   <provider>
@@ -66,7 +66,7 @@ EOF
 
       - name: Generate version.json
         run: |
-          cat > version.json <<'EOF'
+          cat > version.json <<EOF
 {
   "version": "${VERSION}",
   "jar": "${JARNAME}",

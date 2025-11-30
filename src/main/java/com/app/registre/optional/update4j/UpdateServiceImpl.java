@@ -14,6 +14,8 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Reflection-based UpdateService implementation that invokes update4j methods via reflection.
@@ -27,9 +29,26 @@ public final class UpdateServiceImpl {
     public static void checkForUpdatesAndPrompt() {
         CompletableFuture.supplyAsync(() -> {
             try {
-                String xml = readUrlAsString(MANIFEST_URL);
+                String override = System.getProperty("update4j.manifest.url");
+                String manifestUrl = override != null && !override.isBlank() ? override : MANIFEST_URL;
+                String usedUrl = manifestUrl;
+                String xml = null;
+                try {
+                    xml = readUrlAsString(manifestUrl);
+                } catch (IOException ioe) {
+                    // try GitHub API fallback
+                    try {
+                        String found = findManifestUrlFromGitHubApi();
+                        if (found != null) {
+                            xml = readUrlAsString(found);
+                            usedUrl = found;
+                        }
+                    } catch (Exception ignore) {}
+                    if (xml == null) throw ioe;
+                }
+
                 String remoteVersion = parseVersionFromManifest(xml);
-                Object cfg = loadConfiguration(new URL(MANIFEST_URL));
+                Object cfg = loadConfiguration(new URL(usedUrl));
                 return new Object[] { cfg, remoteVersion };
             } catch (Exception e) {
                 LOGGER.log(Level.INFO, "No update manifest found or error reading manifest: " + e.getMessage());
@@ -166,6 +185,36 @@ public final class UpdateServiceImpl {
             Thread.currentThread().interrupt();
             throw new IOException(e);
         }
+    }
+
+    private static String findManifestUrlFromGitHubApi() throws IOException {
+        // Use the GitHub Releases API to find the asset named update4j.xml
+        final String api = "https://api.github.com/repos/aissatahri/registre-comptable/releases/latest";
+        String body = readUrlAsString(api);
+        if (body == null) return null;
+
+        // First try to find an asset object that contains name:"update4j.xml" and capture its browser_download_url
+        Pattern p = Pattern.compile("\"name\"\\s*:\\s*\"update4j\\.xml\"[^{]*?\"browser_download_url\"\\s*:\\s*\"([^\"]+)\"", Pattern.DOTALL);
+        Matcher m = p.matcher(body);
+        if (m.find()) {
+            return m.group(1).replaceAll("\\\\/", "/");
+        }
+
+        // Fallback: find any asset whose name contains 'update4j' and return its browser_download_url
+        p = Pattern.compile("\"name\"\\s*:\\s*\"([^"]*update4j[^"]*)\"[^{]*?\"browser_download_url\"\\s*:\\s*\"([^\"]+)\"", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+        m = p.matcher(body);
+        if (m.find()) {
+            return m.group(2).replaceAll("\\\\/", "/");
+        }
+
+        // As a last resort, try to pick any asset with .xml in the name and hope it's the manifest
+        p = Pattern.compile("\"name\"\\s*:\\s*\"([^"]+\\.xml)\"[^{]*?\"browser_download_url\"\\s*:\\s*\"([^\"]+)\"", Pattern.DOTALL);
+        m = p.matcher(body);
+        if (m.find()) {
+            return m.group(2).replaceAll("\\\\/", "/");
+        }
+
+        return null;
     }
 
     private static String parseVersionFromManifest(String xml) {
