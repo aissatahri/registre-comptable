@@ -66,6 +66,9 @@ jobs:
 </configuration>
 EOF
           echo "Generated update4j.xml"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "BASE=$BASE" >> $GITHUB_ENV
+          echo "JARNAME=$JARNAME" >> $GITHUB_ENV
 
       - name: Generate version.json
         run: |
@@ -89,12 +92,36 @@ EOF
           echo '--- version.json ---'
           if [ -f version.json ]; then cat version.json; else echo 'version.json not found'; fi
 
-      - name: Create GitHub Release and upload assets
-        uses: ncipollo/release-action@v1
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
         with:
-          tag: ${{ github.ref_name }}
-          name: Release ${{ github.ref_name }}
-          files: |
-            ${{ env.JAR }}
-            update4j.xml
-            version.json
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
+          body: Generated release for ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+
+      - name: Upload JAR to release
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ env.JAR }}
+          asset_name: ${{ env.JARNAME }}
+          asset_content_type: application/java-archive
+
+      - name: Upload update4j manifest
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: update4j.xml
+          asset_name: update4j.xml
+          asset_content_type: application/xml
+
+      - name: Upload version.json
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: version.json
+          asset_name: version.json
+          asset_content_type: application/json
