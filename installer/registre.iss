@@ -3,7 +3,7 @@
 
 ; Helper to pass the correct SourceJar path at compile time
 ; Script is located in the `installer\` folder, so reference the jar one level up
-#define SourceJar "..\\target\\registre-comptable-1.1.0-all.jar"
+#define SourceJar "..\\target\\registre-comptable-1.1.0.jar"
 
 ; If a native launcher was built with Launch4j, include it and use it for shortcuts
 #if FileExists('launcher-1.1.0.exe')

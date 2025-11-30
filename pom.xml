@@ -74,6 +74,12 @@
             <artifactId>log4j-core</artifactId>
             <version>2.21.1</version>
         </dependency>
+        <!-- Update4j for application updates (enable when publishing/activating updater) -->
+        <dependency>
+            <groupId>org.update4j</groupId>
+            <artifactId>update4j</artifactId>
+            <version>1.5.0</version>
+        </dependency>
     </dependencies>
 
     <build>

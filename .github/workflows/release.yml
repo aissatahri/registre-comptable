@@ -1,0 +1,74 @@
+name: Build and Release
+
+on:
+  push:
+    tags: ['v*.*.*']
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Build package
+        run: mvn -DskipTests=true package
+
+      - name: Find built jar
+        id: findjar
+        run: |
+          JAR=$(ls target/*.jar | grep -v "original-" | head -n1)
+          echo "JAR=$JAR" >> $GITHUB_ENV
+          echo "Found jar: $JAR"
+
+      - name: Compute SHA256
+        id: sha
+        run: |
+          SHA=$(sha256sum "$JAR" | awk '{print $1}')
+          echo "SHA=$SHA" >> $GITHUB_ENV
+          echo "SHA=$SHA"
+
+      - name: Generate update4j manifest
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          BASE="https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}/"
+          JARNAME=$(basename "$JAR")
+          cat > update4j.xml <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration base="${BASE}">
+  <provider>
+    <name>GitHub Releases</name>
+  </provider>
+  <file path="${JARNAME}" checksum="${SHA}" download="true" />
+  <launcher class="com.app.registre.Main" />
+</configuration>
+EOF
+          echo "Generated update4j.xml"
+
+      - name: Generate version.json
+        run: |
+          cat > version.json <<EOF
+{
+  "version": "${VERSION}",
+  "jar": "${JARNAME}",
+  "sha256": "${SHA}",
+  "url": "${BASE}${JARNAME}"
+}
+EOF
+          echo "Generated version.json"
+
+      - name: Create GitHub Release and upload assets
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          files: |
+            ${{ env.JAR }}
+            update4j.xml
+            version.json

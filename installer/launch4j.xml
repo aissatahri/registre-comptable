@@ -1,7 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <launch4jConfig>
   <dontWrapJar>false</dontWrapJar>
   <headerType>gui</headerType>
-  <jar>..\target\registre-comptable-1.1.0-all.jar</jar>
+  <jar>D:\Project_JavaFX\registre-comptable\target\registre-comptable-1.1.0.jar</jar>
   <outfile>launcher-1.1.0.exe</outfile>
   <errTitle></errTitle>
   <cmdLine></cmdLine>
@@ -14,11 +15,10 @@
   <manifest></manifest>
   <icon>app.ico</icon>
   <jre>
-    <path></path>
-    <bundledJre64Bit>false</bundledJre64Bit>
+    <path>%JAVA_HOME%;%PATH%</path>
+    <requiresJdk>false</requiresJdk>
+    <requires64Bit>false</requires64Bit>
     <minVersion>17</minVersion>
     <maxVersion></maxVersion>
-    <jdkPreference>preferJre</jdkPreference>
-    <runtimeBits>64/32</runtimeBits>
   </jre>
 </launch4jConfig>

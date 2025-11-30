@@ -435,6 +435,24 @@ public class MenuController {
             javafx.scene.control.MenuItem about = new javafx.scene.control.MenuItem("À propos");
             about.setOnAction(e -> showAbout());
 
+            javafx.scene.control.MenuItem checkUpdates = new javafx.scene.control.MenuItem("Vérifier les mises à jour");
+            checkUpdates.setOnAction(e -> {
+                try {
+                    // Use reflection so the project can compile even if UpdateService (and update4j) is not present
+                    Class<?> cls = Class.forName("com.app.registre.util.UpdateService");
+                    java.lang.reflect.Method m = cls.getMethod("checkForUpdatesAndPrompt");
+                    m.invoke(null);
+                } catch (ClassNotFoundException cnf) {
+                    javafx.scene.control.Alert a = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION, "La fonctionnalité de mise à jour n'est pas disponible (module manquant).", javafx.scene.control.ButtonType.OK);
+                    DialogUtils.initOwner(a, rootPane);
+                    a.setTitle("Mise à jour");
+                    a.showAndWait();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    showError("Erreur lors de la vérification des mises à jour", ex);
+                }
+            });
+
             javafx.scene.control.MenuItem logout = new javafx.scene.control.MenuItem("Déconnexion");
             logout.setOnAction(e -> {
                 // reuse existing logout handler
@@ -454,7 +472,7 @@ public class MenuController {
                 userMenu.setAccessibleText(label);
             } catch (Exception ignore) {}
 
-            userMenu.getItems().addAll(profile, settings, new javafx.scene.control.SeparatorMenuItem(), about, new javafx.scene.control.SeparatorMenuItem(), logout);
+            userMenu.getItems().addAll(profile, settings, new javafx.scene.control.SeparatorMenuItem(), checkUpdates, about, new javafx.scene.control.SeparatorMenuItem(), logout);
         } catch (Exception ignore) {}
     }
 
@@ -463,8 +481,7 @@ public class MenuController {
         try {
             String version = getAppVersion();
             if (version == null) version = "dev";
-                String monthYear = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("MMMM yyyy", java.util.Locale.FRENCH));
-                String text = "Registre Comptable\nVersion: " + version + " — " + monthYear + "\n\nUne application de gestion comptable simple.\n\u00A9 A.Tahri — " + monthYear;
+            String text = "Registre Comptable\nVersion: " + version + "\n\nUne application de gestion comptable simple.";
             Alert a = new Alert(Alert.AlertType.INFORMATION, text, javafx.scene.control.ButtonType.OK);
             DialogUtils.initOwner(a, rootPane);
             a.setTitle("À propos");
