@@ -141,10 +141,33 @@ public final class UpdateServiceImpl {
             dialog.setResultConverter(btn -> null);
             CompletableFuture.runAsync(() -> {
                 try {
+                    Platform.runLater(() -> status.setText("Vérification des fichiers..."));
+                    
+                    // Vérifier si des fichiers nécessitent une mise à jour
+                    Method requiresUpdateMethod = cfg.getClass().getMethod("requiresUpdate");
+                    boolean needsUpdate = (boolean) requiresUpdateMethod.invoke(cfg);
+                    
+                    System.err.println("[UpdateServiceImpl] Fichiers à mettre à jour: " + needsUpdate);
+                    
+                    if (!needsUpdate) {
+                        Platform.runLater(() -> {
+                            dialog.close();
+                            Alert info = new Alert(Alert.AlertType.INFORMATION);
+                            info.setTitle("Aucune mise à jour nécessaire");
+                            info.setHeaderText("Tous les fichiers sont déjà à jour");
+                            info.setContentText("Aucun téléchargement n'est requis.");
+                            info.getButtonTypes().setAll(ButtonType.OK);
+                            info.showAndWait();
+                        });
+                        return;
+                    }
+                    
                     Platform.runLater(() -> status.setText("Téléchargement..."));
                     // Appel direct de la méthode update() sur l'instance Configuration
                     Method updateMethod = cfg.getClass().getMethod("update");
                     boolean success = (boolean) updateMethod.invoke(cfg);
+                    
+                    System.err.println("[UpdateServiceImpl] Résultat du téléchargement: " + success);
                     
                     Platform.runLater(() -> status.setText("Application..."));
                     try { Thread.sleep(500); } catch (InterruptedException ignored) {}

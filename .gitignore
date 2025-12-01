@@ -14,6 +14,17 @@
 
 # Local logs and query outputs
 query_*.txt
+update-*.log
+
+# Release folders (upload manually to GitHub)
+release-v*/
+
+# Installer output (large files)
+installer/Output/
+installer/launcher-*.exe
+
+# Test/debug outputs
+out/artifacts/
 
 # OS files
 Thumbs.db

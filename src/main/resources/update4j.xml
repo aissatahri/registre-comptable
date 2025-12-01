@@ -4,7 +4,7 @@
      - In CI you should generate a manifest per release and upload it alongside your artifacts.
 -->
 <!-- Mettez à jour la version dans l'URL et dans la propriété 'version' -->
-<configuration base="https://github.com/aissatahri/registre-comptable/releases/download/v1.3.8/" version="1.3.8">
+<configuration base="https://github.com/aissatahri/registre-comptable/releases/download/v1.3.9/" version="1.3.9">
     <provider>
         <name>GitHub Releases</name>
     </provider>
