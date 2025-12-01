@@ -91,9 +91,10 @@ public class LoginController {
                                 String storedPwd = ConfigUtil.get("firstRun.adminPassword");
                                 if (storedPwd != null && !storedPwd.isBlank() && passwordField != null) passwordField.setText(storedPwd);
                                 handleLogin();
-                                if (authenticated && mustForce) {
-                                    promptForcePasswordChange();
-                                }
+                                // Disabled: force password change on first run
+                                // if (authenticated && mustForce) {
+                                //     promptForcePasswordChange();
+                                // }
                             } catch (Exception ignore) {}
                         });
                     } else {
@@ -167,13 +168,14 @@ public class LoginController {
             }
             close();
                 // After successful login, enforce password-change if required by config
-                try {
-                    String forceChange = com.app.registre.util.ConfigUtil.get("firstRun.forceChange");
-                    boolean mustForce = "true".equalsIgnoreCase(forceChange);
-                    if (mustForce) {
-                        promptForcePasswordChange();
-                    }
-                } catch (Exception ignore) {}
+                // Disabled: force password change on first run
+                // try {
+                //     String forceChange = com.app.registre.util.ConfigUtil.get("firstRun.forceChange");
+                //     boolean mustForce = "true".equalsIgnoreCase(forceChange);
+                //     if (mustForce) {
+                //         promptForcePasswordChange();
+                //     }
+                // } catch (Exception ignore) {}
         } else {
             errorLabel.setText("Identifiants invalides");
         }
