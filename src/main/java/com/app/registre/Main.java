@@ -182,7 +182,10 @@ public class Main extends Application {
                                 javafx.scene.control.Alert a = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR,
                                         "Le chemin enregistré vers la base de données est invalide. Voulez-vous choisir un autre fichier de base de données ?",
                                         choose, ignore);
-                                a.initOwner(owner);
+                                // Ne pas définir owner si le stage n'a pas encore de scène
+                                if (owner != null && owner.getScene() != null) {
+                                    a.initOwner(owner);
+                                }
                                 a.setTitle("Base de données invalide");
                                 java.util.Optional<javafx.scene.control.ButtonType> r = a.showAndWait();
                                 if (r.isPresent() && r.get() == choose) {
@@ -216,7 +219,10 @@ public class Main extends Application {
 
             javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.CONFIRMATION,
                     "Choisissez où stocker ou charger la base de données.", create, open, useDefault);
-            alert.initOwner(owner);
+            // Ne pas définir owner si le stage n'a pas encore de scène
+            if (owner != null && owner.getScene() != null) {
+                alert.initOwner(owner);
+            }
             alert.setTitle("Emplacement de la base de données");
             alert.setHeaderText("Sélectionnez une option");
 

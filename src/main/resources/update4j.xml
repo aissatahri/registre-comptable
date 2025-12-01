@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Manifest update4j généré automatiquement pour v1.4.3 -->
-<configuration base="https://github.com/aissatahri/registre-comptable/releases/download/v1.4.3/" version="1.4.3">
+<!-- Manifest update4j généré automatiquement pour v1.4.4 -->
+<configuration base="https://github.com/aissatahri/registre-comptable/releases/download/v1.4.4/" version="1.4.4">
     <provider>
         <name>GitHub Releases</name>
     </provider>
 
     <!-- JAR principal de l'application -->
-    <file path="registre-comptable-1.4.3.jar" size="43681484" checksum="3cec6f15240108b553ff236995fb3913"/>
+    <file path="registre-comptable-1.4.4.jar" size="45164393" checksum="47559c73912ae7b3653fd18f322a2ca5"/>
 
     <!-- Launcher: classe principale à exécuter après mise à jour -->
     <launcher class="com.app.registre.Main">
