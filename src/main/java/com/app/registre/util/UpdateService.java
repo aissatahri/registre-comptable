@@ -13,14 +13,21 @@ public final class UpdateService {
 
     public static void checkForUpdatesAndPrompt() {
         try {
+            System.err.println("[UpdateService] Tentative de chargement de UpdateServiceImpl...");
             Class<?> impl = Class.forName("com.app.registre.optional.update4j.UpdateServiceImpl");
+            System.err.println("[UpdateService] UpdateServiceImpl chargé avec succès");
             java.lang.reflect.Method m = impl.getMethod("checkForUpdatesAndPrompt");
+            System.err.println("[UpdateService] Méthode checkForUpdatesAndPrompt trouvée, invocation...");
             m.invoke(null);
+            System.err.println("[UpdateService] UpdateServiceImpl.checkForUpdatesAndPrompt() appelé");
         } catch (ClassNotFoundException e) {
+            System.err.println("[UpdateService] UpdateServiceImpl non trouvé, utilisation du fallback");
             // Optional implementation not present: perform a lightweight fallback check using GitHub Releases
             fallbackCheckAndPrompt();
         } catch (Exception ex) {
+            System.err.println("[UpdateService] Erreur lors du chargement/invocation de UpdateServiceImpl: " + ex.getMessage());
             ex.printStackTrace();
+            fallbackCheckAndPrompt();
         }
     }
 

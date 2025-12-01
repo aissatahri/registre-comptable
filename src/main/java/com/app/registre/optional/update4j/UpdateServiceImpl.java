@@ -27,40 +27,57 @@ public final class UpdateServiceImpl {
     private UpdateServiceImpl() {}
 
     public static void checkForUpdatesAndPrompt() {
+        System.err.println("[UpdateServiceImpl] D��marrage de la v��rification des mises ��  jour...");
         CompletableFuture.supplyAsync(() -> {
             try {
+                System.err.println("[UpdateServiceImpl] Lecture du manifest depuis: " + MANIFEST_URL);
                 String override = System.getProperty("update4j.manifest.url");
                 String manifestUrl = override != null && !override.isBlank() ? override : MANIFEST_URL;
                 String usedUrl = manifestUrl;
                 String xml = null;
                 try {
                     xml = readUrlAsString(manifestUrl);
+                    System.err.println("[UpdateServiceImpl] Manifest t��l��charg�� avec succ��s");
                 } catch (IOException ioe) {
+                    System.err.println("[UpdateServiceImpl] ��chec lecture manifest, tentative fallback API GitHub: " + ioe.getMessage());
                     // try GitHub API fallback
                     try {
                         String found = findManifestUrlFromGitHubApi();
                         if (found != null) {
                             xml = readUrlAsString(found);
                             usedUrl = found;
+                            System.err.println("[UpdateServiceImpl] Manifest trouv�� via API GitHub: " + found);
                         }
-                    } catch (Exception ignore) {}
+                    } catch (Exception ignore) {
+                        System.err.println("[UpdateServiceImpl] Fallback API GitHub ��chou��: " + ignore.getMessage());
+                    }
                     if (xml == null) throw ioe;
                 }
 
                 String remoteVersion = parseVersionFromManifest(xml);
+                System.err.println("[UpdateServiceImpl] Version distante: " + remoteVersion);
                 Object cfg = loadConfiguration(new URL(usedUrl));
+                System.err.println("[UpdateServiceImpl] Configuration charg��e");
                 return new Object[] { cfg, remoteVersion };
             } catch (Exception e) {
+                System.err.println("[UpdateServiceImpl] Erreur lors de la v��rification: " + e.getMessage());
+                e.printStackTrace();
                 LOGGER.log(Level.INFO, "No update manifest found or error reading manifest: " + e.getMessage());
                 return null;
             }
         }).thenAccept(obj -> {
-            if (obj == null) return;
+            System.err.println("[UpdateServiceImpl] Traitement du r��sultat...");
+            if (obj == null) {
+                System.err.println("[UpdateServiceImpl] Aucun r��sultat (erreur pr��c��dente)");
+                return;
+            }
             Object cfg = ((Object[]) obj)[0];
             String remoteVersion = (String) ((Object[]) obj)[1];
 
             String local = getLocalVersion();
+            System.err.println("[UpdateServiceImpl] Version locale: " + local);
             final boolean newer = remoteVersion != null && !remoteVersion.isBlank() && isRemoteVersionNewer(local, remoteVersion);
+            System.err.println("[UpdateServiceImpl] Version plus r��cente disponible? " + newer);
 
             Platform.runLater(() -> {
                 if (!newer) {
