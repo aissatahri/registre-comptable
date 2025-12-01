@@ -152,9 +152,15 @@ public final class UpdateServiceImpl {
                     Platform.runLater(() -> {
                         dialog.close();
                         if (success) {
-                            Alert info = new Alert(Alert.AlertType.INFORMATION, "La mise à jour a été appliquée avec succès. Veuillez relancer l'application.", ButtonType.OK);
+                            Alert info = new Alert(Alert.AlertType.INFORMATION);
                             info.setTitle("Mise à jour appliquée");
+                            info.setHeaderText("La mise à jour a été téléchargée avec succès");
+                            info.setContentText("L'application va redémarrer pour appliquer les changements.");
+                            info.getButtonTypes().setAll(ButtonType.OK);
                             info.showAndWait();
+                            
+                            // Redémarrage de l'application
+                            restartApplication();
                         } else {
                             Alert warn = new Alert(Alert.AlertType.WARNING, "La mise à jour a échoué. Consultez les logs pour plus de détails.", ButtonType.OK);
                             warn.setTitle("Échec de la mise à jour");
@@ -263,5 +269,46 @@ public final class UpdateServiceImpl {
             }
         } catch (IOException ignored) {}
         return "0.0.0";
+    }
+
+    private static void restartApplication() {
+        try {
+            // Récupération du chemin du JAR en cours d'exécution
+            String javaBin = System.getProperty("java.home") + "/bin/java";
+            String currentJar = UpdateServiceImpl.class.getProtectionDomain()
+                .getCodeSource().getLocation().toURI().getPath();
+            
+            // Sur Windows, enlever le "/" initial si présent
+            if (currentJar.startsWith("/") && currentJar.contains(":")) {
+                currentJar = currentJar.substring(1);
+            }
+            
+            System.err.println("[UpdateServiceImpl] Redémarrage avec: " + javaBin + " -jar " + currentJar);
+            
+            // Construction de la commande de redémarrage
+            ProcessBuilder builder = new ProcessBuilder(javaBin, "-jar", currentJar);
+            builder.start();
+            
+            // Arrêt de l'application actuelle après un court délai
+            new Thread(() -> {
+                try {
+                    Thread.sleep(500);
+                    System.exit(0);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+            
+        } catch (Exception e) {
+            System.err.println("[UpdateServiceImpl] Erreur lors du redémarrage: " + e.getMessage());
+            e.printStackTrace();
+            Platform.runLater(() -> {
+                Alert error = new Alert(Alert.AlertType.ERROR);
+                error.setTitle("Erreur de redémarrage");
+                error.setHeaderText("Impossible de redémarrer automatiquement");
+                error.setContentText("Veuillez fermer et relancer l'application manuellement.\n\nErreur: " + e.getMessage());
+                error.showAndWait();
+            });
+        }
     }
 }
