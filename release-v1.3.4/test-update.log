@@ -1,0 +1,10 @@
+[main] INFO com.app.registre.Main - Lancement de l'application...
+[JavaFX Application Thread] WARN com.app.registre.Main - Erreur lors du choix de l'emplacement DB, utilisation de la valeur par dلfaut: Cannot invoke "javafx.scene.Scene.getStylesheets()" because "<local5>" is null
+[JavaFX Application Thread] INFO com.app.registre.Main - Initialisation des utilisateurs et affichage de la fenمtre de connexion...
+[JavaFX Application Thread] INFO com.app.registre.dao.Database - Existing operations columns before migration: [id, op, imp, designation, nature, n, budg, exercice, beneficiaire, date_emission, date_entree, date_visa, date_rejet, decision, motif_rejet, date_reponse, contenu_reponse, mois, op_or, ov_cheq_type, ov_cheq, recette, sur_ram, sur_eng, depense, solde, montant]
+[JavaFX Application Thread] INFO com.app.registre.dao.Database - No migration needed for operations table (columns match desired schema)
+[JavaFX Application Thread] INFO com.app.registre.Main - Chargement du FXML principal...
+[JavaFX Application Thread] INFO com.app.registre.Main - FXML chargل avec succكs
+[JavaFX Application Thread] INFO com.app.registre.Main - CSS chargل
+[JavaFX Application Thread] INFO com.app.registre.Main - Icَne chargلe
+[JavaFX Application Thread] INFO com.app.registre.Main - Application dلmarrلe avec succكs
