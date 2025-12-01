@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Manifest update4j généré automatiquement pour v1.4.5 -->
-<configuration version="1.4.5">
+<!-- Manifest update4j généré automatiquement pour v1.4.6 -->
+<configuration version="1.4.6">
     <provider>
         <name>GitHub Releases</name>
     </provider>
 
     <!-- JAR principal de l'application -->
-    <file uri="https://github.com/aissatahri/registre-comptable/releases/download/v1.4.5/registre-comptable-1.4.5.jar" 
-          path="registre-comptable-1.4.5.jar" 
-          size="45164394" 
-          checksum="b33060753cbd168b6d9e81f64486986e"
+    <file uri="https://github.com/aissatahri/registre-comptable/releases/download/v1.4.6/registre-comptable-1.4.6.jar" 
+          path="registre-comptable-1.4.6.jar" 
+          size="43681755" 
+          checksum="4e689886f921904d10a1be7c3868bc90"
           ignoreBootConflict="true"/>
 
     <!-- Launcher: classe principale à exécuter après mise à jour -->
