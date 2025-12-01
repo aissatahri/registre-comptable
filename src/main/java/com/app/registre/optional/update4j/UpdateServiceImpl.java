@@ -191,8 +191,20 @@ public final class UpdateServiceImpl {
                         }
                     });
                 } catch (Exception e) {
-                    LOGGER.log(Level.SEVERE, "Erreur lors de l'application de la mise à jour: " + e.getMessage(), e);
-                    final String errorMsg = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName() + " - " + e.toString();
+                    // Déballer InvocationTargetException pour obtenir la vraie cause
+                    Throwable cause = e;
+                    if (e instanceof java.lang.reflect.InvocationTargetException) {
+                        cause = ((java.lang.reflect.InvocationTargetException) e).getTargetException();
+                    }
+                    
+                    LOGGER.log(Level.SEVERE, "Erreur lors de l'application de la mise à jour: " + cause.getMessage(), cause);
+                    System.err.println("[UpdateServiceImpl] ERREUR: " + cause.getClass().getName() + ": " + cause.getMessage());
+                    cause.printStackTrace();
+                    
+                    final String errorMsg = cause.getMessage() != null && !cause.getMessage().isEmpty() 
+                        ? cause.getMessage() 
+                        : cause.getClass().getSimpleName();
+                        
                     Platform.runLater(() -> {
                         dialog.close();
                         Alert err = new Alert(Alert.AlertType.ERROR);
