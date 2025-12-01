@@ -481,32 +481,60 @@ public class OperationDAO {
     private Operation mapResultSetToOperation(ResultSet rs) throws SQLException {
         Operation operation = new Operation();
         operation.setId(rs.getInt("id"));
-        try { operation.setOp(rs.getString("op")); } catch (SQLException ignored) {}
-        try { operation.setOvCheqType(rs.getString("ov_cheq_type")); } catch (SQLException ignored) {}
-        try { int ov = rs.getInt("ov_cheq"); operation.setOvCheq(rs.wasNull() ? null : ov); } catch (SQLException ignored) {}
+        operation.setOp(rs.getString("op"));
         operation.setImp(rs.getString("imp"));
+        operation.setDesignation(rs.getString("designation"));
         operation.setNature(rs.getString("nature"));
+        operation.setN(rs.getString("n"));
         operation.setBudg(rs.getString("budg"));
-        try { operation.setSolde(rs.getDouble("solde")); } catch (SQLException ignored) {}
-        try { double mont = rs.getDouble("montant"); if (!rs.wasNull()) operation.setSolde(mont); } catch (SQLException ignored) {}
-        try { Date dateEntree = rs.getDate("date_entree"); if (dateEntree != null) operation.setDateEntree(dateEntree.toLocalDate()); } catch (SQLException ignored) {}
-        try { Date dateVisa = rs.getDate("date_visa"); if (dateVisa != null) operation.setDateVisa(dateVisa.toLocalDate()); } catch (SQLException ignored) {}
-        try { Date dateRejet = rs.getDate("date_rejet"); if (dateRejet != null) operation.setDateRejet(dateRejet.toLocalDate()); } catch (SQLException ignored) {}
-        try { operation.setDecision(rs.getString("decision")); } catch (SQLException ignored) {}
-        try { operation.setMotifRejet(rs.getString("motif_rejet")); } catch (SQLException ignored) {}
-        try { Date dateReponse = rs.getDate("date_reponse"); if (dateReponse != null) operation.setDateReponse(dateReponse.toLocalDate()); } catch (SQLException ignored) {}
-        try { operation.setContenuReponse(rs.getString("contenu_reponse")); } catch (SQLException ignored) {}
-        try { operation.setMois(rs.getString("mois")); } catch (SQLException ignored) {}
-        try { operation.setDesignation(rs.getString("designation")); } catch (SQLException ignored) {}
-        try { String nVal = rs.getString("n"); operation.setN(nVal); } catch (SQLException ignored) {}
-        try { operation.setExercice(rs.getString("exercice")); } catch (SQLException ignored) {}
-        try { operation.setBeneficiaire(rs.getString("beneficiaire")); } catch (SQLException ignored) {}
-        try { Date de = rs.getDate("date_emission"); if (de != null) operation.setDateEmission(de.toLocalDate()); } catch (SQLException ignored) {}
-        try { int opOr = rs.getInt("op_or"); operation.setOpOr(rs.wasNull() ? null : opOr); } catch (SQLException ignored) {}
-        try { double r = rs.getDouble("recette"); operation.setRecette(rs.wasNull() ? null : r); } catch (SQLException ignored) {}
-        try { double sr = rs.getDouble("sur_ram"); operation.setSurRam(rs.wasNull() ? null : sr); } catch (SQLException ignored) {}
-        try { double se = rs.getDouble("sur_eng"); operation.setSurEng(rs.wasNull() ? null : se); } catch (SQLException ignored) {}
-        try { double d = rs.getDouble("depense"); operation.setDepense(rs.wasNull() ? null : d); } catch (SQLException ignored) {}
+        operation.setExercice(rs.getString("exercice"));
+        operation.setBeneficiaire(rs.getString("beneficiaire"));
+        
+        // Dates
+        Date dateEmission = rs.getDate("date_emission");
+        if (dateEmission != null) operation.setDateEmission(dateEmission.toLocalDate());
+        
+        Date dateEntree = rs.getDate("date_entree");
+        if (dateEntree != null) operation.setDateEntree(dateEntree.toLocalDate());
+        
+        Date dateVisa = rs.getDate("date_visa");
+        if (dateVisa != null) operation.setDateVisa(dateVisa.toLocalDate());
+        
+        Date dateRejet = rs.getDate("date_rejet");
+        if (dateRejet != null) operation.setDateRejet(dateRejet.toLocalDate());
+        
+        Date dateReponse = rs.getDate("date_reponse");
+        if (dateReponse != null) operation.setDateReponse(dateReponse.toLocalDate());
+        
+        // Texte optionnel
+        operation.setDecision(rs.getString("decision"));
+        operation.setMotifRejet(rs.getString("motif_rejet"));
+        operation.setContenuReponse(rs.getString("contenu_reponse"));
+        operation.setMois(rs.getString("mois"));
+        
+        // Integers nullables
+        int opOr = rs.getInt("op_or");
+        operation.setOpOr(rs.wasNull() ? null : opOr);
+        
+        operation.setOvCheqType(rs.getString("ov_cheq_type"));
+        int ovCheq = rs.getInt("ov_cheq");
+        operation.setOvCheq(rs.wasNull() ? null : ovCheq);
+        
+        // Doubles nullables
+        double recette = rs.getDouble("recette");
+        operation.setRecette(rs.wasNull() ? null : recette);
+        
+        double surRam = rs.getDouble("sur_ram");
+        operation.setSurRam(rs.wasNull() ? null : surRam);
+        
+        double surEng = rs.getDouble("sur_eng");
+        operation.setSurEng(rs.wasNull() ? null : surEng);
+        
+        double depense = rs.getDouble("depense");
+        operation.setDepense(rs.wasNull() ? null : depense);
+        
+        double solde = rs.getDouble("solde");
+        operation.setSolde(rs.wasNull() ? null : solde);
 
         return operation;
     }

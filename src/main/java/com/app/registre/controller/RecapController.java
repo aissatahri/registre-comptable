@@ -11,6 +11,7 @@ import javafx.util.StringConverter;
 import java.text.NumberFormat;
 import java.util.Locale;
 import javafx.scene.chart.XYChart;
+import javafx.scene.chart.PieChart;
 import javafx.scene.control.Alert;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
@@ -28,6 +29,7 @@ import javafx.scene.text.Text;
 
 import java.util.Map;
 import com.app.registre.dao.OperationDAO;
+import com.app.registre.model.Operation;
 
 public class RecapController {
 
@@ -166,30 +168,73 @@ public class RecapController {
             double start = 0.0;
             try {
                 int prevMonth = m - 1;
+                
+                // D'abord, trouver la date du solde initial pour ne pas remonter avant
+                Operation globalInitial = operationDAO.findInitialOperation();
+                Integer initialYear = null;
+                Integer initialMonth = null;
+                if (globalInitial != null && globalInitial.getDateEmission() != null) {
+                    initialYear = globalInitial.getDateEmission().getYear();
+                    initialMonth = globalInitial.getDateEmission().getMonthValue();
+                } else if (globalInitial != null && globalInitial.getDateEntree() != null) {
+                    initialYear = globalInitial.getDateEntree().getYear();
+                    initialMonth = globalInitial.getDateEntree().getMonthValue();
+                }
+                
+                boolean found = false;
+                
+                // Chercher le dernier solde disponible en remontant les mois
                 if (prevMonth >= 1) {
-                    Double prev = operationDAO.getLastMontantForMonthYear(year, prevMonth);
-                    if (prev == null) {
-                        if (operationDAO.hasOperationsForMonthYear(year, prevMonth)) {
-                            operationDAO.recomputeAllSoldes();
-                            prev = operationDAO.getLastMontantForMonthYear(year, prevMonth);
-                            if (prev == null) prev = 0.0;
-                        } else {
-                            prev = 0.0;
+                    // Remonter les mois de l'année courante jusqu'à trouver un solde
+                    for (int pm = prevMonth; pm >= 1; pm--) {
+                        // Ne pas remonter avant le mois du solde initial
+                        if (initialYear != null && initialMonth != null) {
+                            if (year < initialYear || (year == initialYear && pm < initialMonth)) {
+                                break;
+                            }
+                        }
+                        Double prev = operationDAO.getLastMontantForMonthYear(year, pm);
+                        if (prev != null) {
+                            start = prev;
+                            found = true;
+                            break;
                         }
                     }
-                    start = prev;
-                } else {
-                    start = 0.0; // January has no previous month in same year
+                }
+                
+                if (!found && (initialYear == null || year > initialYear || (year == initialYear && prevMonth >= initialMonth))) {
+                    // Pas trouvé dans l'année courante → chercher décembre année précédente et remonter
+                    for (int pm = 12; pm >= 1; pm--) {
+                        // Ne pas remonter avant le mois du solde initial
+                        if (initialYear != null && initialMonth != null) {
+                            if ((year - 1) < initialYear || ((year - 1) == initialYear && pm < initialMonth)) {
+                                break;
+                            }
+                        }
+                        Double prev = operationDAO.getLastMontantForMonthYear(year - 1, pm);
+                        if (prev != null) {
+                            start = prev;
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+                
+                if (!found && globalInitial != null && globalInitial.getSolde() != null) {
+                    // Utiliser le solde initial si on est au mois du solde initial ou après
+                    if (initialYear != null && initialMonth != null) {
+                        if (year > initialYear || (year == initialYear && m >= initialMonth)) {
+                            start = globalInitial.getSolde();
+                        } else {
+                            start = 0.0; // Avant le solde initial
+                        }
+                    } else {
+                        start = 0.0;
+                    }
+                } else if (!found) {
+                    start = 0.0;
                 }
             } catch (Exception ignored) { start = 0.0; }
-
-            // If an explicit 'Solde initial' exists for this month in operations, prefer it
-            try {
-                Double initial = operationDAO.getInitialSoldeForMonthYear(year, m);
-                if (initial != null) {
-                    start = initial;
-                }
-            } catch (Exception ignored) {}
 
             double end = start + (r - d);
 
@@ -305,24 +350,28 @@ public class RecapController {
                             double d = depenses.getOrDefault(i, 0.0);
                             double start = startBalances.getOrDefault(i, 0.0);
                             double end = start + (r - d);
-                                    VBox card = new VBox(6);
+                                    VBox card = new VBox(8);
                             card.setAlignment(Pos.CENTER);
                                     // don't set a fixed pref width here; the width listener will size cards
                             // keep an inline style fallback but also expose CSS classes
-                            card.setStyle("-fx-background-color: white; -fx-padding:12; -fx-border-color: #eee; -fx-border-radius:6; -fx-background-radius:6;");
+                            card.setStyle("-fx-background-color: white; -fx-padding:15; "
+                                        + "-fx-border-color: #e3e8ef; -fx-border-width: 1.5; "
+                                        + "-fx-border-radius:10; -fx-background-radius:10; "
+                                        + "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);");
                             card.getStyleClass().add("month-card");
 
                             Label monthLabel = new Label(label);
-                            monthLabel.setFont(Font.font(14));
+                            monthLabel.setFont(Font.font("System", javafx.scene.text.FontWeight.BOLD, 15));
+                            monthLabel.setStyle("-fx-text-fill: #2c3e50;");
 
-                            StackPane circleHolder = new StackPane();
-                            Circle c = new Circle(70);
-                            c.setStyle("-fx-fill: linear-gradient(#FFFFFF, #f0f6ff); -fx-stroke: #d0d7e6; -fx-stroke-width:1;");
-                            VBox inside = new VBox(4);
-                            inside.setAlignment(Pos.CENTER);
-
+                            // Créer un PieChart pour le mois
+                            PieChart monthPie = new PieChart();
+                            monthPie.setPrefSize(250, 250);
+                            monthPie.setLegendVisible(false);
+                            monthPie.setLabelsVisible(false);
+                            monthPie.setStartAngle(90);
+                            
                             // Prefer explicit 'Solde initial' value when present for this month
-                            String prevText;
                             double prevValue = start;
                             boolean hasExplicit = false;
                             try {
@@ -334,21 +383,68 @@ public class RecapController {
                             } catch (Exception ex) {
                                 // ignore and fall back to computed start
                             }
-                            if (hasExplicit) prevText = "Solde initiale: " + fmt.format(prevValue);
-                            else prevText = "Solde préc.: " + fmt.format(prevValue);
-
-                            Label prevLabel = new Label(prevText);
-                            Label recLabel = new Label("Recette: " + fmt.format(r));
-                            Label depLabel = new Label("Dépense: " + fmt.format(d));
-                            Label endLabel = new Label("Solde fin: " + fmt.format(end));
-                            prevLabel.setStyle("-fx-text-fill: #7f8c8d; -fx-font-size:11;");
-                            recLabel.setStyle("-fx-text-fill: #27ae60; -fx-font-size:12; -fx-font-weight: bold;");
-                            depLabel.setStyle("-fx-text-fill: #e74c3c; -fx-font-size:12; -fx-font-weight: bold;");
-                            endLabel.setStyle("-fx-text-fill: #3498db; -fx-font-size:12; -fx-font-weight: bold;");
-                            inside.getChildren().addAll(prevLabel, recLabel, depLabel, endLabel);
-                            circleHolder.getChildren().addAll(c, inside);
-
-                            card.getChildren().addAll(monthLabel, circleHolder);
+                            
+                            // Ajouter les données au PieChart (incluant solde final)
+                            if (r > 0 || d > 0 || prevValue != 0 || end != 0) {
+                                if (prevValue > 0) {
+                                    PieChart.Data prevData = new PieChart.Data("Solde préc.", prevValue);
+                                    monthPie.getData().add(prevData);
+                                }
+                                if (r > 0) {
+                                    PieChart.Data recData = new PieChart.Data("Recettes", r);
+                                    monthPie.getData().add(recData);
+                                }
+                                if (d > 0) {
+                                    PieChart.Data depData = new PieChart.Data("Dépenses", d);
+                                    monthPie.getData().add(depData);
+                                }
+                                if (end > 0) {
+                                    PieChart.Data endData = new PieChart.Data("Solde fin", end);
+                                    monthPie.getData().add(endData);
+                                }
+                            } else {
+                                // Mois vide - afficher un cercle gris
+                                PieChart.Data emptyData = new PieChart.Data("Vide", 1);
+                                monthPie.getData().add(emptyData);
+                            }
+                            
+                            // Appliquer les couleurs après l'ajout au scene graph
+                            Platform.runLater(() -> {
+                                int idx = 0;
+                                for (PieChart.Data data : monthPie.getData()) {
+                                    String color;
+                                    if (data.getName().equals("Solde préc.")) {
+                                        color = "#95a5a6";
+                                    } else if (data.getName().equals("Recettes")) {
+                                        color = "#27ae60";
+                                    } else if (data.getName().equals("Dépenses")) {
+                                        color = "#e74c3c";
+                                    } else if (data.getName().equals("Solde fin")) {
+                                        color = "#3498db";
+                                    } else {
+                                        color = "#ecf0f1";
+                                    }
+                                    data.getNode().setStyle("-fx-pie-color: " + color + ";");
+                                }
+                            });
+                            
+                            // Labels de valeurs
+                            VBox valuesBox = new VBox(2);
+                            valuesBox.setAlignment(Pos.CENTER);
+                            
+                            Label prevLabel = new Label("Préc: " + fmt.format(prevValue));
+                            Label recLabel = new Label("Rec: " + fmt.format(r));
+                            Label depLabel = new Label("Dép: " + fmt.format(d));
+                            Label endLabel = new Label("Fin: " + fmt.format(end));
+                            
+                            prevLabel.setStyle("-fx-text-fill: #95a5a6; -fx-font-size:10;");
+                            recLabel.setStyle("-fx-text-fill: #27ae60; -fx-font-size:10; -fx-font-weight: bold;");
+                            depLabel.setStyle("-fx-text-fill: #e74c3c; -fx-font-size:10; -fx-font-weight: bold;");
+                            endLabel.setStyle("-fx-text-fill: #3498db; -fx-font-size:11; -fx-font-weight: bold;");
+                            
+                            valuesBox.getChildren().addAll(prevLabel, recLabel, depLabel, endLabel);
+                            
+                            card.getChildren().addAll(monthLabel, monthPie, valuesBox);
 
 
                             // mark card when an explicit initial solde was used

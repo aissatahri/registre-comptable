@@ -481,7 +481,7 @@ public class MenuController {
         try {
             String version = getAppVersion();
             if (version == null) version = "dev";
-            String text = "Registre Comptable\nVersion: " + version + "\n\nUne application de gestion comptable simple.";
+            String text = "Registre Comptable\nVersion: " + version + "\nDate: Dec.25\n\nUne application de gestion comptable simple.";
             Alert a = new Alert(Alert.AlertType.INFORMATION, text, javafx.scene.control.ButtonType.OK);
             DialogUtils.initOwner(a, rootPane);
             a.setTitle("À propos");
@@ -492,6 +492,14 @@ public class MenuController {
 
     private String getAppVersion() {
         try {
+            // Lire le fichier version.txt en priorité
+            try (java.io.InputStream in = getClass().getResourceAsStream("/version.txt")) {
+                if (in != null) {
+                    String v = new String(in.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8).trim();
+                    if (!v.isBlank()) return v;
+                }
+            } catch (Exception ignore) {}
+            
             String v = getClass().getPackage().getImplementationVersion();
             if (v != null && !v.isBlank()) return v;
             try (java.io.InputStream in = getClass().getResourceAsStream("/META-INF/maven/com.app/registre-comptable/pom.properties")) {

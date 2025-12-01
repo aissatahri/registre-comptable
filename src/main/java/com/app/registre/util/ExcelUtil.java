@@ -122,10 +122,10 @@ public class ExcelUtil {
                 Row row = sheet.getRow(i);
                 if (row != null) {
                     Operation operation = new Operation();
-                    // Read according to requested export order
-                    // First column contains legacy `op` identifier
-                    operation.setOp(getCellStringValue(row.getCell(0)));
-                    // For backward compatibility, also set `imp` from second column if available
+                    // Read according to export order:
+                    // {"imp", "designation", "nature", "n", "budg", "exercice", "beneficiaire",
+                    //  "date_emission", "date_visa", "op_or", "ov_cheq_type", "ov_cheq", "recette",
+                    //  "sur_ram", "sur_eng", "depense", "solde", "montant", ...}
                     operation.setImp(getCellStringValue(row.getCell(0)));
                     operation.setDesignation(getCellStringValue(row.getCell(1)));
                     operation.setNature(getCellStringValue(row.getCell(2)));
@@ -153,10 +153,10 @@ public class ExcelUtil {
                     operation.setSurRam(getCellNumericValue(row.getCell(13)));
                     operation.setSurEng(getCellNumericValue(row.getCell(14)));
                     operation.setDepense(getCellNumericValue(row.getCell(15)));
-                    double sol = getCellNumericValue(row.getCell(16));
-                    operation.setSolde(sol);
-                    double montantVal = getCellNumericValue(row.getCell(17));
-                    operation.setMontant(montantVal);
+                    Double sol = getCellNumericValue(row.getCell(16));
+                    if (sol != null) operation.setSolde(sol);
+                    Double montantVal = getCellNumericValue(row.getCell(17));
+                    if (montantVal != null) operation.setMontant(montantVal);
                     // additional text fields
                     operation.setDecision(getCellStringValue(row.getCell(18)));
                     operation.setMotifRejet(getCellStringValue(row.getCell(19)));
@@ -216,20 +216,24 @@ public class ExcelUtil {
         }
     }
 
-    private static double getCellNumericValue(Cell cell) {
-        if (cell == null) return 0.0;
+    private static Double getCellNumericValue(Cell cell) {
+        if (cell == null) return null;
 
         switch (cell.getCellType()) {
             case NUMERIC:
                 return cell.getNumericCellValue();
             case STRING:
+                String val = cell.getStringCellValue().trim();
+                if (val.isEmpty()) return null;
                 try {
-                    return Double.parseDouble(cell.getStringCellValue());
+                    return Double.parseDouble(val);
                 } catch (NumberFormatException e) {
-                    return 0.0;
+                    return null;
                 }
+            case BLANK:
+                return null;
             default:
-                return 0.0;
+                return null;
         }
     }
 

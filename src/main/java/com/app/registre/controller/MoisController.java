@@ -264,21 +264,69 @@ public class MoisController {
             try {
                 Double prev = 0.0;
                 int prevMonth = monthNum - 1;
+                
+                // D'abord, trouver la date du solde initial pour ne pas remonter avant
+                Operation globalInitial = operationDAO.findInitialOperation();
+                Integer initialYear = null;
+                Integer initialMonth = null;
+                if (globalInitial != null && globalInitial.getDateEmission() != null) {
+                    initialYear = globalInitial.getDateEmission().getYear();
+                    initialMonth = globalInitial.getDateEmission().getMonthValue();
+                } else if (globalInitial != null && globalInitial.getDateEntree() != null) {
+                    initialYear = globalInitial.getDateEntree().getYear();
+                    initialMonth = globalInitial.getDateEntree().getMonthValue();
+                }
+                
+                // Chercher le dernier solde disponible en remontant les mois
+                boolean found = false;
                 if (prevMonth >= 1) {
-                    prev = operationDAO.getLastMontantForMonthYear(year, prevMonth);
-                    if (prev == null) {
-                        // si aucune opération dans le mois précédent → solde précédent = 0.0
-                        if (operationDAO.hasOperationsForMonthYear(year, prevMonth)) {
-                            // si des opérations existent mais solde null, recompute et relire
-                            operationDAO.recomputeAllSoldes();
-                            prev = operationDAO.getLastMontantForMonthYear(year, prevMonth);
-                            if (prev == null) prev = 0.0;
-                        } else {
-                            prev = 0.0;
+                    // Remonter les mois jusqu'à trouver un solde (mais pas avant le solde initial)
+                    for (int m = prevMonth; m >= 1; m--) {
+                        // Ne pas remonter avant le mois du solde initial
+                        if (initialYear != null && initialMonth != null) {
+                            if (year < initialYear || (year == initialYear && m < initialMonth)) {
+                                break; // On est avant le solde initial
+                            }
+                        }
+                        prev = operationDAO.getLastMontantForMonthYear(year, m);
+                        if (prev != null) {
+                            found = true;
+                            break;
                         }
                     }
-                } else {
-                    // JANVIER → pas de mois précédent dans l'année
+                }
+                
+                if (!found && (initialYear == null || year > initialYear || (year == initialYear && prevMonth >= initialMonth))) {
+                    // Pas trouvé dans l'année courante → chercher décembre année précédente et remonter
+                    for (int m = 12; m >= 1; m--) {
+                        // Ne pas remonter avant le mois du solde initial
+                        if (initialYear != null && initialMonth != null) {
+                            if ((year - 1) < initialYear || ((year - 1) == initialYear && m < initialMonth)) {
+                                break;
+                            }
+                        }
+                        prev = operationDAO.getLastMontantForMonthYear(year - 1, m);
+                        if (prev != null) {
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+                
+                if (!found && globalInitial != null && globalInitial.getSolde() != null) {
+                    // Utiliser le solde initial si on est au mois du solde initial ou après
+                    if (initialYear != null && initialMonth != null) {
+                        if (year > initialYear || (year == initialYear && monthNum >= initialMonth)) {
+                            prev = globalInitial.getSolde();
+                        } else {
+                            prev = 0.0; // Avant le solde initial
+                        }
+                    } else {
+                        prev = 0.0;
+                    }
+                } else if (!found) {
+                    prev = 0.0;
+                } else if (prev == null) {
                     prev = 0.0;
                 }
 
