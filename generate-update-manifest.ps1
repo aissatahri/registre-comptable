@@ -27,7 +27,7 @@ Write-Host "🔒 Checksum MD5: $checksum" -ForegroundColor Cyan
 # Nom du JAR
 $jarName = "registre-comptable-$Version.jar"
 
-# Générer le XML - utiliser os="..." avec ${user.home} pour télécharger dans un endroit connu
+# Générer le XML avec URI complet
 $xml = @"
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Manifest update4j généré automatiquement pour v$Version -->

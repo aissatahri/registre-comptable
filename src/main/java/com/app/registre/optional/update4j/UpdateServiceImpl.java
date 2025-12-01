@@ -141,14 +141,38 @@ public final class UpdateServiceImpl {
             dialog.setResultConverter(btn -> null);
             CompletableFuture.runAsync(() -> {
                 try {
+                    System.err.println("[UpdateServiceImpl] ===== DÉBUT TÉLÉCHARGEMENT =====");
                     Platform.runLater(() -> status.setText("Téléchargement..."));
+                    
+                    // Afficher les informations de configuration
+                    try {
+                        Method getVersion = cfg.getClass().getMethod("getVersion");
+                        String version = (String) getVersion.invoke(cfg);
+                        System.err.println("[UpdateServiceImpl] Version du manifest: " + version);
+                        
+                        Method getFiles = cfg.getClass().getMethod("getFiles");
+                        Object filesList = getFiles.invoke(cfg);
+                        System.err.println("[UpdateServiceImpl] Nombre de fichiers: " + ((java.util.List<?>) filesList).size());
+                        
+                        for (Object fileRef : (java.util.List<?>) filesList) {
+                            Method getUri = fileRef.getClass().getMethod("getUri");
+                            Object uri = getUri.invoke(fileRef);
+                            System.err.println("[UpdateServiceImpl] - Fichier URI: " + uri);
+                        }
+                    } catch (Exception e) {
+                        System.err.println("[UpdateServiceImpl] Erreur lors de l'affichage des infos: " + e.getMessage());
+                    }
+                    
                     // Création d'un UpdateHandler pour suivre la progression
                     Class<?> updateHandlerClass = Class.forName("org.update4j.service.UpdateHandler");
+                    System.err.println("[UpdateServiceImpl] UpdateHandler class trouvée: " + updateHandlerClass.getName());
+                    
                     Object updateHandlerInstance = java.lang.reflect.Proxy.newProxyInstance(
                         updateHandlerClass.getClassLoader(),
                         new Class<?>[]{updateHandlerClass},
                         (proxy, method, args) -> {
                             String methodName = method.getName();
+                            System.err.println("[UpdateServiceImpl] UpdateHandler." + methodName + " appelé");
                             if ("updateDownloadProgress".equals(methodName)) {
                                 float progress = (float) args[0];
                                 Platform.runLater(() -> status.setText(String.format("Téléchargement... %.0f%%", progress * 100)));
@@ -159,8 +183,13 @@ public final class UpdateServiceImpl {
                         }
                     );
                     
+                    System.err.println("[UpdateServiceImpl] UpdateHandler proxy créé");
+                    
                     // Appel de la méthode update(UpdateHandler) pour vraiment télécharger
                     Method updateMethod = cfg.getClass().getMethod("update", updateHandlerClass);
+                    System.err.println("[UpdateServiceImpl] Méthode update trouvée: " + updateMethod.getName());
+                    System.err.println("[UpdateServiceImpl] Appel de config.update(handler)...");
+                    
                     boolean success = (boolean) updateMethod.invoke(cfg, updateHandlerInstance);
                     
                     System.err.println("[UpdateServiceImpl] Résultat du téléchargement: " + success);
