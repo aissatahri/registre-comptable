@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Test update manifest - Simule une version 1.3.0 pour tester le système -->
+<configuration base="https://github.com/aissatahri/registre-comptable/releases/download/v1.3.0/" version="1.3.0">
+    <provider>
+        <name>GitHub Releases</name>
+    </provider>
+
+    <!-- Replace the file path below with the actual jar published in the release -->
+    <file path="registre-comptable-1.3.0.jar" download="true"/>
+
+    <!-- Launcher configuration: main class to run after update -->
+    <launcher class="com.app.registre.Main">
+        <vmArg>-Xmx512m</vmArg>
+    </launcher>
+</configuration>

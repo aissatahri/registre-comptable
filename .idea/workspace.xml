@@ -17,6 +17,7 @@
       <change beforePath="$PROJECT_DIR$/out/artifacts/registre_comptable_jar/registre-comptable.jar" beforeDir="false" afterPath="$PROJECT_DIR$/out/artifacts/registre_comptable_jar/registre-comptable.jar" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/app/registre/optional/update4j/UpdateServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/app/registre/optional/update4j/UpdateServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/app/registre/util/UpdateService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/app/registre/util/UpdateService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/update4j.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/update4j.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -140,7 +141,7 @@
       <workItem from="1764416894217" duration="15415000" />
       <workItem from="1764438698586" duration="10548000" />
       <workItem from="1764507506627" duration="1461000" />
-      <workItem from="1764509003537" duration="10645000" />
+      <workItem from="1764509003537" duration="11733000" />
     </task>
     <servers />
   </component>

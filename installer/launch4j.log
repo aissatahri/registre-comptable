@@ -58,3 +58,23 @@ Launcher:	C:\Program Files\Zulu\zulu-22\bin\javaw.exe
 Launcher args:	-jar "D:\Project_JavaFX\registre-comptable\installer\launcher-1.1.0.exe"
 Args length:	72/32768 chars
 Exit code:	0
+
+
+Version:	3.50
+CmdLine:	D:\Project_JavaFX\registre-comptable\installer\launcher-1.1.0.exe --l4j-debug
+JNI:		No
+WOW64:		Yes
+Working dir:	D:\Project_JavaFX\registre-comptable\installer\.
+Requires JDK:	No
+Requires 64-Bit: No
+Java min ver:	1.017.000
+Java max ver:	
+Substitute:	JAVA_HOME = C:\Program Files\Zulu\zulu-22\
+Substitute:	PATH = C:\Program Files\gettext-iconv\bin;C:\Program Files\Zulu\zulu-22\bin\;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\Common Files\Intel\Shared Libraries\redist\intel64\compiler;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\Program Files\Java\graalvm-jdk-22.0.1+8.1\bin\;C:\Program Files\apache-maven-3.9.8-bin\apache-maven-3.9.8\bin;C:\Program Files\dotnet\;C:\Program Files\Microsoft SQL Server\120\Tools\Binn\;C:\ProgramData\chocolatey\bin;C:\Program Files\Calibre2\;c:\Users\Aissa\AppData\Local\Programs\cursor\resources\app\bin;;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\PowerShell\7\;c:\Users\Aissa\AppData\Local\Programs\Trae\bin;C:\Users\Aissa\AppData\Local\Programs\Python\Python312\Scripts\;C:\Users\Aissa\AppData\Local\Programs\Python\Python312\;C:\Users\Aissa\AppData\Local\Programs\Python\Launcher\;C:\Users\Aissa\AppData\Local\Microsoft\WindowsApps;C:\Users\Aissa\AppData\Roaming\npm;C:\Program Files\JetBrains\PyCharm 2024.3.1.1\bin;;C:\Program Files\JetBrains\IntelliJ IDEA 2023.2.5\bin;;C:\Users\Aissa\AppData\Local\Programs\Microsoft VS Code\bin;C:\Program Files\JetBrains\WebStorm 2023.2.5\bin;;C:\Users\Aissa\.dotnet\tools;C:\Program Files\JetBrains\CLion 2025.2.3\bin;C:\Users\Aissa\AppData\Local\Programs\Ollama;C:\Program Files\Zulu\zulu-22\\bin
+JRE paths:	C:\Program Files\Zulu\zulu-22\;C:\Program Files\gettext-iconv\bin;C:\Program Files\Zulu\zulu-22\bin\;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\Common Files\Intel\Shared Libraries\redist\intel64\compiler;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\Program Files\Java\graalvm-jdk-22.0.1+8.1\bin\;C:\Program Files\apache-maven-3.9.8-bin\apache-maven-3.9.8\bin;C:\Program Files\dotnet\;C:\Program Files\Microsoft SQL Server\120\Tools\Binn\;C:\ProgramData\chocolatey\bin;C:\Program Files\Calibre2\;c:\Users\Aissa\AppData\Local\Programs\cursor\resources\app\bin;;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\PowerShell\7\;c:\Users\Aissa\AppData\Local\Programs\Trae\bin;C:\Users\Aissa\AppData\Local\Programs\Python\Python312\Scripts\;C:\Users\Aissa\AppData\Local\Programs\Python\Python312\;C:\Users\Aissa\AppData\Local\Programs\Python\Launcher\;C:\Users\Aissa\AppData\Local\Microsoft\WindowsApps;C:\Users\Aissa\AppData\Roaming\npm;C:\Program Files\JetBrains\PyCharm 2024.3.1.1\bin;;C:\Program Files\JetBrains\IntelliJ IDEA 2023.2.5\bin;;C:\Users\Aissa\AppData\Local\Programs\Microsoft VS Code\bin;C:\Program Files\JetBrains\WebStorm 2023.2.5\bin;;C:\Users\Aissa\.dotnet\tools;C:\Program Files\JetBrains\CLion 2025.2.3\bin;C:\Users\Aissa\AppData\Local\Programs\Ollama;C:\Program Files\Zulu\zulu-22\\bin
+Check launcher:	C:\Program Files\Zulu\zulu-22\bin\javaw.exe (OK)
+Version string: 1.022.000_001 / 64-Bit (OK)
+Launcher:	C:\Program Files\Zulu\zulu-22\bin\javaw.exe
+Launcher args:	-jar "D:\Project_JavaFX\registre-comptable\installer\launcher-1.1.0.exe"
+Args length:	72/32768 chars
+Exit code:	0

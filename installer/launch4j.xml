@@ -2,7 +2,7 @@
 <launch4jConfig>
   <dontWrapJar>false</dontWrapJar>
   <headerType>gui</headerType>
-  <jar>D:\Project_JavaFX\registre-comptable\target\registre-comptable-1.1.0.jar</jar>
+  <jar>D:\Project_JavaFX\registre-comptable\release-v1.2.0\registre-comptable-1.2.0.jar</jar>
   <outfile>launcher-1.1.0.exe</outfile>
   <errTitle></errTitle>
   <cmdLine></cmdLine>
