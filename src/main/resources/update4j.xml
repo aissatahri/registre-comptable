@@ -3,13 +3,14 @@
      - Update the `base` URL to point to the release assets for a given release.
      - In CI you should generate a manifest per release and upload it alongside your artifacts.
 -->
-<configuration base="https://github.com/aissatahri/registre-comptable/releases/download/v1.1.0/">
+<!-- Mettez à jour la version dans l'URL et dans la propriété 'version' -->
+<configuration base="https://github.com/aissatahri/registre-comptable/releases/download/v1.2.0/" version="1.2.0">
     <provider>
         <name>GitHub Releases</name>
     </provider>
 
     <!-- Replace the file path below with the actual jar published in the release -->
-    <file path="registre-comptable-1.1.0.jar" download="true"/>
+    <file path="registre-comptable-1.2.0.jar" download="true"/>
 
     <!-- Launcher configuration: main class to run after update -->
     <launcher class="com.app.registre.Main">

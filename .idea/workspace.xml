@@ -11,16 +11,12 @@
   <component name="ChangeListManager">
     <list default="true" id="189dfc45-43d5-48fa-94cb-a5089b5b5a05" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/installer/Output/RegistreComptable-1.1.0-setup.exe" beforeDir="false" afterPath="$PROJECT_DIR$/installer/Output/RegistreComptable-1.1.0-setup.exe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/installer/launch4j.log" beforeDir="false" afterPath="$PROJECT_DIR$/installer/launch4j.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/installer/launch4j.xml" beforeDir="false" afterPath="$PROJECT_DIR$/installer/launch4j.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/installer/launcher-1.1.0.exe" beforeDir="false" afterPath="$PROJECT_DIR$/installer/launcher-1.1.0.exe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/installer/registre.iss" beforeDir="false" afterPath="$PROJECT_DIR$/installer/registre.iss" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/artifact/registre_comptable_jar/registre-comptable.jar" beforeDir="false" afterPath="$PROJECT_DIR$/out/artifact/registre_comptable_jar/registre-comptable.jar" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/artifacts/RegistreComptable-1.1.0/RegistreComptable-1.1.0.jar" beforeDir="false" afterPath="$PROJECT_DIR$/out/artifacts/RegistreComptable-1.1.0/RegistreComptable-1.1.0.jar" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/artifacts/RegistreComptable-1.1.0/registre-comptable-1.1.0.jar" beforeDir="false" afterPath="$PROJECT_DIR$/out/artifacts/RegistreComptable-1.1.0/registre-comptable-1.1.0.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/app/registre/controller/MenuController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/app/registre/controller/MenuController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/artifacts/registre_comptable_jar/registre-comptable.jar" beforeDir="false" afterPath="$PROJECT_DIR$/out/artifacts/registre_comptable_jar/registre-comptable.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/app/registre/optional/update4j/UpdateServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/app/registre/optional/update4j/UpdateServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/app/registre/util/UpdateService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/app/registre/util/UpdateService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -144,7 +140,7 @@
       <workItem from="1764416894217" duration="15415000" />
       <workItem from="1764438698586" duration="10548000" />
       <workItem from="1764507506627" duration="1461000" />
-      <workItem from="1764509003537" duration="4110000" />
+      <workItem from="1764509003537" duration="10645000" />
     </task>
     <servers />
   </component>
