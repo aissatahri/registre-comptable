@@ -24,11 +24,11 @@ Write-Host "📦 Fichier: $jarPath" -ForegroundColor Cyan
 Write-Host "📏 Taille: $size octets" -ForegroundColor Cyan
 Write-Host "🔒 Checksum MD5: $checksum" -ForegroundColor Cyan
 
-# Générer le XML
+# Générer le XML SANS basePath - update4j téléchargera dans un temp dir
 $xml = @"
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Manifest update4j généré automatiquement pour v$Version -->
-<configuration base="https://github.com/aissatahri/registre-comptable/releases/download/v$Version/" basePath="`${user.dir}/" version="$Version">
+<configuration base="https://github.com/aissatahri/registre-comptable/releases/download/v$Version/" version="$Version">
     <provider>
         <name>GitHub Releases</name>
     </provider>

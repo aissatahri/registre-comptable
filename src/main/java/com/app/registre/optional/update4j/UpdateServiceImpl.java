@@ -192,10 +192,6 @@ public final class UpdateServiceImpl {
                     Platform.runLater(() -> {
                         dialog.close();
                         if (success) {
-                            // Récupérer le chemin du nouveau JAR téléchargé
-                            String newJarPath = getDownloadedJarPath(cfg);
-                            System.err.println("[UpdateServiceImpl] Nouveau JAR téléchargé: " + newJarPath);
-                            
                             Alert info = new Alert(Alert.AlertType.INFORMATION);
                             info.setTitle("Mise à jour appliquée");
                             info.setHeaderText("La mise à jour a été téléchargée avec succès");
@@ -203,8 +199,24 @@ public final class UpdateServiceImpl {
                             info.getButtonTypes().setAll(ButtonType.OK);
                             info.showAndWait();
                             
-                            // Redémarrage de l'application avec le nouveau JAR
-                            restartApplication(newJarPath);
+                            // Utiliser le launcher intégré d'update4j pour redémarrer
+                            try {
+                                System.err.println("[UpdateServiceImpl] Lancement via update4j launcher...");
+                                Method launchMethod = cfg.getClass().getMethod("launch");
+                                launchMethod.invoke(cfg);
+                                
+                                // Quitter l'application actuelle
+                                Platform.exit();
+                                System.exit(0);
+                            } catch (Exception e) {
+                                System.err.println("[UpdateServiceImpl] Erreur lors du lancement: " + e.getMessage());
+                                e.printStackTrace();
+                                
+                                // Fallback: redémarrage manuel
+                                String newJarPath = getDownloadedJarPath(cfg);
+                                System.err.println("[UpdateServiceImpl] Fallback - Nouveau JAR téléchargé: " + newJarPath);
+                                restartApplication(newJarPath);
+                            }
                         } else {
                             Alert warn = new Alert(Alert.AlertType.WARNING, "La mise à jour a échoué. Consultez les logs pour plus de détails.", ButtonType.OK);
                             warn.setTitle("Échec de la mise à jour");
