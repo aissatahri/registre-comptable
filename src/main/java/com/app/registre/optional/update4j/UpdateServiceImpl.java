@@ -125,14 +125,24 @@ public final class UpdateServiceImpl {
             CompletableFuture.runAsync(() -> {
                 try {
                     Platform.runLater(() -> status.setText("Téléchargement..."));
-                    invokeBootstrapUpdate(cfg);
+                    // Appel direct de la méthode update() sur l'instance Configuration
+                    Method updateMethod = cfg.getClass().getMethod("update");
+                    boolean success = (boolean) updateMethod.invoke(cfg);
+                    
                     Platform.runLater(() -> status.setText("Application..."));
                     try { Thread.sleep(500); } catch (InterruptedException ignored) {}
+                    
                     Platform.runLater(() -> {
                         dialog.close();
-                        Alert info = new Alert(Alert.AlertType.INFORMATION, "La mise à jour a été appliquée. Veuillez relancer l'application.", ButtonType.OK);
-                        info.setTitle("Mise à jour appliquée");
-                        info.showAndWait();
+                        if (success) {
+                            Alert info = new Alert(Alert.AlertType.INFORMATION, "La mise à jour a été appliquée avec succès. Veuillez relancer l'application.", ButtonType.OK);
+                            info.setTitle("Mise à jour appliquée");
+                            info.showAndWait();
+                        } else {
+                            Alert warn = new Alert(Alert.AlertType.WARNING, "La mise à jour a échoué. Consultez les logs pour plus de détails.", ButtonType.OK);
+                            warn.setTitle("Échec de la mise à jour");
+                            warn.showAndWait();
+                        }
                     });
                 } catch (Exception e) {
                     LOGGER.log(Level.SEVERE, "Erreur lors de l'application de la mise à jour: " + e.getMessage(), e);
@@ -150,13 +160,6 @@ public final class UpdateServiceImpl {
 
             dialog.showAndWait();
         });
-    }
-
-    private static void invokeBootstrapUpdate(Object cfg) throws Exception {
-        Class<?> boot = Class.forName("org.update4j.Bootstrap");
-        // Update4j 1.5.0: Bootstrap.update(Configuration config)
-        Method updateMethod = boot.getMethod("update", cfg.getClass());
-        updateMethod.invoke(null, cfg);
     }
 
     private static String readUrlAsString(String urlStr) throws IOException {
