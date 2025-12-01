@@ -4,13 +4,13 @@
      - In CI you should generate a manifest per release and upload it alongside your artifacts.
 -->
 <!-- Mettez à jour la version dans l'URL et dans la propriété 'version' -->
-<configuration base="https://github.com/aissatahri/registre-comptable/releases/download/v1.3.3/" version="1.3.3">
+<configuration base="https://github.com/aissatahri/registre-comptable/releases/download/v1.3.4/" version="1.3.4">
     <provider>
         <name>GitHub Releases</name>
     </provider>
 
     <!-- Replace the file path below with the actual jar published in the release -->
-    <file path="registre-comptable-1.3.3.jar" download="true"/>
+    <file path="registre-comptable-1.3.4.jar" download="true"/>
 
     <!-- Launcher configuration: main class to run after update -->
     <launcher class="com.app.registre.Main">

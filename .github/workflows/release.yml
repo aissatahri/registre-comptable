@@ -3,9 +3,11 @@ name: Build and Release
 permissions:
   contents: write
 
+# Workflow désactivé - releases créées manuellement
 on:
-  push:
-    tags: ['v*.*.*']
+  workflow_dispatch:
+  # push:
+  #   tags: ['v*.*.*']
 
 jobs:
   build-and-release:

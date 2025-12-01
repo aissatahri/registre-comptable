@@ -136,12 +136,13 @@ public final class UpdateServiceImpl {
                     });
                 } catch (Exception e) {
                     LOGGER.log(Level.SEVERE, "Erreur lors de l'application de la mise à jour: " + e.getMessage(), e);
+                    final String errorMsg = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName() + " - " + e.toString();
                     Platform.runLater(() -> {
                         dialog.close();
                         Alert err = new Alert(Alert.AlertType.ERROR);
                         err.setTitle("Erreur de mise à jour");
                         err.setHeaderText("Impossible d'appliquer la mise à jour");
-                        err.setContentText(e.getMessage());
+                        err.setContentText(errorMsg);
                         err.showAndWait();
                     });
                 }
