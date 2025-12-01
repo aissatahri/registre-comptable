@@ -27,7 +27,7 @@ Write-Host "🔒 Checksum MD5: $checksum" -ForegroundColor Cyan
 # Nom du JAR
 $jarName = "registre-comptable-$Version.jar"
 
-# Générer le XML avec uri au lieu de path pour forcer le téléchargement
+# Générer le XML - utiliser os="..." avec ${user.home} pour télécharger dans un endroit connu
 $xml = @"
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Manifest update4j généré automatiquement pour v$Version -->
@@ -38,10 +38,9 @@ $xml = @"
 
     <!-- JAR principal de l'application -->
     <file uri="https://github.com/aissatahri/registre-comptable/releases/download/v$Version/$jarName" 
-          path="$jarName" 
+          os="`${user.home}/.registre-comptable/$jarName"
           size="$size" 
-          checksum="$checksum"
-          ignoreBootConflict="true"/>
+          checksum="$checksum"/>
 
     <!-- Launcher: classe principale à exécuter après mise à jour -->
     <launcher class="com.app.registre.Main">
