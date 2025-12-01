@@ -153,25 +153,9 @@ public final class UpdateServiceImpl {
 
     private static void invokeBootstrapUpdate(Object cfg) throws Exception {
         Class<?> boot = Class.forName("org.update4j.Bootstrap");
-        Method[] methods = boot.getMethods();
-        for (Method m : methods) {
-            if (!m.getName().equals("update")) continue;
-            Class<?>[] pts = m.getParameterTypes();
-            if (pts.length == 1) {
-                m.invoke(null, cfg);
-                return;
-            } else if (pts.length == 2) {
-                // try passing null for second param
-                m.invoke(null, cfg, (Object) null);
-                return;
-            } else if (pts.length == 3) {
-                // pass (cfg, null, false) if boolean expected
-                Object third = Boolean.FALSE;
-                m.invoke(null, cfg, (Object) null, third);
-                return;
-            }
-        }
-        throw new NoSuchMethodException("No suitable Bootstrap.update(...) found");
+        // Update4j 1.5.0: Bootstrap.update(Configuration config)
+        Method updateMethod = boot.getMethod("update", cfg.getClass());
+        updateMethod.invoke(null, cfg);
     }
 
     private static String readUrlAsString(String urlStr) throws IOException {
