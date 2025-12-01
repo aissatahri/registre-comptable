@@ -163,9 +163,26 @@ public final class UpdateServiceImpl {
                     }
                     
                     Platform.runLater(() -> status.setText("Téléchargement..."));
-                    // Appel direct de la méthode update() sur l'instance Configuration
-                    Method updateMethod = cfg.getClass().getMethod("update");
-                    boolean success = (boolean) updateMethod.invoke(cfg);
+                    // Création d'un UpdateHandler pour suivre la progression
+                    Class<?> updateHandlerClass = Class.forName("org.update4j.service.UpdateHandler");
+                    Object updateHandlerInstance = java.lang.reflect.Proxy.newProxyInstance(
+                        updateHandlerClass.getClassLoader(),
+                        new Class<?>[]{updateHandlerClass},
+                        (proxy, method, args) -> {
+                            String methodName = method.getName();
+                            if ("updateDownloadProgress".equals(methodName)) {
+                                float progress = (float) args[0];
+                                Platform.runLater(() -> status.setText(String.format("Téléchargement... %.0f%%", progress * 100)));
+                            } else if ("doneDownloads".equals(methodName)) {
+                                Platform.runLater(() -> status.setText("Téléchargement terminé"));
+                            }
+                            return null;
+                        }
+                    );
+                    
+                    // Appel de la méthode update(UpdateHandler) pour vraiment télécharger
+                    Method updateMethod = cfg.getClass().getMethod("update", updateHandlerClass);
+                    boolean success = (boolean) updateMethod.invoke(cfg, updateHandlerInstance);
                     
                     System.err.println("[UpdateServiceImpl] Résultat du téléchargement: " + success);
                     
@@ -175,6 +192,10 @@ public final class UpdateServiceImpl {
                     Platform.runLater(() -> {
                         dialog.close();
                         if (success) {
+                            // Récupérer le chemin du nouveau JAR téléchargé
+                            String newJarPath = getDownloadedJarPath(cfg);
+                            System.err.println("[UpdateServiceImpl] Nouveau JAR téléchargé: " + newJarPath);
+                            
                             Alert info = new Alert(Alert.AlertType.INFORMATION);
                             info.setTitle("Mise à jour appliquée");
                             info.setHeaderText("La mise à jour a été téléchargée avec succès");
@@ -182,8 +203,8 @@ public final class UpdateServiceImpl {
                             info.getButtonTypes().setAll(ButtonType.OK);
                             info.showAndWait();
                             
-                            // Redémarrage de l'application
-                            restartApplication();
+                            // Redémarrage de l'application avec le nouveau JAR
+                            restartApplication(newJarPath);
                         } else {
                             Alert warn = new Alert(Alert.AlertType.WARNING, "La mise à jour a échoué. Consultez les logs pour plus de détails.", ButtonType.OK);
                             warn.setTitle("Échec de la mise à jour");
@@ -306,22 +327,67 @@ public final class UpdateServiceImpl {
         return "0.0.0";
     }
 
-    private static void restartApplication() {
+    private static String getDownloadedJarPath(Object configInstance) {
         try {
-            // Récupération du chemin du JAR en cours d'exécution
-            String javaBin = System.getProperty("java.home") + "/bin/java";
-            String currentJar = UpdateServiceImpl.class.getProtectionDomain()
-                .getCodeSource().getLocation().toURI().getPath();
+            // Récupérer le basePath depuis la configuration
+            Method getBasePath = configInstance.getClass().getMethod("getBasePath");
+            Object basePath = getBasePath.invoke(configInstance);
             
-            // Sur Windows, enlever le "/" initial si présent
-            if (currentJar.startsWith("/") && currentJar.contains(":")) {
-                currentJar = currentJar.substring(1);
+            // Récupérer la liste des fichiers
+            Method getFiles = configInstance.getClass().getMethod("getFiles");
+            Object filesList = getFiles.invoke(configInstance);
+            
+            if (filesList instanceof java.util.List) {
+                for (Object fileRef : (java.util.List<?>) filesList) {
+                    Method getPath = fileRef.getClass().getMethod("getPath");
+                    Object path = getPath.invoke(fileRef);
+                    String pathStr = path.toString();
+                    
+                    // Trouver le fichier JAR
+                    if (pathStr.endsWith(".jar")) {
+                        // Résoudre le chemin complet avec le basePath
+                        if (basePath != null) {
+                            // basePath est un Path object
+                            Method resolve = basePath.getClass().getMethod("resolve", String.class);
+                            Object resolved = resolve.invoke(basePath, pathStr);
+                            Method toAbsolutePath = resolved.getClass().getMethod("toAbsolutePath");
+                            Object absolute = toAbsolutePath.invoke(resolved);
+                            return absolute.toString();
+                        }
+                        // Sinon, utiliser le répertoire de travail actuel
+                        return new java.io.File(System.getProperty("user.dir"), pathStr).getAbsolutePath();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("[UpdateServiceImpl] Erreur lors de la récupération du chemin du JAR: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private static void restartApplication(String newJarPath) {
+        try {
+            String javaBin = System.getProperty("java.home") + "/bin/java";
+            String jarToLaunch = newJarPath;
+            
+            // Si le nouveau JAR n'est pas trouvé, utiliser le JAR actuel
+            if (jarToLaunch == null || jarToLaunch.isEmpty()) {
+                System.err.println("[UpdateServiceImpl] Nouveau JAR non trouvé, utilisation du JAR actuel");
+                jarToLaunch = UpdateServiceImpl.class.getProtectionDomain()
+                    .getCodeSource().getLocation().toURI().getPath();
             }
             
-            System.err.println("[UpdateServiceImpl] Redémarrage avec: " + javaBin + " -jar " + currentJar);
+            // Sur Windows, enlever le "/" initial si présent
+            if (jarToLaunch.startsWith("/") && jarToLaunch.contains(":")) {
+                jarToLaunch = jarToLaunch.substring(1);
+            }
+            
+            System.err.println("[UpdateServiceImpl] Redémarrage avec: " + javaBin + " -jar " + jarToLaunch);
             
             // Construction de la commande de redémarrage
-            ProcessBuilder builder = new ProcessBuilder(javaBin, "-jar", currentJar);
+            ProcessBuilder builder = new ProcessBuilder(javaBin, "-jar", jarToLaunch);
+            builder.directory(new java.io.File(System.getProperty("user.dir")));
             builder.start();
             
             // Arrêt de l'application actuelle après un court délai
