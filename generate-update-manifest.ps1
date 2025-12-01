@@ -24,17 +24,24 @@ Write-Host "📦 Fichier: $jarPath" -ForegroundColor Cyan
 Write-Host "📏 Taille: $size octets" -ForegroundColor Cyan
 Write-Host "🔒 Checksum MD5: $checksum" -ForegroundColor Cyan
 
-# Générer le XML SANS basePath - update4j téléchargera dans un temp dir
+# Nom du JAR
+$jarName = "registre-comptable-$Version.jar"
+
+# Générer le XML avec uri au lieu de path pour forcer le téléchargement
 $xml = @"
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Manifest update4j généré automatiquement pour v$Version -->
-<configuration base="https://github.com/aissatahri/registre-comptable/releases/download/v$Version/" version="$Version">
+<configuration version="$Version">
     <provider>
         <name>GitHub Releases</name>
     </provider>
 
     <!-- JAR principal de l'application -->
-    <file path="registre-comptable-$Version.jar" size="$size" checksum="$checksum"/>
+    <file uri="https://github.com/aissatahri/registre-comptable/releases/download/v$Version/$jarName" 
+          path="$jarName" 
+          size="$size" 
+          checksum="$checksum"
+          ignoreBootConflict="true"/>
 
     <!-- Launcher: classe principale à exécuter après mise à jour -->
     <launcher class="com.app.registre.Main">
