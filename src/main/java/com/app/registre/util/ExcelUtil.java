@@ -65,7 +65,7 @@ public class ExcelUtil {
             Row headerRow = sheet.createRow(currentRow++);
                         // Colonnes selon la structure de la table operations
                         String[] headers = {"IMP", "Désignation", "Nature", "N", "BUDG", "Exercice", "Bénéficiaire",
-                            "Date émission", "Date entrée", "Date visa", "Date rejet", "OP/OR", "OV/CHEQ Type", "OV/CHEQ", 
+                            "Date émission", "Date visa", "OP/OR", "OV/CHEQ Type", "OV/CHEQ", 
                             "Recette", "SUR-RAM", "SUR-ENG", "Dépense", "Solde"};
 
             for (int i = 0; i < headers.length; i++) {
@@ -100,21 +100,13 @@ public class ExcelUtil {
                 c7.setCellStyle(dateStyle);
                 
                 Cell c8 = row.createCell(8);
-                c8.setCellValue(op.getDateEntree() != null ? op.getDateEntree().toString() : "");
+                c8.setCellValue(op.getDateVisa() != null ? op.getDateVisa().toString() : "");
                 c8.setCellStyle(dateStyle);
                 
-                Cell c9 = row.createCell(9);
-                c9.setCellValue(op.getDateVisa() != null ? op.getDateVisa().toString() : "");
-                c9.setCellStyle(dateStyle);
-                
-                Cell c10 = row.createCell(10);
-                c10.setCellValue(op.getDateRejet() != null ? op.getDateRejet().toString() : "");
-                c10.setCellStyle(dateStyle);
-                
                 // Numéros
-                Cell c11 = row.createCell(11); c11.setCellValue(op.getOpOr() != null ? op.getOpOr() : 0); c11.setCellStyle(dataStyle);
-                Cell c12 = row.createCell(12); c12.setCellValue(op.getOvCheqType() != null ? op.getOvCheqType() : ""); c12.setCellStyle(dataStyle);
-                Cell c13 = row.createCell(13); c13.setCellValue(op.getOvCheq() != null ? op.getOvCheq() : 0); c13.setCellStyle(dataStyle);
+                Cell c9 = row.createCell(9); c9.setCellValue(op.getOpOr() != null ? op.getOpOr() : 0); c9.setCellStyle(dataStyle);
+                Cell c10 = row.createCell(10); c10.setCellValue(op.getOvCheqType() != null ? op.getOvCheqType() : ""); c10.setCellStyle(dataStyle);
+                Cell c11 = row.createCell(11); c11.setCellValue(op.getOvCheq() != null ? op.getOvCheq() : 0); c11.setCellStyle(dataStyle);
                 
                 // Montants avec couleurs conditionnelles
                 double recette = op.getRecette() != null ? op.getRecette() : 0.0;
@@ -124,25 +116,25 @@ public class ExcelUtil {
                 totalRecette += recette;
                 totalDepense += depense;
                 
+                Cell c12 = row.createCell(12); 
+                c12.setCellValue(recette); 
+                c12.setCellStyle(recette > 0 ? positiveStyle : numberStyle);
+                
+                Cell c13 = row.createCell(13); 
+                c13.setCellValue(op.getSurRam() != null ? op.getSurRam() : 0.0); 
+                c13.setCellStyle(numberStyle);
+                
                 Cell c14 = row.createCell(14); 
-                c14.setCellValue(recette); 
-                c14.setCellStyle(recette > 0 ? positiveStyle : numberStyle);
+                c14.setCellValue(op.getSurEng() != null ? op.getSurEng() : 0.0); 
+                c14.setCellStyle(numberStyle);
                 
                 Cell c15 = row.createCell(15); 
-                c15.setCellValue(op.getSurRam() != null ? op.getSurRam() : 0.0); 
-                c15.setCellStyle(numberStyle);
+                c15.setCellValue(depense); 
+                c15.setCellStyle(depense > 0 ? negativeStyle : numberStyle);
                 
                 Cell c16 = row.createCell(16); 
-                c16.setCellValue(op.getSurEng() != null ? op.getSurEng() : 0.0); 
-                c16.setCellStyle(numberStyle);
-                
-                Cell c17 = row.createCell(17); 
-                c17.setCellValue(depense); 
-                c17.setCellStyle(depense > 0 ? negativeStyle : numberStyle);
-                
-                Cell c18 = row.createCell(18); 
-                c18.setCellValue(solde); 
-                c18.setCellStyle(solde >= 0 ? positiveStyle : negativeStyle);
+                c16.setCellValue(solde); 
+                c16.setCellStyle(solde >= 0 ? positiveStyle : negativeStyle);
             }
             
             // Ligne de totaux
@@ -151,20 +143,20 @@ public class ExcelUtil {
             Cell labelTotal = totalRow.createCell(0);
             labelTotal.setCellValue("TOTAUX");
             labelTotal.setCellStyle(totalStyle);
-            sheet.addMergedRegion(new CellRangeAddress(rowNum - 1, rowNum - 1, 0, 13));
+            sheet.addMergedRegion(new CellRangeAddress(rowNum - 1, rowNum - 1, 0, 11));
             
-            Cell totalRecetteCell = totalRow.createCell(14);
+            Cell totalRecetteCell = totalRow.createCell(12);
             totalRecetteCell.setCellValue(totalRecette);
             totalRecetteCell.setCellStyle(totalStyle);
             
-            totalRow.createCell(15).setCellStyle(totalStyle);
-            totalRow.createCell(16).setCellStyle(totalStyle);
+            totalRow.createCell(13).setCellStyle(totalStyle);
+            totalRow.createCell(14).setCellStyle(totalStyle);
             
-            Cell totalDepenseCell = totalRow.createCell(17);
+            Cell totalDepenseCell = totalRow.createCell(15);
             totalDepenseCell.setCellValue(totalDepense);
             totalDepenseCell.setCellStyle(totalStyle);
             
-            Cell totalSoldeCell = totalRow.createCell(18);
+            Cell totalSoldeCell = totalRow.createCell(16);
             totalSoldeCell.setCellValue(totalRecette - totalDepense);
             totalSoldeCell.setCellStyle(totalStyle);
 

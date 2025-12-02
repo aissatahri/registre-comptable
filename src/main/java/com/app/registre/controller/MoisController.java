@@ -16,6 +16,7 @@ import javafx.stage.FileChooser;
 
 import java.io.File;
 import java.io.IOException;
+import java.awt.Desktop;
 import java.util.List;
 import java.time.LocalDate;
 import com.app.registre.util.DialogUtils;
@@ -396,6 +397,8 @@ public class MoisController {
                     }
                     ExcelUtil.exportOperationsToExcel(operations, file.getAbsolutePath(), prev);
                     showInfo("Export réussi !");
+                    openFile(file);
+                    openFile(file);
                 } catch (IOException e) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 DialogUtils.initOwner(alert, moisOperationsTable);
@@ -460,6 +463,16 @@ public class MoisController {
             if (months[i].equalsIgnoreCase(mois.trim())) return i + 1;
         }
         return LocalDate.now().getMonthValue();
+    }
+
+    private void openFile(File file) {
+        try {
+            if (Desktop.isDesktopSupported()) {
+                Desktop.getDesktop().open(file);
+            }
+        } catch (Exception e) {
+            // Silently ignore if file cannot be opened
+        }
     }
 
     
