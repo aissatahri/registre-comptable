@@ -2,7 +2,8 @@ package com.app.registre.util;
 
 import com.app.registre.model.Operation;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.*;
 
 import java.io.*;
 import java.time.LocalDate;
@@ -17,72 +18,167 @@ public class ExcelUtil {
     }
 
     public static void exportOperationsToExcel(List<Operation> operations, String filePath, Double prevSolde) throws IOException {
-        try (Workbook workbook = new XSSFWorkbook()) {
-            Sheet sheet = workbook.createSheet("Operations");
+        try (XSSFWorkbook workbook = new XSSFWorkbook()) {
+            XSSFSheet sheet = workbook.createSheet("Operations");
 
-            // Style pour l'en-tête
-            CellStyle headerStyle = createHeaderStyle(workbook);
+            // Styles
+            CellStyle headerStyle = createEnhancedHeaderStyle(workbook);
+            CellStyle titleStyle = createTitleStyle(workbook);
+            CellStyle dataStyle = createDataStyle(workbook);
+            CellStyle numberStyle = createNumberStyle(workbook);
+            CellStyle dateStyle = createDateStyle(workbook);
+            CellStyle totalStyle = createTotalStyle(workbook);
+            CellStyle positiveStyle = createPositiveNumberStyle(workbook);
+            CellStyle negativeStyle = createNegativeNumberStyle(workbook);
 
-            int headerRowIndex = 0;
-            // If prevSolde provided, write an info row above header
+            int currentRow = 0;
+            
+            // Titre et logo
+            Row titleRow = sheet.createRow(currentRow++);
+            Cell titleCell = titleRow.createCell(0);
+            titleCell.setCellValue("REGISTRE COMPTABLE - EXPORT");
+            titleCell.setCellStyle(titleStyle);
+            sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 10));
+            titleRow.setHeightInPoints(30);
+            
+            // Date d'export
+            Row dateRow = sheet.createRow(currentRow++);
+            Cell dateCell = dateRow.createCell(0);
+            dateCell.setCellValue("Date d'export: " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+            sheet.addMergedRegion(new CellRangeAddress(1, 1, 0, 5));
+            
+            currentRow++; // Ligne vide
+            
+            // Solde précédent si fourni
             if (prevSolde != null) {
-                Row info = sheet.createRow(0);
-                info.createCell(0).setCellValue("solde_precedent");
-                info.createCell(1).setCellValue(prevSolde);
-                headerRowIndex = 1;
+                Row soldeRow = sheet.createRow(currentRow++);
+                Cell labelCell = soldeRow.createCell(0);
+                labelCell.setCellValue("Solde précédent:");
+                labelCell.setCellStyle(createBoldStyle(workbook));
+                Cell valueCell = soldeRow.createCell(1);
+                valueCell.setCellValue(prevSolde);
+                valueCell.setCellStyle(numberStyle);
+                currentRow++; // Ligne vide
             }
+            
             // Créer l'en-tête
-            Row headerRow = sheet.createRow(headerRowIndex);
-                        // Export only these fields in this exact order as requested by user
-                        String[] headers = {"imp", "designation", "nature", "n", "budg", "exercice", "beneficiaire",
-                            "date_emission", "date_visa", "op_or", "ov_cheq_type", "ov_cheq", "recette",
-                            "sur_ram", "sur_eng", "depense", "solde", "montant", "decision", "motif_rejet", "date_reponse", "contenu_reponse", "mois"};
+            Row headerRow = sheet.createRow(currentRow++);
+                        // Colonnes selon la structure de la table operations
+                        String[] headers = {"IMP", "Désignation", "Nature", "N", "BUDG", "Exercice", "Bénéficiaire",
+                            "Date émission", "Date entrée", "Date visa", "Date rejet", "OP/OR", "OV/CHEQ Type", "OV/CHEQ", 
+                            "Recette", "SUR-RAM", "SUR-ENG", "Dépense", "Solde"};
 
             for (int i = 0; i < headers.length; i++) {
                 Cell cell = headerRow.createCell(i);
                 cell.setCellValue(headers[i]);
                 cell.setCellStyle(headerStyle);
             }
+            
+            headerRow.setHeightInPoints(25);
 
-            // Remplir les données
-            int rowNum = headerRowIndex + 1;
+            // Remplir les données avec styles conditionnels
+            int rowNum = currentRow;
+            double totalRecette = 0.0;
+            double totalDepense = 0.0;
+            int dataStartRow = rowNum;
+            
             for (Operation op : operations) {
                 Row row = sheet.createRow(rowNum++);
-
-                // Write only the requested fields in the exact order
-                // Use legacy `op` as first column (request uses OP identifier)
-                row.createCell(0).setCellValue(op.getOp() != null ? op.getOp() : "");
-                row.createCell(1).setCellValue(op.getDesignation() != null ? op.getDesignation() : "");
-                row.createCell(2).setCellValue(op.getNature() != null ? op.getNature() : "");
-                row.createCell(3).setCellValue(op.getN() != null ? op.getN() : "");
-                row.createCell(4).setCellValue(op.getBudg() != null ? op.getBudg() : "");
-                row.createCell(5).setCellValue(op.getExercice() != null ? op.getExercice() : "");
-                row.createCell(6).setCellValue(op.getBeneficiaire() != null ? op.getBeneficiaire() : "");
-                // Prefer dateEmission, then dateEntree, then dateVisa for export
-                java.time.LocalDate de = op.getDateEmission() != null ? op.getDateEmission() : op.getDateEntree();
-                row.createCell(7).setCellValue(de != null ? de.toString() : "");
-                row.createCell(8).setCellValue(op.getDateVisa() != null ? op.getDateVisa().toString() : "");
-                row.createCell(9).setCellValue(op.getOpOr() != null ? op.getOpOr() : 0);
-                row.createCell(10).setCellValue(op.getOvCheqType() != null ? op.getOvCheqType() : "");
-                row.createCell(11).setCellValue(op.getOvCheq() != null ? op.getOvCheq() : 0);
-                row.createCell(12).setCellValue(op.getRecette() != null ? op.getRecette() : 0.0);
-                row.createCell(13).setCellValue(op.getSurRam() != null ? op.getSurRam() : 0.0);
-                row.createCell(14).setCellValue(op.getSurEng() != null ? op.getSurEng() : 0.0);
-                row.createCell(15).setCellValue(op.getDepense() != null ? op.getDepense() : 0.0);
-                row.createCell(16).setCellValue(op.getSolde() != null ? op.getSolde() : 0.0);
-                // getMontant() returns a primitive double (backwards-compatible), so write it directly
-                row.createCell(17).setCellValue(op.getMontant());
-                row.createCell(18).setCellValue(op.getDecision() != null ? op.getDecision() : "");
-                row.createCell(19).setCellValue(op.getMotifRejet() != null ? op.getMotifRejet() : "");
-                row.createCell(20).setCellValue(op.getDateReponse() != null ? op.getDateReponse().toString() : "");
-                row.createCell(21).setCellValue(op.getContenuReponse() != null ? op.getContenuReponse() : "");
-                row.createCell(22).setCellValue(op.getMois() != null ? op.getMois() : "");
+                
+                // Colonnes texte
+                Cell c0 = row.createCell(0); c0.setCellValue(op.getImp() != null ? op.getImp() : ""); c0.setCellStyle(dataStyle);
+                Cell c1 = row.createCell(1); c1.setCellValue(op.getDesignation() != null ? op.getDesignation() : ""); c1.setCellStyle(dataStyle);
+                Cell c2 = row.createCell(2); c2.setCellValue(op.getNature() != null ? op.getNature() : ""); c2.setCellStyle(dataStyle);
+                Cell c3 = row.createCell(3); c3.setCellValue(op.getN() != null ? op.getN() : ""); c3.setCellStyle(dataStyle);
+                Cell c4 = row.createCell(4); c4.setCellValue(op.getBudg() != null ? op.getBudg() : ""); c4.setCellStyle(dataStyle);
+                Cell c5 = row.createCell(5); c5.setCellValue(op.getExercice() != null ? op.getExercice() : ""); c5.setCellStyle(dataStyle);
+                Cell c6 = row.createCell(6); c6.setCellValue(op.getBeneficiaire() != null ? op.getBeneficiaire() : ""); c6.setCellStyle(dataStyle);
+                
+                // Dates
+                Cell c7 = row.createCell(7);
+                c7.setCellValue(op.getDateEmission() != null ? op.getDateEmission().toString() : "");
+                c7.setCellStyle(dateStyle);
+                
+                Cell c8 = row.createCell(8);
+                c8.setCellValue(op.getDateEntree() != null ? op.getDateEntree().toString() : "");
+                c8.setCellStyle(dateStyle);
+                
+                Cell c9 = row.createCell(9);
+                c9.setCellValue(op.getDateVisa() != null ? op.getDateVisa().toString() : "");
+                c9.setCellStyle(dateStyle);
+                
+                Cell c10 = row.createCell(10);
+                c10.setCellValue(op.getDateRejet() != null ? op.getDateRejet().toString() : "");
+                c10.setCellStyle(dateStyle);
+                
+                // Numéros
+                Cell c11 = row.createCell(11); c11.setCellValue(op.getOpOr() != null ? op.getOpOr() : 0); c11.setCellStyle(dataStyle);
+                Cell c12 = row.createCell(12); c12.setCellValue(op.getOvCheqType() != null ? op.getOvCheqType() : ""); c12.setCellStyle(dataStyle);
+                Cell c13 = row.createCell(13); c13.setCellValue(op.getOvCheq() != null ? op.getOvCheq() : 0); c13.setCellStyle(dataStyle);
+                
+                // Montants avec couleurs conditionnelles
+                double recette = op.getRecette() != null ? op.getRecette() : 0.0;
+                double depense = op.getDepense() != null ? op.getDepense() : 0.0;
+                double solde = op.getSolde() != null ? op.getSolde() : 0.0;
+                
+                totalRecette += recette;
+                totalDepense += depense;
+                
+                Cell c14 = row.createCell(14); 
+                c14.setCellValue(recette); 
+                c14.setCellStyle(recette > 0 ? positiveStyle : numberStyle);
+                
+                Cell c15 = row.createCell(15); 
+                c15.setCellValue(op.getSurRam() != null ? op.getSurRam() : 0.0); 
+                c15.setCellStyle(numberStyle);
+                
+                Cell c16 = row.createCell(16); 
+                c16.setCellValue(op.getSurEng() != null ? op.getSurEng() : 0.0); 
+                c16.setCellStyle(numberStyle);
+                
+                Cell c17 = row.createCell(17); 
+                c17.setCellValue(depense); 
+                c17.setCellStyle(depense > 0 ? negativeStyle : numberStyle);
+                
+                Cell c18 = row.createCell(18); 
+                c18.setCellValue(solde); 
+                c18.setCellStyle(solde >= 0 ? positiveStyle : negativeStyle);
             }
+            
+            // Ligne de totaux
+            Row totalRow = sheet.createRow(rowNum++);
+            totalRow.setHeightInPoints(20);
+            Cell labelTotal = totalRow.createCell(0);
+            labelTotal.setCellValue("TOTAUX");
+            labelTotal.setCellStyle(totalStyle);
+            sheet.addMergedRegion(new CellRangeAddress(rowNum - 1, rowNum - 1, 0, 13));
+            
+            Cell totalRecetteCell = totalRow.createCell(14);
+            totalRecetteCell.setCellValue(totalRecette);
+            totalRecetteCell.setCellStyle(totalStyle);
+            
+            totalRow.createCell(15).setCellStyle(totalStyle);
+            totalRow.createCell(16).setCellStyle(totalStyle);
+            
+            Cell totalDepenseCell = totalRow.createCell(17);
+            totalDepenseCell.setCellValue(totalDepense);
+            totalDepenseCell.setCellStyle(totalStyle);
+            
+            Cell totalSoldeCell = totalRow.createCell(18);
+            totalSoldeCell.setCellValue(totalRecette - totalDepense);
+            totalSoldeCell.setCellStyle(totalStyle);
 
             // Ajuster automatiquement la largeur des colonnes
             for (int i = 0; i < headers.length; i++) {
                 sheet.autoSizeColumn(i);
+                // Largeur minimum
+                if (sheet.getColumnWidth(i) < 2000) {
+                    sheet.setColumnWidth(i, 2000);
+                }
             }
+            
+            // Activer les filtres sur la ligne d'en-tête
+            sheet.setAutoFilter(new CellRangeAddress(currentRow - 1, currentRow - 1, 0, headers.length - 1));
 
             // Écrire le fichier
             try (FileOutputStream fileOut = new FileOutputStream(filePath)) {
@@ -275,4 +371,103 @@ public class ExcelUtil {
             default: return "";
         }
     }
+    
+    // Styles améliorés
+    private static CellStyle createTitleStyle(Workbook wb) {
+        CellStyle style = wb.createCellStyle();
+        Font font = wb.createFont();
+        font.setBold(true);
+        font.setFontHeightInPoints((short) 18);
+        font.setColor(IndexedColors.WHITE.getIndex());
+        style.setFont(font);
+        style.setFillForegroundColor(IndexedColors.DARK_BLUE.getIndex());
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        style.setAlignment(HorizontalAlignment.CENTER);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
+        return style;
+    }
+    
+    private static CellStyle createEnhancedHeaderStyle(Workbook wb) {
+        CellStyle style = wb.createCellStyle();
+        Font font = wb.createFont();
+        font.setBold(true);
+        font.setFontHeightInPoints((short) 12);
+        font.setColor(IndexedColors.WHITE.getIndex());
+        style.setFont(font);
+        style.setFillForegroundColor(IndexedColors.GREY_50_PERCENT.getIndex());
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        style.setAlignment(HorizontalAlignment.CENTER);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
+        style.setBorderTop(BorderStyle.MEDIUM);
+        style.setBorderBottom(BorderStyle.MEDIUM);
+        style.setBorderLeft(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
+        style.setWrapText(true);
+        return style;
+    }
+    
+    private static CellStyle createDataStyle(Workbook wb) {
+        CellStyle style = wb.createCellStyle();
+        style.setBorderTop(BorderStyle.THIN);
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setBorderLeft(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
+        return style;
+    }
+    
+    private static CellStyle createNumberStyle(Workbook wb) {
+        CellStyle style = createDataStyle(wb);
+        style.setDataFormat(wb.createDataFormat().getFormat("#,##0.00"));
+        style.setAlignment(HorizontalAlignment.RIGHT);
+        return style;
+    }
+    
+    private static CellStyle createDateStyle(Workbook wb) {
+        CellStyle style = createDataStyle(wb);
+        style.setDataFormat(wb.createDataFormat().getFormat("dd/mm/yyyy"));
+        style.setAlignment(HorizontalAlignment.CENTER);
+        return style;
+    }
+    
+    private static CellStyle createTotalStyle(Workbook wb) {
+        CellStyle style = wb.createCellStyle();
+        Font font = wb.createFont();
+        font.setBold(true);
+        font.setFontHeightInPoints((short) 11);
+        style.setFont(font);
+        style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        style.setBorderTop(BorderStyle.MEDIUM);
+        style.setBorderBottom(BorderStyle.MEDIUM);
+        style.setBorderLeft(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
+        style.setDataFormat(wb.createDataFormat().getFormat("#,##0.00"));
+        style.setAlignment(HorizontalAlignment.RIGHT);
+        return style;
+    }
+    
+    private static CellStyle createPositiveNumberStyle(Workbook wb) {
+        CellStyle style = createNumberStyle(wb);
+        Font font = wb.createFont();
+        font.setColor(IndexedColors.GREEN.getIndex());
+        style.setFont(font);
+        return style;
+    }
+    
+    private static CellStyle createNegativeNumberStyle(Workbook wb) {
+        CellStyle style = createNumberStyle(wb);
+        Font font = wb.createFont();
+        font.setColor(IndexedColors.RED.getIndex());
+        style.setFont(font);
+        return style;
+    }
+    
+    private static CellStyle createBoldStyle(Workbook wb) {
+        CellStyle style = wb.createCellStyle();
+        Font font = wb.createFont();
+        font.setBold(true);
+        style.setFont(font);
+        return style;
+    }
 }
+

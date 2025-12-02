@@ -170,7 +170,7 @@ public class OperationDAO {
     }
 
     public int countOperations() {
-        String sql = "SELECT COUNT(*) as c FROM operations";
+        String sql = "SELECT COUNT(*) as c FROM operations WHERE imp IS NOT NULL AND imp != ''";
         try (Connection conn = Database.getInstance().getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -350,7 +350,8 @@ public class OperationDAO {
         String dateExpr = "CASE WHEN typeof(COALESCE(date_emission,date_visa)) = 'integer' "
             + "THEN datetime(COALESCE(date_emission,date_visa)/1000, 'unixepoch', 'localtime') "
             + "ELSE COALESCE(date_emission,date_visa) END";
-        String sql = "SELECT COUNT(*) as c FROM operations WHERE strftime('%Y', " + dateExpr + ") = ? "
+        String sql = "SELECT COUNT(*) as c FROM operations WHERE imp IS NOT NULL AND imp != '' "
+            + "AND strftime('%Y', " + dateExpr + ") = ? "
             + "AND strftime('%m', " + dateExpr + ") = printf('%02d', ?)";
         try (Connection conn = Database.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -481,7 +482,6 @@ public class OperationDAO {
     private Operation mapResultSetToOperation(ResultSet rs) throws SQLException {
         Operation operation = new Operation();
         operation.setId(rs.getInt("id"));
-        operation.setOp(rs.getString("op"));
         operation.setImp(rs.getString("imp"));
         operation.setDesignation(rs.getString("designation"));
         operation.setNature(rs.getString("nature"));
@@ -494,23 +494,8 @@ public class OperationDAO {
         Date dateEmission = rs.getDate("date_emission");
         if (dateEmission != null) operation.setDateEmission(dateEmission.toLocalDate());
         
-        Date dateEntree = rs.getDate("date_entree");
-        if (dateEntree != null) operation.setDateEntree(dateEntree.toLocalDate());
-        
         Date dateVisa = rs.getDate("date_visa");
         if (dateVisa != null) operation.setDateVisa(dateVisa.toLocalDate());
-        
-        Date dateRejet = rs.getDate("date_rejet");
-        if (dateRejet != null) operation.setDateRejet(dateRejet.toLocalDate());
-        
-        Date dateReponse = rs.getDate("date_reponse");
-        if (dateReponse != null) operation.setDateReponse(dateReponse.toLocalDate());
-        
-        // Texte optionnel
-        operation.setDecision(rs.getString("decision"));
-        operation.setMotifRejet(rs.getString("motif_rejet"));
-        operation.setContenuReponse(rs.getString("contenu_reponse"));
-        operation.setMois(rs.getString("mois"));
         
         // Integers nullables
         int opOr = rs.getInt("op_or");

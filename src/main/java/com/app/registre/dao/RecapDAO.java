@@ -15,20 +15,20 @@ public class RecapDAO {
     public Map<String, Double> getTotauxParMois() {
         Map<String, Double> totaux = new HashMap<>();
         // If explicit textual 'mois' values exist in the table, prefer grouping by that column
-        String countMoisSql = "SELECT COUNT(*) as c FROM operations WHERE mois IS NOT NULL AND TRIM(mois) <> ''";
+        String countMoisSql = "SELECT COUNT(*) as c FROM operations WHERE imp IS NOT NULL AND imp != '' AND mois IS NOT NULL AND TRIM(mois) <> ''";
         try (Connection conn = Database.getInstance().getConnection()) {
 
             // Log total rows for diagnostics
-            try (Statement stmtCount = conn.createStatement(); ResultSet totalRs = stmtCount.executeQuery("SELECT COUNT(*) as c FROM operations")) {
+            try (Statement stmtCount = conn.createStatement(); ResultSet totalRs = stmtCount.executeQuery("SELECT COUNT(*) as c FROM operations WHERE imp IS NOT NULL AND imp != ''")) {
                 if (totalRs.next()) log.info("Total operations rows in DB: {}", totalRs.getInt("c"));
             } catch (SQLException ex) {
                 log.warn("Unable to query operations count: {}", ex.getMessage());
             }
 
             // Dump all rows for debugging using a dedicated statement (avoid multiple open ResultSets on same Statement)
-            try (Statement stmtDump = conn.createStatement(); ResultSet all = stmtDump.executeQuery("SELECT id, op, mois, montant, solde, depense, recette FROM operations ORDER BY id")) {
+            try (Statement stmtDump = conn.createStatement(); ResultSet all = stmtDump.executeQuery("SELECT id, imp, solde, depense, recette FROM operations ORDER BY id")) {
                 while (all.next()) {
-                    log.info("ROW id={} op={} mois={} montant={} solde={} depense={} recette={}", all.getInt("id"), all.getString("op"), all.getString("mois"), all.getObject("montant"), all.getObject("solde"), all.getObject("depense"), all.getObject("recette"));
+                    log.info("ROW id={} imp={} solde={} depense={} recette={}", all.getInt("id"), all.getString("imp"), all.getObject("solde"), all.getObject("depense"), all.getObject("recette"));
                 }
             } catch (SQLException ex) {
                 log.warn("Unable to dump operations rows: {}", ex.getMessage());
@@ -41,7 +41,7 @@ public class RecapDAO {
 
             if (c > 0) {
                 // Group by textual mois column (e.g. 'JANVIER'). Use Java aggregation to avoid SQLite strangeness on grouping.
-                String sql = "SELECT mois, COALESCE(montant, solde) as val FROM operations";
+                String sql = "SELECT COALESCE(solde, 0) as val FROM operations";
                 try (Statement stmt2 = conn.createStatement(); ResultSet rs = stmt2.executeQuery(sql)) {
                     while (rs.next()) {
                         String m = rs.getString("mois");
@@ -179,8 +179,8 @@ public class RecapDAO {
     }
 
     public double getTotalRecettes() {
-        // Sum recettes: prefer stored 'recette' but fallback to montant or solde when recette is NULL
-        String sql = "SELECT SUM(COALESCE(recette, COALESCE(montant, solde))) as total FROM operations WHERE nature IN ('SUBVENTION', 'RECETTE')";
+        // Sum recettes: use recette column, fallback to solde when recette is NULL
+        String sql = "SELECT SUM(COALESCE(recette, solde)) as total FROM operations WHERE nature IN ('SUBVENTION', 'RECETTE')";
 
         try (Connection conn = Database.getInstance().getConnection();
              Statement stmt = conn.createStatement();
@@ -253,7 +253,7 @@ public class RecapDAO {
     }
 
     public int getTotalOperations() {
-        String sql = "SELECT COUNT(*) as total FROM operations";
+        String sql = "SELECT COUNT(*) as total FROM operations WHERE imp IS NOT NULL AND imp != ''";
 
         try (Connection conn = Database.getInstance().getConnection();
              Statement stmt = conn.createStatement();
