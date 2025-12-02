@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Manifest update4j généré automatiquement pour v1.0.0 -->
-<configuration version="1.0.0">
+<!-- Manifest update4j généré automatiquement pour v1.3.0 -->
+<configuration version="1.3.0">
     <provider>
         <name>GitHub Releases</name>
     </provider>
 
     <!-- JAR principal de l'application -->
-    <file uri="https://github.com/aissatahri/registre-comptable/releases/download/v1.0.0/registre-comptable-1.0.0.jar" 
-          os="${user.home}/.registre-comptable/registre-comptable-1.0.0.jar"
-          size="45164588" 
-          checksum="a439e087c4e706263c6d25e64dd7127f"/>
+    <file uri="https://github.com/aissatahri/registre-comptable/releases/download/v1.3.0/registre-comptable-1.3.0.jar" 
+          os="${user.home}/.registre-comptable/registre-comptable-1.3.0.jar"
+          size="45183897" 
+          checksum="40c45b22caea25a5cbfa5fe3e0a62480"/>
 
     <!-- Launcher: classe principale à exécuter après mise à jour -->
     <launcher class="com.app.registre.Main">
