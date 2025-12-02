@@ -11,13 +11,30 @@
 
 # Runtime dumps
 *.stackdump
+crash-log.txt
 
 # Local logs and query outputs
 query_*.txt
 update-*.log
+test-*.log
+test-*.sql
+
+# Test files
+TestDB.java
+TestDB.class
+
+# Temporary folders
+view/
+out/
+
+# Old releases kept locally
+registre-comptable-v*.jar
 
 # Release folders (upload manually to GitHub)
 release-v*/
+
+# Database migrations (obsolete after v1.3.0)
+database-migrations/
 
 # Installer output (large files)
 installer/Output/
