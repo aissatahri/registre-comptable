@@ -27,6 +27,9 @@ public class RegistreController {
     @FXML private TableView<Operation> operationsTable;
     @FXML private TableColumn<Operation, Integer> colOvCheq;
     @FXML private TableColumn<Operation, String> colImp;
+    @FXML private TableColumn<Operation, Integer> colArt;
+    @FXML private TableColumn<Operation, Integer> colPar;
+    @FXML private TableColumn<Operation, Integer> colLig;
     @FXML private TableColumn<Operation, String> colDesignation;
     @FXML private TableColumn<Operation, String> colN;
     @FXML private TableColumn<Operation, String> colNature;
@@ -46,16 +49,24 @@ public class RegistreController {
     @FXML private TextField searchField;
     @FXML private ComboBox<String> filterMois;
     @FXML private ComboBox<String> filterNature;
+    @FXML private ComboBox<Integer> filterAnnee;
     @FXML private javafx.scene.control.MenuButton columnsMenu;
     @FXML private Text totalOperationsText;
     @FXML private Text totalMontantText;
     @FXML private Text dossiersPayesText;
     @FXML private Text dossiersRejetesText;
+    @FXML private javafx.scene.control.Pagination pagination;
 
     private ObservableList<Operation> operations;
+    private ObservableList<Operation> allOperations;
     private OperationDAO operationDAO;
     private RecapDAO recapDAO;
     private CheckBox headerSelectAll;
+    private String lastMonthFromData;
+    private Integer lastYearFromData;
+    private boolean initialFiltersApplied = false;
+    
+    private static final int ROWS_PER_PAGE = 13;
 
     public void initialize() {
         try {
@@ -64,12 +75,51 @@ public class RegistreController {
 
             // Map Table columns to Operation properties (ordered like the operation dialog)
             colImp.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("imp"));
+            colArt.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("art"));
+            colPar.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("par"));
+            colLig.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("lig"));
             colDesignation.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("designation"));
             colNature.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("nature"));
             colN.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("n"));
             colBudg.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("budg"));
             colExercice.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("exercice"));
             colBeneficiaire.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("beneficiaire"));
+            
+            // Indicateurs visuels pour les décisions (dans la colonne désignation via rowFactory)
+            operationsTable.setRowFactory(tv -> new TableRow<Operation>() {
+                @Override
+                protected void updateItem(Operation item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setStyle("");
+                        setGraphic(null);
+                    } else {
+                        // Lignes alternées (zebra striping)
+                        if (getIndex() % 2 == 0) {
+                            setStyle("-fx-background-color: #f8f9fa;");
+                        } else {
+                            setStyle("-fx-background-color: white;");
+                        }
+                        
+                        // Highlight pour sélection
+                        if (isSelected()) {
+                            setStyle("-fx-background-color: #d4edff; -fx-border-color: #3498db; -fx-border-width: 1;");
+                        }
+                        
+                        // Icônes pour statuts dans le texte de la désignation
+                        String decision = item.getDecision();
+                        if (decision != null) {
+                            if (decision.equals("P") || decision.toUpperCase().contains("ACCEPT")) {
+                                // Vert clair pour payé
+                                setStyle(getStyle() + "-fx-background-color: #d4edda;");
+                            } else if (decision.equals("R") || decision.toUpperCase().contains("REFUS") || decision.toUpperCase().contains("REJET")) {
+                                // Rouge clair pour rejeté
+                                setStyle(getStyle() + "-fx-background-color: #f8d7da;");
+                            }
+                        }
+                    }
+                }
+            });
             colDateEmission.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("dateEmission"));
             colDateVisa.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("dateVisa"));
             colOpOr.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("opOr"));
@@ -127,11 +177,42 @@ public class RegistreController {
                 }
             };
 
-            colRecette.setCellFactory(doubleCellFactory);
+            // Format avec couleurs pour montants positifs/négatifs
+            javafx.util.Callback<TableColumn<Operation, Double>, TableCell<Operation, Double>> coloredDoubleCellFactory = col -> new TableCell<>() {
+                @Override protected void updateItem(Double item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setText(null);
+                        setStyle("");
+                    } else {
+                        setText(nf.format(item));
+                        if (item < 0) {
+                            setStyle("-fx-text-fill: #e74c3c; -fx-font-weight: bold;");
+                        } else if (item > 0) {
+                            setStyle("-fx-text-fill: #27ae60;");
+                        } else {
+                            setStyle("-fx-text-fill: #95a5a6;");
+                        }
+                    }
+                }
+            };
+            
+            colRecette.setCellFactory(coloredDoubleCellFactory);
             colSurRam.setCellFactory(doubleCellFactory);
             colSurEng.setCellFactory(doubleCellFactory);
-            colDepense.setCellFactory(doubleCellFactory);
-            colMontant.setCellFactory(doubleCellFactory);
+            colDepense.setCellFactory(coloredDoubleCellFactory);
+            colMontant.setCellFactory(coloredDoubleCellFactory);
+
+            Callback<TableColumn<Operation, Integer>, TableCell<Operation, Integer>> intCenterFactory = col -> new TableCell<>() {
+                @Override protected void updateItem(Integer item, boolean empty) {
+                    super.updateItem(item, empty);
+                    setText(empty || item == null ? "" : item.toString());
+                    setStyle("-fx-alignment: CENTER;");
+                }
+            };
+            colArt.setCellFactory(intCenterFactory);
+            colPar.setCellFactory(intCenterFactory);
+            colLig.setCellFactory(intCenterFactory);
 
             loadOperations();
             setupFilters();
@@ -251,11 +332,94 @@ public class RegistreController {
             prevSolde = computed;
         }
 
-        operations = FXCollections.observableArrayList(operationList);
-        operationsTable.setItems(operations);
+        allOperations = FXCollections.observableArrayList(operationList);
+        operations = allOperations;
+
+        computeLastMonthYear(allOperations);
+        populateYearFilter(allOperations);
+        
+        setupPagination();
         operationsTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         autoResizeColumns();
         updateHeaderSelectAll();
+
+        applyInitialFilters();
+    }
+
+    private void computeLastMonthYear(List<Operation> list) {
+        lastMonthFromData = null;
+        lastYearFromData = null;
+        java.time.LocalDate latest = null;
+        for (Operation op : list) {
+            java.time.LocalDate d = op.getDateEmission() != null ? op.getDateEmission() : op.getDateVisa();
+            if (d != null && (latest == null || d.isAfter(latest))) {
+                latest = d;
+            }
+        }
+        if (latest != null) {
+            lastMonthFromData = getMonthName(latest);
+            lastYearFromData = latest.getYear();
+        }
+    }
+
+    private void populateYearFilter(List<Operation> list) {
+        if (filterAnnee == null) return;
+        java.util.Set<Integer> years = new java.util.TreeSet<>(java.util.Comparator.reverseOrder());
+        for (Operation op : list) {
+            java.time.LocalDate d = op.getDateEmission() != null ? op.getDateEmission() : op.getDateVisa();
+            if (d != null) years.add(d.getYear());
+        }
+        if (years.isEmpty()) years.add(java.time.LocalDate.now().getYear());
+        filterAnnee.getItems().setAll(years);
+        if (filterAnnee.getValue() == null && lastYearFromData != null) {
+            filterAnnee.setValue(lastYearFromData);
+        }
+    }
+
+    private void reloadAndPreserveFilters() {
+        String mois = filterMois != null ? filterMois.getValue() : null;
+        Integer annee = filterAnnee != null ? filterAnnee.getValue() : null;
+        String nature = filterNature != null ? filterNature.getValue() : null;
+        String search = searchField != null ? searchField.getText() : null;
+        int currentPage = pagination != null ? pagination.getCurrentPageIndex() : 0;
+
+        loadOperations();
+
+        if (filterAnnee != null && annee != null) {
+            filterAnnee.setValue(annee);
+        }
+
+        boolean hasFilters = (mois != null && !mois.isBlank()) || (annee != null) || (nature != null && !nature.isBlank()) || (search != null && !search.isBlank());
+        if (hasFilters) {
+            applyFilters();
+        } else {
+            operations = allOperations;
+            setupPagination();
+            updateHeaderSelectAll();
+        }
+
+        if (pagination != null) {
+            int lastPage = Math.max(0, pagination.getPageCount() - 1);
+            pagination.setCurrentPageIndex(Math.min(currentPage, lastPage));
+        }
+    }
+    
+    private void setupPagination() {
+        int pageCount = (int) Math.ceil((double) operations.size() / ROWS_PER_PAGE);
+        pagination.setPageCount(Math.max(1, pageCount));
+        pagination.setCurrentPageIndex(0);
+        
+        pagination.setPageFactory(pageIndex -> {
+            int fromIndex = pageIndex * ROWS_PER_PAGE;
+            int toIndex = Math.min(fromIndex + ROWS_PER_PAGE, operations.size());
+            
+            operationsTable.setItems(FXCollections.observableArrayList(
+                operations.subList(fromIndex, toIndex)
+            ));
+            
+            updateStatistics();
+            return new javafx.scene.layout.VBox(); // Pagination requires a Node return
+        });
     }
 
     private void setupFilters() {
@@ -264,32 +428,59 @@ public class RegistreController {
 
         filterNature.getItems().addAll("MARCHE V", "MARCHE NV", "BC", "REGIE", "CONVENTION", "ESD", "SUBVENTION");
 
-        // Default to the current month on view load
-        try { filterMois.setValue(getCurrentMonth()); } catch (Exception ignored) {}
+        filterAnnee.valueProperty().addListener((obs, oldVal, newVal) -> applyFilters());
 
         filterMois.valueProperty().addListener((obs, oldVal, newVal) -> applyFilters());
         filterNature.valueProperty().addListener((obs, oldVal, newVal) -> applyFilters());
         searchField.textProperty().addListener((obs, oldVal, newVal) -> applyFilters());
     }
 
+    private void applyInitialFilters() {
+        if (initialFiltersApplied) return;
+        try {
+            if (filterAnnee != null && filterAnnee.getValue() == null) {
+                if (lastYearFromData != null) filterAnnee.setValue(lastYearFromData);
+                else filterAnnee.setValue(java.time.LocalDate.now().getYear());
+            }
+            if (filterMois != null && filterMois.getValue() == null) {
+                if (lastMonthFromData != null) filterMois.setValue(lastMonthFromData);
+                else filterMois.setValue(getCurrentMonth());
+            }
+        } catch (Exception ignored) {}
+        initialFiltersApplied = true;
+        applyFilters();
+    }
+
     @FXML
     private void applyFilters() {
         String mois = filterMois.getValue();
+        Integer annee = filterAnnee.getValue();
         String nature = filterNature.getValue();
         String search = searchField.getText() == null ? "" : searchField.getText().toLowerCase();
 
         ObservableList<Operation> filtered = FXCollections.observableArrayList();
 
-        for (Operation op : operations) {
+        for (Operation op : allOperations) {
             boolean matches = true;
             // Determine month from dateEmission first (preferred), otherwise fall back to stored mois
             String opMonth = null;
             if (op.getDateEmission() != null) {
                 opMonth = getMonthName(op.getDateEmission());
+            } else if (op.getDateVisa() != null) {
+                opMonth = getMonthName(op.getDateVisa());
             } else if (op.getMois() != null) {
                 opMonth = op.getMois();
             }
             if (mois != null && (opMonth == null || !mois.equals(opMonth))) matches = false;
+            if (annee != null) {
+                Integer opYear = null;
+                if (op.getDateEmission() != null) {
+                    opYear = op.getDateEmission().getYear();
+                } else if (op.getDateVisa() != null) {
+                    opYear = op.getDateVisa().getYear();
+                }
+                if (opYear == null || !annee.equals(opYear)) matches = false;
+            }
             if (nature != null && !nature.equals(op.getNature())) matches = false;
 
             if (!search.isEmpty() && !containsSearch(op, search)) matches = false;
@@ -297,8 +488,8 @@ public class RegistreController {
             if (matches) filtered.add(op);
         }
 
-        operationsTable.setItems(filtered);
-        updateStatistics();
+        operations = filtered;
+        setupPagination();
         autoResizeColumns();
         updateHeaderSelectAll();
     }
@@ -306,10 +497,11 @@ public class RegistreController {
     @FXML
     private void resetFilters() {
         filterMois.setValue(null);
+        filterAnnee.setValue(null);
         filterNature.setValue(null);
         searchField.clear();
-        operationsTable.setItems(operations);
-        updateStatistics();
+        operations = allOperations;
+        setupPagination();
         updateHeaderSelectAll();
     }
 
@@ -327,7 +519,10 @@ public class RegistreController {
     /* --------------------------- STATISTICS --------------------------- */
 
     private void updateStatistics() {
-        int totalOps = operationsTable.getItems().size();
+        // Compter seulement les opérations avec IMP
+        int totalOps = (int) operationsTable.getItems().stream()
+            .filter(op -> op.getImp() != null && !op.getImp().trim().isEmpty())
+            .count();
         // Instead of total montant, show the latest solde (dernier solde)
         java.text.NumberFormat nf = java.text.NumberFormat.getNumberInstance(java.util.Locale.FRANCE);
         nf.setMinimumFractionDigits(2);
@@ -401,7 +596,7 @@ public class RegistreController {
             if (result.isPresent() && result.get() == ButtonType.OK) {
                 operationDAO.delete(selected.getId());
                 showInfo("Opération supprimée avec succès");
-                loadOperations();
+                reloadAndPreserveFilters();
                 notifyMenuStats();
             }
         } else {
@@ -421,7 +616,7 @@ public class RegistreController {
         if (res.isPresent() && res.get() == ButtonType.OK) {
             operationDAO.deleteAll();
             showInfo("Toutes les opérations ont été supprimées.");
-            loadOperations();
+            reloadAndPreserveFilters();
             notifyMenuStats();
         }
     }
@@ -445,7 +640,7 @@ public class RegistreController {
                 operationDAO.delete(op.getId());
             }
             showInfo(toDelete.size() + " opérations supprimées.");
-            loadOperations();
+            reloadAndPreserveFilters();
             notifyMenuStats();
         }
     }
@@ -512,7 +707,7 @@ public class RegistreController {
                     }
                     showInfo("Opération ajoutée avec succès");
                 }
-                loadOperations();
+                    reloadAndPreserveFilters();
                 autoResizeColumns();
                 notifyMenuStats();
             }
@@ -579,7 +774,7 @@ public class RegistreController {
                     }
 
                     showInfo("Importation terminée !\n" + importedCount + " opérations importées");
-                    loadOperations();
+                    reloadAndPreserveFilters();
                     autoResizeColumns();
                     notifyMenuStats();
                     // After a successful import, try to open the source file for convenience

@@ -98,16 +98,8 @@ public class DesignationsController {
 
     private void loadFromCsv() {
         try {
-            URL res = getClass().getResource("/data/designations.csv");
-            if (res != null) {
-                try {
-                    csvPath = Path.of(res.toURI());
-                } catch (Exception ex) {
-                    csvPath = Path.of("src/main/resources/data/designations.csv");
-                }
-            } else {
-                csvPath = Path.of("src/main/resources/data/designations.csv");
-            }
+            // Utiliser le fichier dans le dossier utilisateur (permet les modifications dans le JAR)
+            csvPath = com.app.registre.util.DesignationFileManager.getDesignationsPath();
 
             List<String> lines = new ArrayList<>();
             if (Files.exists(csvPath)) {
@@ -291,7 +283,9 @@ public class DesignationsController {
 
     private void saveToCsv() {
         try {
-            if (csvPath == null) csvPath = Path.of("src/main/resources/data/designations.csv");
+            if (csvPath == null) {
+                csvPath = com.app.registre.util.DesignationFileManager.getDesignationsPath();
+            }
             // ensure parent exists
             File parent = csvPath.toFile().getParentFile();
             if (parent != null && !parent.exists()) parent.mkdirs();
@@ -308,7 +302,13 @@ public class DesignationsController {
             out.add("IMP;Designation");
             out.addAll(set);
             Files.write(csvPath, out, StandardCharsets.UTF_8);
-            Alert a = new Alert(Alert.AlertType.INFORMATION, "Fichier enregistré.");
+            
+            // Afficher le chemin du fichier sauvegardé
+            String location = csvPath.toString();
+            Alert a = new Alert(Alert.AlertType.INFORMATION, 
+                "Fichier enregistré avec succès.\n\nEmplacement: " + location + 
+                "\n\nNote: Redémarrez l'application pour que les modifications soient prises en compte dans l'autocomplétion.");
+            a.setHeaderText("Sauvegarde réussie");
             a.showAndWait();
         } catch (Exception ex) {
             ex.printStackTrace();

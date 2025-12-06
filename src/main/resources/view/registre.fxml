@@ -4,6 +4,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.Pagination?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
@@ -34,6 +35,7 @@
             <HBox alignment="CENTER_LEFT" spacing="10">
                 <TextField fx:id="searchField" promptText="Rechercher..." HBox.hgrow="ALWAYS" />
                 <ComboBox fx:id="filterMois" promptText="Filtrer par mois" />
+                <ComboBox fx:id="filterAnnee" promptText="Filtrer par année" />
                 <ComboBox fx:id="filterNature" promptText="Filtrer par nature" />
                 <Button onAction="#applyFilters" text="Filtrer" />
                 <Button onAction="#resetFilters" text="Réinitialiser" />
@@ -52,6 +54,9 @@
                     <columns>
                 <TableColumn fx:id="selectColumn" editable="true" prefWidth="40" text="" />
                 <!-- Order aligned with operation dialog: IMP, Désignation, Nature, N, BUDG, Date Emission, Date Visa, OV/CHEQ, Solde, ... -->
+                <TableColumn fx:id="colArt" prefWidth="70" text="ART" />
+                <TableColumn fx:id="colPar" prefWidth="70" text="PAR" />
+                <TableColumn fx:id="colLig" prefWidth="70" text="LIG" />
                 <TableColumn fx:id="colImp" prefWidth="80" text="IMP" />
                 <TableColumn fx:id="colDesignation" prefWidth="200" text="Désignation" />
                 <TableColumn fx:id="colNature" prefWidth="120" text="Nature" />
@@ -79,18 +84,22 @@
     </center>
 
     <bottom>
-        <HBox alignment="CENTER_LEFT" spacing="20" styleClass="page-footer">
-            <VBox>
-                <Text style="-fx-font-weight: bold;" text="Total des opérations:" />
-                <Text fx:id="totalOperationsText" style="-fx-font-size: 16; -fx-fill: #2c3e50;" text="0" />
-            </VBox>
-            <VBox>
-                <Text style="-fx-font-weight: bold;" text="Solde:" />
-                <Text fx:id="totalMontantText" style="-fx-font-size: 16; -fx-fill: #27ae60;" text="0.00" />
-            </VBox>
-            <VBox />
-            <VBox />
-        </HBox>
+        <VBox spacing="10">
+            <HBox alignment="CENTER_LEFT" spacing="20" styleClass="page-footer">
+                <VBox>
+                    <Text style="-fx-font-weight: bold;" text="Total des opérations:" />
+                    <Text fx:id="totalOperationsText" style="-fx-font-size: 16; -fx-fill: #2c3e50;" text="0" />
+                </VBox>
+                <VBox>
+                    <Text style="-fx-font-weight: bold;" text="Solde:" />
+                    <Text fx:id="totalMontantText" style="-fx-font-size: 16; -fx-fill: #27ae60;" text="0.00" />
+                </VBox>
+                <VBox />
+                <VBox />
+                <Region HBox.hgrow="ALWAYS" />
+                <javafx.scene.control.Pagination fx:id="pagination" maxPageIndicatorCount="10" />
+            </HBox>
+        </VBox>
     </bottom>
 
 </BorderPane>

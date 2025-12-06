@@ -33,12 +33,12 @@ public class MenuController {
     @FXML private Text recettesMenuText;
     @FXML private Text lastSoldeMenuText;
     @FXML private javafx.scene.control.MenuButton userMenu;
+    @FXML private Button btnDashboard;
     @FXML private Button btnRegistre;
     @FXML private Button btnRecap;
     @FXML private Button btnMois;
     @FXML private Button btnDesignations;
     @FXML private Button btnInitialSolde;
-    @FXML private Button btnUserManagement;
     @FXML private Button btnChangeDb;
     private boolean sidebarVisible = true;
     private RecapDAO recapDAO = new RecapDAO();
@@ -145,6 +145,13 @@ public class MenuController {
     }
 
     @FXML
+    private void showDashboard() {
+        loadView("/view/dashboard.fxml");
+        refreshMenuStats();
+        setActive(btnDashboard);
+    }
+
+    @FXML
     private void showRecap() {
         loadView("/view/recap.fxml");
         refreshMenuStats();
@@ -220,7 +227,11 @@ public class MenuController {
     private void showUserManagement() {
         try {
             loadView("/view/user_management.fxml");
-            setActive(btnUserManagement);
+            // Désactiver tous les boutons du menu principal
+            java.util.List<Button> all = java.util.Arrays.asList(btnRegistre, btnRecap, btnMois, btnInitialSolde, btnDesignations, btnDashboard);
+            for (Button b : all) {
+                if (b != null) b.getStyleClass().remove("active");
+            }
         } catch (Exception e) {
             e.printStackTrace();
             showError("Erreur lors de l'ouverture de la gestion des utilisateurs", e);
@@ -424,18 +435,18 @@ public class MenuController {
         try {
             if (userMenu == null) return;
             userMenu.getItems().clear();
-            javafx.scene.control.MenuItem profile = new javafx.scene.control.MenuItem("Profil");
+            javafx.scene.control.MenuItem profile = new javafx.scene.control.MenuItem("👤 Profil");
             profile.setOnAction(e -> showProfileDialog());
             // accessibility handled on the menu button and tooltip
 
-            javafx.scene.control.MenuItem settings = new javafx.scene.control.MenuItem("Paramètres");
+            javafx.scene.control.MenuItem settings = new javafx.scene.control.MenuItem("⚙️ Paramètres");
             settings.setOnAction(e -> showSettingsDialog());
             // accessibility handled on the menu button and tooltip
 
-            javafx.scene.control.MenuItem about = new javafx.scene.control.MenuItem("À propos");
-            about.setOnAction(e -> showAbout());
+            javafx.scene.control.MenuItem userManagementItem = new javafx.scene.control.MenuItem("👥 Gestion des utilisateurs");
+            userManagementItem.setOnAction(e -> showUserManagement());
 
-            javafx.scene.control.MenuItem checkUpdates = new javafx.scene.control.MenuItem("Vérifier les mises à jour");
+            javafx.scene.control.MenuItem checkUpdates = new javafx.scene.control.MenuItem("🔄 Vérifier les mises à jour");
             checkUpdates.setOnAction(e -> {
                 try {
                     // Use reflection so the project can compile even if UpdateService (and update4j) is not present
@@ -453,7 +464,10 @@ public class MenuController {
                 }
             });
 
-            javafx.scene.control.MenuItem logout = new javafx.scene.control.MenuItem("Déconnexion");
+            javafx.scene.control.MenuItem about = new javafx.scene.control.MenuItem("ℹ️ À propos");
+            about.setOnAction(e -> showAbout());
+
+            javafx.scene.control.MenuItem logout = new javafx.scene.control.MenuItem("🚪 Déconnexion");
             logout.setOnAction(e -> {
                 // reuse existing logout handler
                 handleLogout();
@@ -472,7 +486,7 @@ public class MenuController {
                 userMenu.setAccessibleText(label);
             } catch (Exception ignore) {}
 
-            userMenu.getItems().addAll(profile, settings, new javafx.scene.control.SeparatorMenuItem(), checkUpdates, about, new javafx.scene.control.SeparatorMenuItem(), logout);
+            userMenu.getItems().addAll(profile, settings, new javafx.scene.control.SeparatorMenuItem(), userManagementItem, checkUpdates, new javafx.scene.control.SeparatorMenuItem(), about, new javafx.scene.control.SeparatorMenuItem(), logout);
         } catch (Exception ignore) {}
     }
 
@@ -630,7 +644,7 @@ public class MenuController {
 
     private void setActive(Button active) {
         if (active == null) return;
-        java.util.List<Button> all = java.util.Arrays.asList(btnRegistre, btnRecap, btnMois, btnInitialSolde, btnDesignations, btnUserManagement);
+        java.util.List<Button> all = java.util.Arrays.asList(btnRegistre, btnRecap, btnMois, btnInitialSolde, btnDesignations, btnDashboard);
         for (Button b : all) {
             if (b == null) continue;
             b.getStyleClass().remove("active");

@@ -135,6 +135,10 @@ public class Database {
         String createOperationsTable = """
             CREATE TABLE IF NOT EXISTS operations (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+                op TEXT,
+                art INTEGER,
+                par INTEGER,
+                lig INTEGER,
                 imp TEXT,
                 designation TEXT,
                 nature TEXT,
@@ -143,6 +147,7 @@ public class Database {
                 exercice TEXT,
                 beneficiaire TEXT,
                 date_emission DATE,
+                date_entree DATE,
                 date_visa DATE,
                 op_or INTEGER,
                 ov_cheq_type TEXT,
@@ -151,7 +156,10 @@ public class Database {
                 sur_ram REAL,
                 sur_eng REAL,
                 depense REAL,
-                solde REAL
+                solde REAL,
+                montant REAL,
+                decision TEXT,
+                mois TEXT
             )
             """;
 
@@ -169,8 +177,26 @@ public class Database {
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(createOperationsTable);
             stmt.execute(createUsersTable);
+            // Ensure new numeric columns exist for legacy databases
+            ensureColumnExists(stmt, "operations", "op", "TEXT");
+            ensureColumnExists(stmt, "operations", "art", "INTEGER");
+            ensureColumnExists(stmt, "operations", "par", "INTEGER");
+            ensureColumnExists(stmt, "operations", "lig", "INTEGER");
+            ensureColumnExists(stmt, "operations", "date_entree", "DATE");
+            ensureColumnExists(stmt, "operations", "montant", "REAL");
+            ensureColumnExists(stmt, "operations", "decision", "TEXT");
+            ensureColumnExists(stmt, "operations", "mois", "TEXT");
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void ensureColumnExists(Statement stmt, String table, String column, String type) {
+        try {
+            String sql = "ALTER TABLE " + table + " ADD COLUMN " + column + " " + type;
+            stmt.execute(sql);
+        } catch (SQLException ignored) {
+            // Column already exists
         }
     }
 }

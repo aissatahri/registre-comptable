@@ -21,6 +21,9 @@ public class OperationDialogController implements Initializable {
 
     @FXML private Text dialogTitle;
     @FXML private TextField ovCheqNumber;
+    @FXML private TextField artField;
+    @FXML private TextField parField;
+    @FXML private TextField ligField;
     @FXML private TextField impField;
     @FXML private TextField designationField;
     @FXML private ComboBox<String> natureCombo;
@@ -111,6 +114,9 @@ public class OperationDialogController implements Initializable {
         numeric.accept(recetteField, recetteField.getText());
         numeric.accept(surRamField, surRamField.getText());
         numeric.accept(surEngField, surEngField.getText());
+        if (artField != null) numeric.accept(artField, artField.getText());
+        if (parField != null) numeric.accept(parField, parField.getText());
+        if (ligField != null) numeric.accept(ligField, ligField.getText());
     }
 
     public void setOperation(Operation operation, boolean isEditMode) {
@@ -121,6 +127,9 @@ public class OperationDialogController implements Initializable {
 
         if (operation != null) {
             if (operation.getOvCheq() != null && ovCheqNumber != null) ovCheqNumber.setText(String.valueOf(operation.getOvCheq()));
+            if (operation.getArt() != null && artField != null) artField.setText(String.valueOf(operation.getArt()));
+            if (operation.getPar() != null && parField != null) parField.setText(String.valueOf(operation.getPar()));
+            if (operation.getLig() != null && ligField != null) ligField.setText(String.valueOf(operation.getLig()));
             impField.setText(operation.getImp());
             designationField.setText(operation.getDesignation());
             natureCombo.setValue(operation.getNature());
@@ -178,6 +187,9 @@ public class OperationDialogController implements Initializable {
             // OV/CHEQ number only (type removed from UI)
             operation.setOvCheq(parseInt(ovCheqNumber != null ? ovCheqNumber.getText() : null));
             operation.setOvCheqType(null);
+            operation.setArt(parseInt(artField != null ? artField.getText() : null));
+            operation.setPar(parseInt(parField != null ? parField.getText() : null));
+            operation.setLig(parseInt(ligField != null ? ligField.getText() : null));
             operation.setImp(impField.getText());
             operation.setNature(natureCombo.getValue());
             operation.setDesignation(designationField.getText());

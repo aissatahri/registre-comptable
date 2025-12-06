@@ -13,9 +13,9 @@ public class OperationDAO {
 
     public void insert(Operation operation) {
         String sql = """
-            INSERT INTO operations(op, imp, designation, nature, n, budg, exercice, beneficiaire,
+            INSERT INTO operations(op, art, par, lig, imp, designation, nature, n, budg, exercice, beneficiaire,
                                    date_emission, date_entree, date_visa, op_or, ov_cheq_type, ov_cheq, recette, sur_ram, sur_eng, depense, solde, montant, decision, mois)
-            VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+            VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
             """;
 
         try (Connection conn = Database.getInstance().getConnection();
@@ -29,6 +29,9 @@ public class OperationDAO {
                 int idx = 1;
                 // legacy 'op' field
                 pstmt.setString(idx++, operation.getOp());
+                if (operation.getArt() != null) pstmt.setInt(idx++, operation.getArt()); else { pstmt.setNull(idx++, java.sql.Types.INTEGER); }
+                if (operation.getPar() != null) pstmt.setInt(idx++, operation.getPar()); else { pstmt.setNull(idx++, java.sql.Types.INTEGER); }
+                if (operation.getLig() != null) pstmt.setInt(idx++, operation.getLig()); else { pstmt.setNull(idx++, java.sql.Types.INTEGER); }
                 pstmt.setString(idx++, operation.getImp());
                 pstmt.setString(idx++, operation.getDesignation());
                 pstmt.setString(idx++, operation.getNature());
@@ -67,7 +70,7 @@ public class OperationDAO {
     public void update(Operation operation) {
             String sql = """
             UPDATE operations SET
-            op = ?, imp = ?, designation = ?, nature = ?, n = ?, budg = ?, exercice = ?, beneficiaire = ?,
+            op = ?, art = ?, par = ?, lig = ?, imp = ?, designation = ?, nature = ?, n = ?, budg = ?, exercice = ?, beneficiaire = ?,
             date_emission = ?, date_entree = ?, date_visa = ?, op_or = ?, ov_cheq_type = ?, ov_cheq = ?, recette = ?, sur_ram = ?, sur_eng = ?, depense = ?, solde = ?, montant = ?, decision = ?, mois = ?
             WHERE id = ?
             """;
@@ -77,6 +80,9 @@ public class OperationDAO {
 
             int idx2 = 1;
             pstmt.setString(idx2++, operation.getOp());
+            if (operation.getArt() != null) pstmt.setInt(idx2++, operation.getArt()); else { pstmt.setNull(idx2++, java.sql.Types.INTEGER); }
+            if (operation.getPar() != null) pstmt.setInt(idx2++, operation.getPar()); else { pstmt.setNull(idx2++, java.sql.Types.INTEGER); }
+            if (operation.getLig() != null) pstmt.setInt(idx2++, operation.getLig()); else { pstmt.setNull(idx2++, java.sql.Types.INTEGER); }
             pstmt.setString(idx2++, operation.getImp());
             pstmt.setString(idx2++, operation.getDesignation());
             pstmt.setString(idx2++, operation.getNature());
@@ -482,7 +488,11 @@ public class OperationDAO {
     private Operation mapResultSetToOperation(ResultSet rs) throws SQLException {
         Operation operation = new Operation();
         operation.setId(rs.getInt("id"));
+        operation.setOp(rs.getString("op"));
         operation.setImp(rs.getString("imp"));
+        operation.setArt(rs.getObject("art") != null ? rs.getInt("art") : null);
+        operation.setPar(rs.getObject("par") != null ? rs.getInt("par") : null);
+        operation.setLig(rs.getObject("lig") != null ? rs.getInt("lig") : null);
         operation.setDesignation(rs.getString("designation"));
         operation.setNature(rs.getString("nature"));
         operation.setN(rs.getString("n"));
@@ -517,6 +527,7 @@ public class OperationDAO {
         
         double depense = rs.getDouble("depense");
         operation.setDepense(rs.wasNull() ? null : depense);
+
         
         double solde = rs.getDouble("solde");
         operation.setSolde(rs.wasNull() ? null : solde);

@@ -10,20 +10,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="189dfc45-43d5-48fa-94cb-a5089b5b5a05" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mise ajour/original-registre-comptable-1.2.0.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mise ajour/registre-comptable-1.1.0.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/mise ajour/registre-comptable-1.2.0.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/installer/launch4j.log" beforeDir="false" afterPath="$PROJECT_DIR$/installer/launch4j.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/installer/launch4j.xml" beforeDir="false" afterPath="$PROJECT_DIR$/installer/launch4j.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/installer/registre.iss" beforeDir="false" afterPath="$PROJECT_DIR$/installer/registre.iss" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/artifact/registre_comptable_jar/registre-comptable.jar" beforeDir="false" afterPath="$PROJECT_DIR$/out/artifact/registre_comptable_jar/registre-comptable.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/app/registre/controller/DesignationsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/app/registre/controller/DesignationsController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/app/registre/controller/MenuController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/app/registre/controller/MenuController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/app/registre/controller/MoisController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/app/registre/controller/MoisController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/app/registre/controller/RecapController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/app/registre/controller/RecapController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/app/registre/dao/OperationDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/app/registre/dao/OperationDAO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/app/registre/util/ExcelUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/app/registre/util/ExcelUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/version.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/version.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/view/login.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/view/login.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/app/registre/controller/RegistreController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/app/registre/controller/RegistreController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/app/registre/util/DesignationLookup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/app/registre/util/DesignationLookup.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/style.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/view/menu.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/view/menu.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/view/registre.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/view/registre.fxml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -148,7 +146,7 @@
       <workItem from="1764438698586" duration="10548000" />
       <workItem from="1764507506627" duration="1461000" />
       <workItem from="1764509003537" duration="11733000" />
-      <workItem from="1764619054520" duration="8614000" />
+      <workItem from="1764619054520" duration="21843000" />
     </task>
     <servers />
   </component>

@@ -229,9 +229,14 @@
     -fx-background-color: transparent;
     -fx-text-fill: white; /* white text on dark background like original sidebar */
     -fx-font-weight: 600;
-    -fx-padding: 8 16 10 16;
+    -fx-padding: 8 12 10 12;
     -fx-background-radius: 4;
     -fx-border-color: transparent;
+    -fx-min-width: 110px;
+    -fx-max-width: 200px;
+    -fx-font-size: 13px;
+    -fx-alignment: CENTER;
+    -fx-text-alignment: CENTER;
 }
 
 /* subtle hover underline */
@@ -241,7 +246,7 @@
     -fx-border-color: transparent transparent rgba(255,255,255,0.08) transparent;
     -fx-border-width: 0 0 2 0;
     -fx-border-radius: 6;
-    -fx-padding: 6 16 12 16; /* give room for underline */
+    -fx-padding: 6 12 12 12; /* give room for underline */
 }
 
 /* active underline (as in mockup) */
@@ -250,7 +255,7 @@
     -fx-border-width: 0 0 3 0;
     -fx-border-radius: 6;
     -fx-text-fill: white;
-    -fx-padding: 6 16 12 16;
+    -fx-padding: 6 12 12 12;
 }
 
 /* Make the user menu visually consistent with the top-bar menu buttons */
@@ -448,6 +453,66 @@
     -fx-font-size: 11px;
     -fx-text-fill: #7f8c8d;
     -fx-padding: 6 0 0 0;
+}
+
+/* Dashboard KPI Cards */
+.kpi-card, .kpi-card-green, .kpi-card-red, .kpi-card-blue {
+    -fx-background-color: white;
+    -fx-background-radius: 10;
+    -fx-border-color: #e3e8ef;
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 8, 0, 0, 2);
+}
+
+.kpi-card {
+    -fx-border-color: #3498db;
+}
+
+.kpi-card-green {
+    -fx-border-color: #27ae60;
+}
+
+.kpi-card-red {
+    -fx-border-color: #e74c3c;
+}
+
+.kpi-card-blue {
+    -fx-border-color: #3498db;
+}
+
+.kpi-label {
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #7f8c8d;
+}
+
+.kpi-value {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+}
+
+.kpi-subtitle {
+    -fx-font-size: 11px;
+    -fx-text-fill: #95a5a6;
+}
+
+.label-bold {
+    -fx-font-weight: bold;
+    -fx-text-fill: #34495e;
+}
+
+.alert-warning {
+    -fx-background-color: #fff3cd;
+    -fx-text-fill: #856404;
+    -fx-padding: 15;
+    -fx-background-radius: 8;
+    -fx-border-color: #ffeaa7;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
 }
 
 /* Button graphic spacing: give a small gap between icon and text */

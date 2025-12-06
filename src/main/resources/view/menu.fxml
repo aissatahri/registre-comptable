@@ -1,29 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.MenuButton?>
-<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.SeparatorMenuItem?>
-<?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.layout.Region?>
 <?import javafx.scene.text.Text?>
 
-<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.app.registre.controller.MenuController" fx:id="rootPane">
+<BorderPane fx:id="rootPane" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.app.registre.controller.MenuController">
 
     <top>
         <StackPane fx:id="topBarStack">
             <HBox fx:id="topBar" alignment="CENTER_LEFT" spacing="12" styleClass="top-bar">
                 <!-- Brand (logo + title) -->
-                <HBox spacing="10" alignment="CENTER_LEFT" styleClass="brand">
-                    <ImageView fitWidth="36" fitHeight="36" preserveRatio="true">
+                <HBox alignment="CENTER_LEFT" spacing="10" styleClass="brand">
+                    <ImageView fitHeight="36" fitWidth="36" preserveRatio="true">
                         <Image url="@../images/icon.png" />
                     </ImageView>
                     <VBox>
@@ -32,13 +30,13 @@
                     </VBox>
                 </HBox>
 
-                <HBox spacing="8" alignment="CENTER_LEFT">
-                    <Button fx:id="btnRegistre" onAction="#showRegistre" styleClass="menu-button" text="Registre des OP" />
-                    <Button fx:id="btnRecap" onAction="#showRecap" styleClass="menu-button" text="Récapitulatif" />
-                    <Button fx:id="btnMois" onAction="#showMois" styleClass="menu-button" text="Par Mois" />
-                    <Button fx:id="btnInitialSolde" onAction="#showEditInitialSolde" styleClass="menu-button" text="Solde initial" />
-                    <Button fx:id="btnDesignations" onAction="#showDesignations" styleClass="menu-button" text="Designations" />
-                    <Button fx:id="btnUserManagement" onAction="#showUserManagement" styleClass="menu-button" text="Gestion des utilisateurs" />
+                <HBox alignment="CENTER_LEFT" spacing="6">
+                    <Button fx:id="btnDashboard" onAction="#showDashboard" styleClass="menu-button" text="📊 Tableau de bord" />
+                    <Button fx:id="btnRegistre" onAction="#showRegistre" styleClass="menu-button" text="📋 Registre des OP" />
+                    <Button fx:id="btnRecap" onAction="#showRecap" styleClass="menu-button" text="📊 Récapitulatif" />
+                    <Button fx:id="btnMois" onAction="#showMois" styleClass="menu-button" text="📅 Par Mois" />
+                    <Button fx:id="btnInitialSolde" onAction="#showEditInitialSolde" styleClass="menu-button" text="💰 Solde initial" />
+                    <Button fx:id="btnDesignations" onAction="#showDesignations" styleClass="menu-button" text="📝 Désignations" />
                 </HBox>
 
                 <Region HBox.hgrow="ALWAYS" />
@@ -46,20 +44,22 @@
                 <Separator orientation="VERTICAL" styleClass="top-separator" />
 
                 <HBox alignment="CENTER_RIGHT" spacing="8">
-                    <Button fx:id="btnChangeDb" onAction="#handleChangeDatabase" styleClass="menu-button" text="Changer de base..." />
+                    <Button fx:id="btnChangeDb" onAction="#handleChangeDatabase" styleClass="menu-button" text="🗄️ Base de données" />
                     <MenuButton fx:id="userMenu" styleClass="user-name">
                         <graphic>
-                            <ImageView fitWidth="20" fitHeight="20" preserveRatio="true">
+                            <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
                                 <Image url="@../images/account.png" />
                             </ImageView>
                         </graphic>
                         <items>
-                            <MenuItem text="Profil" onAction="#showProfileDialog" />
-                            <MenuItem text="Paramètres" onAction="#showSettingsDialog" />
+                            <MenuItem onAction="#showProfileDialog" text="Profil" />
+                            <MenuItem onAction="#showSettingsDialog" text="Paramètres" />
                             <SeparatorMenuItem />
-                            <MenuItem text="À propos" onAction="#showAbout" />
+                            <MenuItem onAction="#showUserManagement" text="Gestion des utilisateurs" />
                             <SeparatorMenuItem />
-                            <MenuItem text="Déconnexion" onAction="#handleLogout" />
+                            <MenuItem onAction="#showAbout" text="À propos" />
+                            <SeparatorMenuItem />
+                            <MenuItem onAction="#handleLogout" text="Déconnexion" />
                         </items>
                     </MenuButton>
                 </HBox>

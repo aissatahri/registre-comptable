@@ -7,6 +7,9 @@ import javafx.beans.property.SimpleBooleanProperty;
 public class Operation {
     private int id;
     private String op;
+    private Integer art;
+    private Integer par;
+    private Integer lig;
     private String ovCheqType;
     private Integer ovCheq;
     private String imp;
@@ -56,6 +59,15 @@ public class Operation {
 
     public String getOp() { return op; }
     public void setOp(String op) { this.op = op; }
+
+    public Integer getArt() { return art; }
+    public void setArt(Integer art) { this.art = art; }
+
+    public Integer getPar() { return par; }
+    public void setPar(Integer par) { this.par = par; }
+
+    public Integer getLig() { return lig; }
+    public void setLig(Integer lig) { this.lig = lig; }
 
     public String getOvCheqType() { return ovCheqType; }
     public void setOvCheqType(String ovCheqType) { this.ovCheqType = ovCheqType; }
