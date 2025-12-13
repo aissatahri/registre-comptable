@@ -113,6 +113,14 @@ public class Database {
         }
     }
 
+    /**
+     * Return the current JDBC URL used by the Database singleton.
+     * Useful for creating short-lived connections in background tasks.
+     */
+    public static String getDbUrl() {
+        return dbUrl;
+    }
+
     public static void reset() {
         if (instance != null) {
             try {
@@ -148,7 +156,6 @@ public class Database {
                 beneficiaire TEXT,
                 date_emission DATE,
                 date_entree DATE,
-                date_visa DATE,
                 op_or INTEGER,
                 ov_cheq_type TEXT,
                 ov_cheq INTEGER,

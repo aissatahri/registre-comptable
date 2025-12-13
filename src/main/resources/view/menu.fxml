@@ -35,6 +35,7 @@
                     <Button fx:id="btnRegistre" onAction="#showRegistre" styleClass="menu-button" text="📋 Registre des OP" />
                     <Button fx:id="btnRecap" onAction="#showRecap" styleClass="menu-button" text="📊 Récapitulatif" />
                     <Button fx:id="btnMois" onAction="#showMois" styleClass="menu-button" text="📅 Par Mois" />
+                    <Button fx:id="btnRecherche" onAction="#showRechercheAvance" styleClass="menu-button" text="🔎 Recherche avancée" />
                     <Button fx:id="btnInitialSolde" onAction="#showEditInitialSolde" styleClass="menu-button" text="💰 Solde initial" />
                     <Button fx:id="btnDesignations" onAction="#showDesignations" styleClass="menu-button" text="📝 Désignations" />
                 </HBox>
@@ -44,7 +45,12 @@
                 <Separator orientation="VERTICAL" styleClass="top-separator" />
 
                 <HBox alignment="CENTER_RIGHT" spacing="8">
-                    <Button fx:id="btnChangeDb" onAction="#handleChangeDatabase" styleClass="menu-button" text="🗄️ Base de données" />
+                    <MenuButton fx:id="dbMenu" styleClass="menu-button" text="🗄️ Base de données">
+                        <items>
+                            <MenuItem onAction="#handleChangeDatabase" text="Changer de base de données" />
+                            <MenuItem onAction="#exportDatabase" text="Exporter la base de données" />
+                        </items>
+                    </MenuButton>
                     <MenuButton fx:id="userMenu" styleClass="user-name">
                         <graphic>
                             <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">

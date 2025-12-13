@@ -16,10 +16,10 @@ public class QueryLastSolde {
         String dbFile = "registre.db";
         String url = "jdbc:sqlite:" + dbFile;
 
-        String sql = "SELECT id, COALESCE(date_emission, date_visa) AS d, solde "
-                + "FROM operations "
-                + "WHERE COALESCE(date_emission, date_visa) < ? "
-                + "ORDER BY COALESCE(date_emission, date_visa) DESC LIMIT 1;";
+        String sql = "SELECT id, date_emission AS d, solde "
+            + "FROM operations "
+            + "WHERE date_emission < ? "
+            + "ORDER BY date_emission DESC LIMIT 1;";
 
         System.out.println("Querying last operation before: " + cutoff);
         try {

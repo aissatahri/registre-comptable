@@ -33,7 +33,6 @@ public class OperationDialogController implements Initializable {
     @FXML private TextField beneficiaireField;
     @FXML private DatePicker dateEmissionPicker;
     
-    @FXML private DatePicker dateVisaPicker;
     @FXML private TextField opOrField;
     @FXML private TextField recetteField;
     @FXML private TextField surRamField;
@@ -141,10 +140,6 @@ public class OperationDialogController implements Initializable {
 
             // mois removed from dialog
 
-            if (operation.getDateVisa() != null) {
-                dateVisaPicker.setValue(operation.getDateVisa());
-            }
-
             if (operation.getOpOr() != null) opOrField.setText(String.valueOf(operation.getOpOr()));
             if (operation.getRecette() != null) recetteField.setText(String.valueOf(operation.getRecette()));
             if (operation.getSurRam() != null) surRamField.setText(String.valueOf(operation.getSurRam()));
@@ -199,7 +194,6 @@ public class OperationDialogController implements Initializable {
             operation.setExercice(exerciceField.getText());
             operation.setBeneficiaire(beneficiaireField.getText());
             operation.setDateEmission(dateEmissionPicker.getValue());
-            operation.setDateVisa(dateVisaPicker.getValue());
             operation.setOpOr(parseInt(opOrField.getText()));
 
             // Recette, Sur RAM, Sur ENG

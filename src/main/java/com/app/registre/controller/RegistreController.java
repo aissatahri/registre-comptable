@@ -38,7 +38,6 @@ public class RegistreController {
     @FXML private TableColumn<Operation, String> colBeneficiaire;
     @FXML private TableColumn<Operation, Double> colMontant;
     @FXML private TableColumn<Operation, java.time.LocalDate> colDateEmission;
-    @FXML private TableColumn<Operation, java.time.LocalDate> colDateVisa;
     @FXML private TableColumn<Operation, Integer> colOpOr;
     @FXML private TableColumn<Operation, Double> colRecette;
     @FXML private TableColumn<Operation, Double> colSurRam;
@@ -121,7 +120,6 @@ public class RegistreController {
                 }
             });
             colDateEmission.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("dateEmission"));
-            colDateVisa.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("dateVisa"));
             colOpOr.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("opOr"));
             colOvCheq.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("ovCheq"));
             colRecette.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("recette"));
@@ -147,12 +145,6 @@ public class RegistreController {
 
             java.time.format.DateTimeFormatter df = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
             colDateEmission.setCellFactory(col -> new TableCell<>() {
-                @Override protected void updateItem(java.time.LocalDate item, boolean empty) {
-                    super.updateItem(item, empty);
-                    setText(empty || item == null ? "" : df.format(item));
-                }
-            });
-            colDateVisa.setCellFactory(col -> new TableCell<>() {
                 @Override protected void updateItem(java.time.LocalDate item, boolean empty) {
                     super.updateItem(item, empty);
                     setText(empty || item == null ? "" : df.format(item));
@@ -351,7 +343,7 @@ public class RegistreController {
         lastYearFromData = null;
         java.time.LocalDate latest = null;
         for (Operation op : list) {
-            java.time.LocalDate d = op.getDateEmission() != null ? op.getDateEmission() : op.getDateVisa();
+            java.time.LocalDate d = op.getDateEmission();
             if (d != null && (latest == null || d.isAfter(latest))) {
                 latest = d;
             }
@@ -366,7 +358,7 @@ public class RegistreController {
         if (filterAnnee == null) return;
         java.util.Set<Integer> years = new java.util.TreeSet<>(java.util.Comparator.reverseOrder());
         for (Operation op : list) {
-            java.time.LocalDate d = op.getDateEmission() != null ? op.getDateEmission() : op.getDateVisa();
+            java.time.LocalDate d = op.getDateEmission();
             if (d != null) years.add(d.getYear());
         }
         if (years.isEmpty()) years.add(java.time.LocalDate.now().getYear());
@@ -466,8 +458,6 @@ public class RegistreController {
             String opMonth = null;
             if (op.getDateEmission() != null) {
                 opMonth = getMonthName(op.getDateEmission());
-            } else if (op.getDateVisa() != null) {
-                opMonth = getMonthName(op.getDateVisa());
             } else if (op.getMois() != null) {
                 opMonth = op.getMois();
             }
@@ -476,8 +466,6 @@ public class RegistreController {
                 Integer opYear = null;
                 if (op.getDateEmission() != null) {
                     opYear = op.getDateEmission().getYear();
-                } else if (op.getDateVisa() != null) {
-                    opYear = op.getDateVisa().getYear();
                 }
                 if (opYear == null || !annee.equals(opYear)) matches = false;
             }
@@ -534,7 +522,7 @@ public class RegistreController {
             Operation best = null;
             java.time.LocalDate bestDate = null;
             for (Operation op : items) {
-                java.time.LocalDate d = op.getDateEmission() != null ? op.getDateEmission() : op.getDateVisa();
+                java.time.LocalDate d = op.getDateEmission();
                 if (d != null) {
                     if (best == null || bestDate == null || d.isAfter(bestDate) || (d.equals(bestDate) && op.getId() > best.getId())) {
                         best = op;
@@ -728,12 +716,57 @@ public class RegistreController {
         fileChooser.getExtensionFilters().add(
                 new FileChooser.ExtensionFilter("Fichiers Excel", "*.xlsx")
         );
-        fileChooser.setInitialFileName("operations_" + java.time.LocalDate.now() + ".xlsx");
+        // Default filename: include selected month/year when available
+        String selectedMois = filterMois != null ? filterMois.getValue() : null;
+        Integer selectedAnnee = filterAnnee != null ? filterAnnee.getValue() : null;
+        String initialName;
+        if (selectedMois != null) {
+            int yearForName = selectedAnnee != null ? selectedAnnee : java.time.LocalDate.now().getYear();
+            initialName = "operations_" + selectedMois + "_" + yearForName + ".xlsx";
+        } else if (selectedAnnee != null) {
+            initialName = "operations_" + selectedAnnee + ".xlsx";
+        } else {
+            initialName = "operations_" + java.time.LocalDate.now() + ".xlsx";
+        }
+        fileChooser.setInitialFileName(initialName);
 
         File file = fileChooser.showSaveDialog(operationsTable.getScene().getWindow());
         if (file != null) {
             try {
-                List<Operation> operationsToExport = operationsTable.getItems();
+                List<Operation> operationsToExport;
+                selectedMois = filterMois != null ? filterMois.getValue() : null;
+                selectedAnnee = filterAnnee != null ? filterAnnee.getValue() : null;
+                if (selectedMois != null) {
+                    // Export all operations for the selected month (not only current page)
+                    List<Operation> all = operationDAO.findAll();
+                    operationsToExport = new java.util.ArrayList<>();
+                    for (Operation op : all) {
+                        if (op == null) continue;
+                        String opMonth = null;
+                        if (op.getDateEmission() != null) opMonth = getMonthName(op.getDateEmission());
+                        else if (op.getMois() != null) opMonth = op.getMois();
+                        if (opMonth != null && opMonth.equals(selectedMois)) {
+                            if (selectedAnnee == null) {
+                                operationsToExport.add(op);
+                            } else {
+                                Integer opYear = op.getDateEmission() != null ? op.getDateEmission().getYear() : null;
+                                if (opYear != null && opYear.equals(selectedAnnee)) operationsToExport.add(op);
+                            }
+                        }
+                    }
+                } else if (selectedAnnee != null) {
+                    // Export all operations for the selected year
+                    List<Operation> all = operationDAO.findAll();
+                    operationsToExport = new java.util.ArrayList<>();
+                    for (Operation op : all) {
+                        if (op == null) continue;
+                        Integer opYear = op.getDateEmission() != null ? op.getDateEmission().getYear() : null;
+                        if (opYear != null && opYear.equals(selectedAnnee)) operationsToExport.add(op);
+                    }
+                } else {
+                    // No month/year filter: export current table items
+                    operationsToExport = new java.util.ArrayList<>(operationsTable.getItems());
+                }
                 ExcelUtil.exportOperationsToExcel(operationsToExport, file.getAbsolutePath(), null);
                 showInfo("Export réussi !");
                 // Attempt to open the exported file with the system default application

@@ -109,12 +109,12 @@ public class DashboardDAO {
     }
 
     /**
-     * Retourne la date la plus récente (date_emission ou date_visa) trouvée dans les opérations.
+    * Retourne la date la plus récente (date_emission) trouvée dans les opérations.
      */
     public LocalDate getLatestOperationDate() {
-        String sql = "SELECT COALESCE(date_emission, date_visa) AS d FROM operations " +
-            "WHERE COALESCE(date_emission, date_visa) IS NOT NULL " +
-            "ORDER BY COALESCE(date_emission, date_visa) DESC, id DESC LIMIT 1";
+        String sql = "SELECT date_emission AS d FROM operations " +
+            "WHERE date_emission IS NOT NULL " +
+            "ORDER BY date_emission DESC, id DESC LIMIT 1";
         try (Connection conn = Database.getInstance().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -189,9 +189,9 @@ public class DashboardDAO {
     }
 
     private Double fetchSoldeInitial(Connection conn) throws SQLException {
-        String dateExpr = "CASE WHEN typeof(COALESCE(date_emission,date_visa)) = 'integer' "
-            + "THEN datetime(COALESCE(date_emission,date_visa)/1000, 'unixepoch', 'localtime') "
-            + "ELSE COALESCE(date_emission,date_visa) END";
+        String dateExpr = "CASE WHEN typeof(date_emission) = 'integer' "
+            + "THEN datetime(date_emission/1000, 'unixepoch', 'localtime') "
+            + "ELSE date_emission END";
         String sql = "SELECT solde FROM operations WHERE LOWER(TRIM(designation)) LIKE 'solde initial%' "
             + "ORDER BY " + dateExpr + " ASC, id ASC LIMIT 1";
         try (PreparedStatement ps = conn.prepareStatement(sql);

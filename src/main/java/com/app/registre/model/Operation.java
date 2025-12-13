@@ -17,7 +17,6 @@ public class Operation {
     private String budg;
     private Double solde;
     private LocalDate dateEntree;
-    private LocalDate dateVisa;
     private LocalDate dateRejet;
     private String decision;
     private String motifRejet;
@@ -94,8 +93,7 @@ public class Operation {
     public LocalDate getDateEntree() { return dateEntree; }
     public void setDateEntree(LocalDate dateEntree) { this.dateEntree = dateEntree; }
 
-    public LocalDate getDateVisa() { return dateVisa; }
-    public void setDateVisa(LocalDate dateVisa) { this.dateVisa = dateVisa; }
+    
 
     public LocalDate getDateRejet() { return dateRejet; }
     public void setDateRejet(LocalDate dateRejet) { this.dateRejet = dateRejet; }

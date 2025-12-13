@@ -65,7 +65,6 @@
                 <TableColumn fx:id="colExercice" prefWidth="80" text="Exercice" />
                 <TableColumn fx:id="colBeneficiaire" prefWidth="160" text="Bénéficiaire" />
                 <TableColumn fx:id="colDateEmission" prefWidth="110" text="Date Emission" />
-                <TableColumn fx:id="colDateVisa" prefWidth="110" text="Date Visa" />
                 <TableColumn fx:id="colOpOr" prefWidth="80" text="OP/OR" />
                 <TableColumn fx:id="colOvCheq" prefWidth="80" text="OV/CHEQ" />
                 <TableColumn fx:id="colRecette" prefWidth="100" text="Recette" />

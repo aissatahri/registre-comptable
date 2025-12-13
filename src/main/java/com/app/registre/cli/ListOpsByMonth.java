@@ -11,11 +11,11 @@ public class ListOpsByMonth {
         int year = args.length > 0 ? Integer.parseInt(args[0]) : 2022;
         int month = args.length > 1 ? Integer.parseInt(args[1]) : 1;
 
-        String dateExpr = "CASE WHEN typeof(COALESCE(date_emission,date_visa)) = 'integer' "
-            + "THEN datetime(COALESCE(date_emission,date_visa)/1000, 'unixepoch', 'localtime') "
-            + "ELSE COALESCE(date_emission,date_visa) END";
+        String dateExpr = "CASE WHEN typeof(date_emission) = 'integer' "
+            + "THEN datetime(date_emission/1000, 'unixepoch', 'localtime') "
+            + "ELSE date_emission END";
 
-        String sql = "SELECT id, date_emission, date_visa, solde, " + dateExpr + " as dstr "
+        String sql = "SELECT id, date_emission, solde, " + dateExpr + " as dstr "
                 + "FROM operations WHERE strftime('%Y', " + dateExpr + ") = ? "
                 + "AND strftime('%m', " + dateExpr + ") = printf('%02d', ?) "
                 + "ORDER BY " + dateExpr + " ASC, id ASC";
@@ -31,10 +31,9 @@ public class ListOpsByMonth {
                     any = true;
                     int id = rs.getInt("id");
                     String de = rs.getString("date_emission");
-                    String dv = rs.getString("date_visa");
                     String dstr = rs.getString("dstr");
                     String sol = rs.getString("solde");
-                    System.out.printf("id=%d  date_emission=%s  date_visa=%s  d=%s  solde=%s%n", id, de, dv, dstr, sol);
+                    System.out.printf("id=%d  date_emission=%s  d=%s  solde=%s%n", id, de, dstr, sol);
                 }
                 if (!any) System.out.println("(no operations)");
             }

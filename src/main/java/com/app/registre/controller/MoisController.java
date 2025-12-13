@@ -47,7 +47,6 @@ public class MoisController {
     @FXML private TableColumn<Operation, String> colExercice;
     @FXML private TableColumn<Operation, String> colBeneficiaire;
     @FXML private TableColumn<Operation, LocalDate> colDateEmission;
-    @FXML private TableColumn<Operation, LocalDate> colDateVisa;
     @FXML private TableColumn<Operation, Integer> colOpOr;
     @FXML private TableColumn<Operation, String> colOvCheq;
     @FXML private TableColumn<Operation, Double> colRecette;
@@ -151,7 +150,6 @@ public class MoisController {
         colExercice.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("exercice"));
         colBeneficiaire.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("beneficiaire"));
         colDateEmission.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("dateEmission"));
-        colDateVisa.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("dateVisa"));
         colOpOr.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("opOr"));
         colOvCheq.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("ovCheq"));
         colRecette.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("recette"));
@@ -167,12 +165,7 @@ public class MoisController {
                 setText(empty || item == null ? "" : df.format(item));
             }
         });
-        colDateVisa.setCellFactory(col -> new TableCell<>() {
-            @Override protected void updateItem(LocalDate item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(empty || item == null ? "" : df.format(item));
-            }
-        });
+        
 
         colN.setCellFactory(col -> new TableCell<>() {
             @Override protected void updateItem(String item, boolean empty) {
@@ -367,7 +360,9 @@ public class MoisController {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Exporter le mois vers Excel");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Fichiers Excel", "*.xlsx"));
-        fileChooser.setInitialFileName("operations_" + mois + "_" + java.time.LocalDate.now() + ".xlsx");
+        // Include selected month and year in filename
+        int year = anneeComboBox != null && anneeComboBox.getValue() != null ? Integer.parseInt(anneeComboBox.getValue()) : java.time.LocalDate.now().getYear();
+        fileChooser.setInitialFileName("operations_" + mois + "_" + year + ".xlsx");
 
         File file = fileChooser.showSaveDialog(moisOperationsTable.getScene().getWindow());
         if (file != null) {
@@ -376,7 +371,7 @@ public class MoisController {
                     Double prev = 0.0;
                     try {
                         int monthNum = monthNumberFromName(mois);
-                        int year = anneeComboBox != null && anneeComboBox.getValue() != null ? Integer.parseInt(anneeComboBox.getValue()) : LocalDate.now().getYear();
+                        year = anneeComboBox != null && anneeComboBox.getValue() != null ? Integer.parseInt(anneeComboBox.getValue()) : LocalDate.now().getYear();
                         int prevMonth = monthNum - 1;
                         if (prevMonth >= 1) {
                             prev = operationDAO.getLastMontantForMonthYear(year, prevMonth);

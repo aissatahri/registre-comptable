@@ -239,6 +239,14 @@
     -fx-text-alignment: CENTER;
 }
 
+/* Ensure the visible label/text of MenuButton is white (covers different node types) */
+.top-bar .menu-button .label,
+.top-bar .menu-button .text,
+.top-bar .menu-button > .label {
+    -fx-text-fill: white;
+    -fx-fill: white;
+}
+
 /* subtle hover underline */
 .top-bar .menu-button:hover {
     -fx-background-color: transparent;
@@ -288,6 +296,52 @@
 }
 .context-menu .menu-item:selected, .menu-button .menu-item:selected {
     -fx-background-color: rgba(52,152,219,0.08);
+}
+
+/* Stronger top-bar-specific popup styling to ensure visibility */
+.top-bar .menu-button .context-menu,
+.top-bar .menu-button .menu,
+.top-bar .menu-button .menu-popup {
+    -fx-background-color: white;
+    -fx-border-color: rgba(0,0,0,0.08);
+    -fx-border-width: 1;
+    -fx-background-radius: 4;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.18), 8, 0.2, 0, 2);
+}
+.top-bar .menu-button .menu-item,
+.top-bar .menu-button .menu-item .label,
+.top-bar .menu-button .context-menu .menu-item,
+.top-bar .menu-button .context-menu .menu-item .label,
+.top-bar .menu-button .menu .menu-item,
+.top-bar .menu-button .menu .menu-item .label {
+    -fx-text-fill: #2c3e50;
+    -fx-font-size: 13px;
+    -fx-padding: 8 14;
+}
+.top-bar .menu-button .menu-item:armed,
+.top-bar .menu-button .menu-item:selected {
+    -fx-background-color: rgba(52,152,219,0.08);
+}
+.top-bar .menu-button .separator-menu-item {
+    -fx-background-color: rgba(0,0,0,0.06);
+    -fx-padding: 4 0;
+}
+
+/* Global fallback: ensure all Menu / ContextMenu items are readable regardless of origin */
+.menu, .context-menu {
+    -fx-background-color: white;
+}
+.menu-item, .menu-item .label, .menu-item .text,
+.context-menu .menu-item, .context-menu .menu-item .label, .context-menu .menu-item .text,
+.menu .menu-item, .menu .menu-item .label, .menu .menu-item .text {
+    -fx-text-fill: #2c3e50;
+    -fx-fill: #2c3e50;
+    -fx-opacity: 1;
+}
+
+/* In case MenuButton label styling bled into popup, make popup labels explicitly dark */
+.menu-button .menu .label, .menu-button .context-menu .label {
+    -fx-text-fill: #2c3e50;
 }
 
 /* Brand styles: logo + title on left of top bar */
@@ -397,6 +451,14 @@
 
 .scroll-pane .viewport {
     -fx-background-color: transparent;
+}
+
+/* Result count label in recherche view */
+.result-count {
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #2c3e50;
+    -fx-padding: 6 0 0 0;
 }
 
 /* Month card styles for recap view */

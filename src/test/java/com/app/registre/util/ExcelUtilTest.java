@@ -21,7 +21,7 @@ public class ExcelUtilTest {
         op.setBudg("B1");
         op.setMontant(42.5);
         op.setDateEntree(LocalDate.of(2022, 1, 10));
-        op.setDateVisa(LocalDate.of(2022, 1, 12));
+        op.setDateEmission(LocalDate.of(2022, 1, 12));
         op.setDateRejet(null);
         op.setDecision("P");
         op.setMotifRejet("");

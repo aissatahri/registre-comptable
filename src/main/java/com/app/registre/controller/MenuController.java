@@ -37,9 +37,10 @@ public class MenuController {
     @FXML private Button btnRegistre;
     @FXML private Button btnRecap;
     @FXML private Button btnMois;
+    @FXML private Button btnRecherche;
     @FXML private Button btnDesignations;
     @FXML private Button btnInitialSolde;
-    @FXML private Button btnChangeDb;
+    @FXML private javafx.scene.control.MenuButton dbMenu;
     private boolean sidebarVisible = true;
     private RecapDAO recapDAO = new RecapDAO();
     private com.app.registre.dao.OperationDAO operationDAO = new com.app.registre.dao.OperationDAO();
@@ -224,6 +225,18 @@ public class MenuController {
     }
 
     @FXML
+    private void showRechercheAvance() {
+        try {
+            loadView("/view/recherche.fxml");
+            refreshMenuStats();
+            setActive(btnRecherche);
+        } catch (Exception e) {
+            e.printStackTrace();
+            showError("Erreur lors de l'ouverture de la recherche avancée", e);
+        }
+    }
+
+    @FXML
     private void showUserManagement() {
         try {
             loadView("/view/user_management.fxml");
@@ -390,6 +403,43 @@ public class MenuController {
         } catch (Exception e) {
             e.printStackTrace();
             showError("Erreur lors du changement de base", e);
+        }
+    }
+
+    @FXML
+    private void exportDatabase() {
+        try {
+            // Determine current DB file from JDBC URL
+            java.sql.Connection conn = com.app.registre.dao.Database.getInstance().getConnection();
+            String url = conn.getMetaData().getURL();
+            if (url == null || !url.startsWith("jdbc:sqlite:")) {
+                showError("Impossible de déterminer le chemin de la base de données actuelle.", null);
+                return;
+            }
+            String srcPath = url.substring("jdbc:sqlite:".length());
+            java.io.File srcFile = new java.io.File(srcPath);
+            if (!srcFile.exists()) {
+                showError("Fichier de base introuvable: " + srcPath, null);
+                return;
+            }
+
+            javafx.stage.FileChooser fc = new javafx.stage.FileChooser();
+            fc.getExtensionFilters().add(new javafx.stage.FileChooser.ExtensionFilter("Fichier SQLite (*.db)", "*.db"));
+            String defaultName = "registre_export_" + java.time.LocalDate.now() + ".db";
+            fc.setInitialFileName(defaultName);
+            java.io.File dest = fc.showSaveDialog(rootPane.getScene() != null ? rootPane.getScene().getWindow() : null);
+            if (dest == null) return;
+
+            java.nio.file.Files.copy(srcFile.toPath(), dest.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+
+            javafx.scene.control.Alert info = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION, "Base exportée avec succès: " + dest.getAbsolutePath(), javafx.scene.control.ButtonType.OK);
+            DialogUtils.initOwner(info, rootPane);
+            info.setTitle("Export terminé");
+            info.showAndWait();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            showError("Erreur lors de l'export de la base", e);
         }
     }
 
@@ -644,7 +694,7 @@ public class MenuController {
 
     private void setActive(Button active) {
         if (active == null) return;
-        java.util.List<Button> all = java.util.Arrays.asList(btnRegistre, btnRecap, btnMois, btnInitialSolde, btnDesignations, btnDashboard);
+        java.util.List<Button> all = java.util.Arrays.asList(btnRegistre, btnRecap, btnMois, btnRecherche, btnInitialSolde, btnDesignations, btnDashboard);
         for (Button b : all) {
             if (b == null) continue;
             b.getStyleClass().remove("active");

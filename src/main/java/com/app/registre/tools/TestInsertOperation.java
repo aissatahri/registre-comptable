@@ -9,7 +9,7 @@ import java.time.LocalDate;
 
 public class TestInsertOperation {
     public static void main(String[] args) {
-        String sql = "INSERT INTO operations(imp, designation, nature, n, budg, exercice, beneficiaire, date_emission, date_visa, op_or, ov_cheq, recette, sur_ram, sur_eng, depense, solde) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        String sql = "INSERT INTO operations(imp, designation, nature, n, budg, exercice, beneficiaire, date_emission, op_or, ov_cheq, recette, sur_ram, sur_eng, depense, solde) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         try (Connection conn = Database.getInstance().getConnection();
              PreparedStatement p = conn.prepareStatement(sql)) {
 
@@ -21,14 +21,13 @@ public class TestInsertOperation {
             p.setString(6, "2025");
             p.setString(7, "Unit Test");
             p.setDate(8, java.sql.Date.valueOf(LocalDate.now()));
-            p.setDate(9, java.sql.Date.valueOf(LocalDate.now()));
-            p.setInt(10, 0);
-            p.setString(11, "OV");
-            p.setDouble(12, 1500.0);
+            p.setInt(9, 0);
+            p.setString(10, "OV");
+            p.setDouble(11, 1500.0);
+            p.setDouble(12, 0.0);
             p.setDouble(13, 0.0);
             p.setDouble(14, 0.0);
-            p.setDouble(15, 0.0);
-            p.setDouble(16, 1500.0);
+            p.setDouble(15, 1500.0);
 
             System.out.println("Inserting test operation via raw SQL...");
             int rows = p.executeUpdate();

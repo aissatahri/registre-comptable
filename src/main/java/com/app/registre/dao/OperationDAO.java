@@ -2,6 +2,7 @@ package com.app.registre.dao;
 
 import com.app.registre.model.Operation;
 import java.sql.*;
+import java.sql.DriverManager;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,8 +15,8 @@ public class OperationDAO {
     public void insert(Operation operation) {
         String sql = """
             INSERT INTO operations(op, art, par, lig, imp, designation, nature, n, budg, exercice, beneficiaire,
-                                   date_emission, date_entree, date_visa, op_or, ov_cheq_type, ov_cheq, recette, sur_ram, sur_eng, depense, solde, montant, decision, mois)
-            VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                                   date_emission, date_entree, op_or, ov_cheq_type, ov_cheq, recette, sur_ram, sur_eng, depense, solde, montant, decision, mois)
+            VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
             """;
 
         try (Connection conn = Database.getInstance().getConnection();
@@ -41,7 +42,6 @@ public class OperationDAO {
                 pstmt.setString(idx++, operation.getBeneficiaire());
                 pstmt.setDate(idx++, operation.getDateEmission() != null ? Date.valueOf(operation.getDateEmission()) : null);
                 pstmt.setDate(idx++, operation.getDateEntree() != null ? Date.valueOf(operation.getDateEntree()) : null);
-                pstmt.setDate(idx++, operation.getDateVisa() != null ? Date.valueOf(operation.getDateVisa()) : null);
                 if (operation.getOpOr() != null) pstmt.setInt(idx++, operation.getOpOr()); else { pstmt.setNull(idx++, java.sql.Types.INTEGER); }
                 // ov_cheq_type (TEXT)
                 pstmt.setString(idx++, operation.getOvCheqType());
@@ -71,7 +71,7 @@ public class OperationDAO {
             String sql = """
             UPDATE operations SET
             op = ?, art = ?, par = ?, lig = ?, imp = ?, designation = ?, nature = ?, n = ?, budg = ?, exercice = ?, beneficiaire = ?,
-            date_emission = ?, date_entree = ?, date_visa = ?, op_or = ?, ov_cheq_type = ?, ov_cheq = ?, recette = ?, sur_ram = ?, sur_eng = ?, depense = ?, solde = ?, montant = ?, decision = ?, mois = ?
+            date_emission = ?, date_entree = ?, op_or = ?, ov_cheq_type = ?, ov_cheq = ?, recette = ?, sur_ram = ?, sur_eng = ?, depense = ?, solde = ?, montant = ?, decision = ?, mois = ?
             WHERE id = ?
             """;
 
@@ -92,7 +92,6 @@ public class OperationDAO {
             pstmt.setString(idx2++, operation.getBeneficiaire());
             pstmt.setDate(idx2++, operation.getDateEmission() != null ? Date.valueOf(operation.getDateEmission()) : null);
             pstmt.setDate(idx2++, operation.getDateEntree() != null ? Date.valueOf(operation.getDateEntree()) : null);
-            pstmt.setDate(idx2++, operation.getDateVisa() != null ? Date.valueOf(operation.getDateVisa()) : null);
             if (operation.getOpOr() != null) pstmt.setInt(idx2++, operation.getOpOr()); else { pstmt.setNull(idx2++, java.sql.Types.INTEGER); }
             // ov_cheq_type
             pstmt.setString(idx2++, operation.getOvCheqType());
@@ -141,7 +140,7 @@ public class OperationDAO {
     public List<Operation> findAll() {
         List<Operation> operations = new ArrayList<>();
         // Order ASC so the latest inserted operation appears at the bottom of the table
-        String sql = "SELECT * FROM operations ORDER BY COALESCE(date_emission, date_visa) ASC";
+        String sql = "SELECT * FROM operations ORDER BY date_emission ASC";
 
         try (Connection conn = Database.getInstance().getConnection();
              Statement stmt = conn.createStatement();
@@ -156,11 +155,43 @@ public class OperationDAO {
         return operations;
     }
 
+    /**
+     * Recherche des opérations filtrées par ART, PAR et LIG. Si une valeur est null,
+     * elle n'est pas prise en compte dans le filtre.
+     */
+    public List<Operation> findByArtParLig(Integer art, Integer par, Integer lig) {
+        List<Operation> operations = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("SELECT * FROM operations");
+        java.util.List<Object> params = new java.util.ArrayList<>();
+        boolean first = true;
+        if (art != null) {
+            sql.append(first ? " WHERE " : " AND "); sql.append("art = ?"); params.add(art); first = false;
+        }
+        if (par != null) {
+            sql.append(first ? " WHERE " : " AND "); sql.append("par = ?"); params.add(par); first = false;
+        }
+        if (lig != null) {
+            sql.append(first ? " WHERE " : " AND "); sql.append("lig = ?"); params.add(lig); first = false;
+        }
+        sql.append(" ORDER BY date_emission ASC");
+
+        try (Connection conn = DriverManager.getConnection(Database.getDbUrl());
+             PreparedStatement pstmt = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) pstmt.setObject(i + 1, params.get(i));
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) operations.add(mapResultSetToOperation(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return operations;
+    }
+
     public List<Operation> findByMois(String mois) {
         List<Operation> operations = new ArrayList<>();
         // The DB no longer contains a dedicated 'mois' column; return all operations
         // and let the caller filter by month if needed.
-        String sql = "SELECT * FROM operations ORDER BY COALESCE(date_emission, date_visa) ASC";
+        String sql = "SELECT * FROM operations ORDER BY date_emission ASC";
 
         try (Connection conn = Database.getInstance().getConnection();
              Statement stmt = conn.createStatement();
@@ -207,7 +238,7 @@ public class OperationDAO {
      * Si aucune opération antérieure, retourne 0.0
      */
     public Double getLastMontantBeforeDate(java.time.LocalDate date) {
-        String sql = "SELECT solde FROM operations WHERE COALESCE(date_emission, date_visa) < ? ORDER BY COALESCE(date_emission, date_visa) DESC LIMIT 1";
+        String sql = "SELECT solde FROM operations WHERE date_emission < ? ORDER BY date_emission DESC LIMIT 1";
         try (Connection conn = Database.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setDate(1, java.sql.Date.valueOf(date));
@@ -227,7 +258,7 @@ public class OperationDAO {
      * Retourne vrai s'il existe au moins une opération strictement antérieure à la date fournie.
      */
     public boolean hasOperationBeforeDate(java.time.LocalDate date) {
-        String sql = "SELECT 1 FROM operations WHERE COALESCE(date_emission, date_visa) < ? LIMIT 1";
+        String sql = "SELECT 1 FROM operations WHERE date_emission < ? LIMIT 1";
         try (Connection conn = Database.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setDate(1, java.sql.Date.valueOf(date));
@@ -241,13 +272,13 @@ public class OperationDAO {
     }
 
     /**
-     * Retourne le dernier solde enregistré (la plus récente opération selon date_emission/date_visa).
+    * Retourne le dernier solde enregistré (la plus récente opération selon date_emission).
      * Si aucune opération, retourne 0.0
      */
     public Double getLastMontant() {
-        String dateExpr = "CASE WHEN typeof(COALESCE(date_emission,date_visa)) = 'integer' "
-                + "THEN datetime(COALESCE(date_emission,date_visa)/1000, 'unixepoch', 'localtime') "
-                + "ELSE COALESCE(date_emission,date_visa) END";
+        String dateExpr = "CASE WHEN typeof(date_emission) = 'integer' "
+            + "THEN datetime(date_emission/1000, 'unixepoch', 'localtime') "
+            + "ELSE date_emission END";
         String sql = "SELECT solde FROM operations ORDER BY " + dateExpr + " DESC, id DESC LIMIT 1";
         try (Connection conn = Database.getInstance().getConnection();
              Statement stmt = conn.createStatement();
@@ -268,13 +299,13 @@ public class OperationDAO {
      */
     /**
      * Retourne le dernier solde enregistré pour un mois et une année donnés (même année seulement).
-     * Utilise `date_emission` et `date_visa` dans ORDER BY comme demandé.
+    * Utilise `date_emission` dans ORDER BY.
      * Si aucune opération pour ce mois/année, retourne null.
      */
     public Double getLastSoldeForMonthYear(int year, int month) {
-        String dateExpr = "CASE WHEN typeof(COALESCE(date_emission,date_visa)) = 'integer' "
-            + "THEN datetime(COALESCE(date_emission,date_visa)/1000, 'unixepoch', 'localtime') "
-            + "ELSE COALESCE(date_emission,date_visa) END";
+        String dateExpr = "CASE WHEN typeof(date_emission) = 'integer' "
+            + "THEN datetime(date_emission/1000, 'unixepoch', 'localtime') "
+            + "ELSE date_emission END";
 
         String sql = "SELECT solde FROM operations "
             + "WHERE strftime('%Y', " + dateExpr + ") = ? "
@@ -298,7 +329,6 @@ public class OperationDAO {
 
     /**
      * Compatibility method with expected name: retourne le dernier solde pour le mois/année.
-     * Uses COALESCE(date_emission, date_visa) as requested.
      */
     public Double getLastMontantForMonthYear(int year, int month) {
         // Delegate to the robust implementation that handles epoch ms and ISO dates
@@ -309,9 +339,9 @@ public class OperationDAO {
      * Compatibility method: détecte s'il existe des opérations pour le mois/année donnés.
      */
     public boolean hasOperationsForMonthYear(int year, int month) {
-        String dateExpr = "CASE WHEN typeof(COALESCE(date_emission,date_visa)) = 'integer' "
-            + "THEN datetime(COALESCE(date_emission,date_visa)/1000, 'unixepoch', 'localtime') "
-            + "ELSE COALESCE(date_emission,date_visa) END";
+        String dateExpr = "CASE WHEN typeof(date_emission) = 'integer' "
+            + "THEN datetime(date_emission/1000, 'unixepoch', 'localtime') "
+            + "ELSE date_emission END";
         String sql = "SELECT 1 FROM operations WHERE strftime('%Y', " + dateExpr + ") = ? "
                 + "AND strftime('%m', " + dateExpr + ") = printf('%02d', ?) LIMIT 1";
         try (Connection conn = Database.getInstance().getConnection();
@@ -330,32 +360,14 @@ public class OperationDAO {
     /**
      * Retourne vrai s'il existe au moins une opération pour le mois/année donnés.
      */
-    public boolean hasOperationsInMonthYear(int year, int month) {
-        String dateExpr = "CASE WHEN typeof(COALESCE(date_emission,date_visa)) = 'integer' "
-                + "THEN datetime(COALESCE(date_emission,date_visa)/1000, 'unixepoch') "
-                + "ELSE COALESCE(date_emission,date_visa) END";
-        String sql = "SELECT 1 FROM operations WHERE strftime('%Y', " + dateExpr + ") = ? "
-                + "AND strftime('%m', " + dateExpr + ") = printf('%02d', ?) LIMIT 1";
-        try (Connection conn = Database.getInstance().getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, String.valueOf(year));
-            pstmt.setInt(2, month);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                return rs.next();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
 
     /**
      * Retourne le nombre d'opérations pour un mois/année donnés.
      */
     public int getCountForMonthYear(int year, int month) {
-        String dateExpr = "CASE WHEN typeof(COALESCE(date_emission,date_visa)) = 'integer' "
-            + "THEN datetime(COALESCE(date_emission,date_visa)/1000, 'unixepoch', 'localtime') "
-            + "ELSE COALESCE(date_emission,date_visa) END";
+        String dateExpr = "CASE WHEN typeof(date_emission) = 'integer' "
+            + "THEN datetime(date_emission/1000, 'unixepoch', 'localtime') "
+            + "ELSE date_emission END";
         String sql = "SELECT COUNT(*) as c FROM operations WHERE imp IS NOT NULL AND imp != '' "
             + "AND strftime('%Y', " + dateExpr + ") = ? "
             + "AND strftime('%m', " + dateExpr + ") = printf('%02d', ?)";
@@ -412,9 +424,9 @@ public class OperationDAO {
      * Retourne la valeur de solde si trouvée, sinon null.
      */
     public Double getInitialSoldeForMonthYear(int year, int month) {
-        String dateExpr = "CASE WHEN typeof(COALESCE(date_emission,date_visa)) = 'integer' "
-            + "THEN datetime(COALESCE(date_emission,date_visa)/1000, 'unixepoch', 'localtime') "
-            + "ELSE COALESCE(date_emission,date_visa) END";
+        String dateExpr = "CASE WHEN typeof(date_emission) = 'integer' "
+            + "THEN datetime(date_emission/1000, 'unixepoch', 'localtime') "
+            + "ELSE date_emission END";
         String sql = "SELECT solde FROM operations WHERE LOWER(TRIM(designation)) LIKE 'solde initial%' "
             + "AND strftime('%Y', " + dateExpr + ") = ? "
             + "AND strftime('%m', " + dateExpr + ") = printf('%02d', ?) "
@@ -436,13 +448,13 @@ public class OperationDAO {
     }
 
     /**
-     * Recompute cumulative solde for all operations ordered by date_emission/date_visa and
+    * Recompute cumulative solde for all operations ordered by date_emission and
      * persist new solde values. This is useful after changing the initial balance.
      */
     public void recomputeAllSoldes() {
-        String dateExpr = "CASE WHEN typeof(COALESCE(date_emission,date_visa)) = 'integer' "
-            + "THEN datetime(COALESCE(date_emission,date_visa)/1000, 'unixepoch', 'localtime') "
-            + "ELSE COALESCE(date_emission,date_visa) END";
+        String dateExpr = "CASE WHEN typeof(date_emission) = 'integer' "
+            + "THEN datetime(date_emission/1000, 'unixepoch', 'localtime') "
+            + "ELSE date_emission END";
         String sql = "SELECT * FROM operations ORDER BY " + dateExpr + " ASC, id ASC";
         try (Connection conn = Database.getInstance().getConnection();
              Statement stmt = conn.createStatement();
@@ -488,7 +500,7 @@ public class OperationDAO {
     private Operation mapResultSetToOperation(ResultSet rs) throws SQLException {
         Operation operation = new Operation();
         operation.setId(rs.getInt("id"));
-        operation.setOp(rs.getString("op"));
+        if (hasColumn(rs, "op")) operation.setOp(rs.getString("op"));
         operation.setImp(rs.getString("imp"));
         operation.setArt(rs.getObject("art") != null ? rs.getInt("art") : null);
         operation.setPar(rs.getObject("par") != null ? rs.getInt("par") : null);
@@ -504,34 +516,55 @@ public class OperationDAO {
         Date dateEmission = rs.getDate("date_emission");
         if (dateEmission != null) operation.setDateEmission(dateEmission.toLocalDate());
         
-        Date dateVisa = rs.getDate("date_visa");
-        if (dateVisa != null) operation.setDateVisa(dateVisa.toLocalDate());
-        
         // Integers nullables
-        int opOr = rs.getInt("op_or");
-        operation.setOpOr(rs.wasNull() ? null : opOr);
+        if (hasColumn(rs, "op_or")) {
+            int opOr = rs.getInt("op_or");
+            operation.setOpOr(rs.wasNull() ? null : opOr);
+        }
         
-        operation.setOvCheqType(rs.getString("ov_cheq_type"));
-        int ovCheq = rs.getInt("ov_cheq");
-        operation.setOvCheq(rs.wasNull() ? null : ovCheq);
+        if (hasColumn(rs, "ov_cheq_type")) {
+            operation.setOvCheqType(rs.getString("ov_cheq_type"));
+        }
+        if (hasColumn(rs, "ov_cheq")) {
+            int ovCheq = rs.getInt("ov_cheq");
+            operation.setOvCheq(rs.wasNull() ? null : ovCheq);
+        }
         
         // Doubles nullables
-        double recette = rs.getDouble("recette");
-        operation.setRecette(rs.wasNull() ? null : recette);
-        
-        double surRam = rs.getDouble("sur_ram");
-        operation.setSurRam(rs.wasNull() ? null : surRam);
-        
-        double surEng = rs.getDouble("sur_eng");
-        operation.setSurEng(rs.wasNull() ? null : surEng);
-        
-        double depense = rs.getDouble("depense");
-        operation.setDepense(rs.wasNull() ? null : depense);
-
-        
-        double solde = rs.getDouble("solde");
-        operation.setSolde(rs.wasNull() ? null : solde);
+        if (hasColumn(rs, "recette")) {
+            double recette = rs.getDouble("recette");
+            operation.setRecette(rs.wasNull() ? null : recette);
+        }
+        if (hasColumn(rs, "sur_ram")) {
+            double surRam = rs.getDouble("sur_ram");
+            operation.setSurRam(rs.wasNull() ? null : surRam);
+        }
+        if (hasColumn(rs, "sur_eng")) {
+            double surEng = rs.getDouble("sur_eng");
+            operation.setSurEng(rs.wasNull() ? null : surEng);
+        }
+        if (hasColumn(rs, "depense")) {
+            double depense = rs.getDouble("depense");
+            operation.setDepense(rs.wasNull() ? null : depense);
+        }
+        if (hasColumn(rs, "solde")) {
+            double solde = rs.getDouble("solde");
+            operation.setSolde(rs.wasNull() ? null : solde);
+        }
 
         return operation;
+    }
+
+    private boolean hasColumn(ResultSet rs, String columnName) {
+        try {
+            ResultSetMetaData md = rs.getMetaData();
+            int cols = md.getColumnCount();
+            for (int i = 1; i <= cols; i++) {
+                if (md.getColumnName(i).equalsIgnoreCase(columnName)) return true;
+            }
+        } catch (SQLException e) {
+            // ignore and fall through
+        }
+        return false;
     }
 }

@@ -64,8 +64,8 @@ public class ExcelUtil {
             // Créer l'en-tête
             Row headerRow = sheet.createRow(currentRow++);
                         // Colonnes selon la structure de la table operations
-                        String[] headers = {"IMP", "Désignation", "Nature", "N", "BUDG", "Exercice", "Bénéficiaire",
-                            "Date émission", "Date visa", "OP/OR", "OV/CHEQ Type", "OV/CHEQ", 
+                        String[] headers = {"ART", "PAR", "LIG", "IMP", "Désignation", "Nature", "N", "BUDG", "Exercice", "Bénéficiaire",
+                            "Date émission", "OP/OR", "OV/CHEQ",
                             "Recette", "SUR-RAM", "SUR-ENG", "Dépense", "Solde"};
 
             for (int i = 0; i < headers.length; i++) {
@@ -85,28 +85,26 @@ public class ExcelUtil {
             for (Operation op : operations) {
                 Row row = sheet.createRow(rowNum++);
                 
-                // Colonnes texte
-                Cell c0 = row.createCell(0); c0.setCellValue(op.getImp() != null ? op.getImp() : ""); c0.setCellStyle(dataStyle);
-                Cell c1 = row.createCell(1); c1.setCellValue(op.getDesignation() != null ? op.getDesignation() : ""); c1.setCellStyle(dataStyle);
-                Cell c2 = row.createCell(2); c2.setCellValue(op.getNature() != null ? op.getNature() : ""); c2.setCellStyle(dataStyle);
-                Cell c3 = row.createCell(3); c3.setCellValue(op.getN() != null ? op.getN() : ""); c3.setCellStyle(dataStyle);
-                Cell c4 = row.createCell(4); c4.setCellValue(op.getBudg() != null ? op.getBudg() : ""); c4.setCellStyle(dataStyle);
-                Cell c5 = row.createCell(5); c5.setCellValue(op.getExercice() != null ? op.getExercice() : ""); c5.setCellStyle(dataStyle);
-                Cell c6 = row.createCell(6); c6.setCellValue(op.getBeneficiaire() != null ? op.getBeneficiaire() : ""); c6.setCellStyle(dataStyle);
+                // Colonnes texte (ART, PAR, LIG, IMP, ...)
+                Cell c0 = row.createCell(0); c0.setCellValue(op.getArt() != null ? String.valueOf(op.getArt()) : ""); c0.setCellStyle(dataStyle);
+                Cell c1 = row.createCell(1); c1.setCellValue(op.getPar() != null ? String.valueOf(op.getPar()) : ""); c1.setCellStyle(dataStyle);
+                Cell c2 = row.createCell(2); c2.setCellValue(op.getLig() != null ? String.valueOf(op.getLig()) : ""); c2.setCellStyle(dataStyle);
+                Cell c3 = row.createCell(3); c3.setCellValue(op.getImp() != null ? op.getImp() : ""); c3.setCellStyle(dataStyle);
+                Cell c4 = row.createCell(4); c4.setCellValue(op.getDesignation() != null ? op.getDesignation() : ""); c4.setCellStyle(dataStyle);
+                Cell c5 = row.createCell(5); c5.setCellValue(op.getNature() != null ? op.getNature() : ""); c5.setCellStyle(dataStyle);
+                Cell c6 = row.createCell(6); c6.setCellValue(op.getN() != null ? op.getN() : ""); c6.setCellStyle(dataStyle);
+                Cell c7 = row.createCell(7); c7.setCellValue(op.getBudg() != null ? op.getBudg() : ""); c7.setCellStyle(dataStyle);
+                Cell c8 = row.createCell(8); c8.setCellValue(op.getExercice() != null ? op.getExercice() : ""); c8.setCellStyle(dataStyle);
+                Cell c9 = row.createCell(9); c9.setCellValue(op.getBeneficiaire() != null ? op.getBeneficiaire() : ""); c9.setCellStyle(dataStyle);
                 
                 // Dates
-                Cell c7 = row.createCell(7);
-                c7.setCellValue(op.getDateEmission() != null ? op.getDateEmission().toString() : "");
-                c7.setCellStyle(dateStyle);
-                
-                Cell c8 = row.createCell(8);
-                c8.setCellValue(op.getDateVisa() != null ? op.getDateVisa().toString() : "");
-                c8.setCellStyle(dateStyle);
-                
+                Cell c10 = row.createCell(10);
+                c10.setCellValue(op.getDateEmission() != null ? op.getDateEmission().toString() : "");
+                c10.setCellStyle(dateStyle);
+
                 // Numéros
-                Cell c9 = row.createCell(9); c9.setCellValue(op.getOpOr() != null ? op.getOpOr() : 0); c9.setCellStyle(dataStyle);
-                Cell c10 = row.createCell(10); c10.setCellValue(op.getOvCheqType() != null ? op.getOvCheqType() : ""); c10.setCellStyle(dataStyle);
-                Cell c11 = row.createCell(11); c11.setCellValue(op.getOvCheq() != null ? op.getOvCheq() : 0); c11.setCellStyle(dataStyle);
+                Cell c11 = row.createCell(11); c11.setCellValue(op.getOpOr() != null ? op.getOpOr() : 0); c11.setCellStyle(dataStyle);
+                Cell c12 = row.createCell(12); c12.setCellValue(op.getOvCheq() != null ? op.getOvCheq() : 0); c12.setCellStyle(dataStyle);
                 
                 // Montants avec couleurs conditionnelles
                 double recette = op.getRecette() != null ? op.getRecette() : 0.0;
@@ -116,25 +114,25 @@ public class ExcelUtil {
                 totalRecette += recette;
                 totalDepense += depense;
                 
-                Cell c12 = row.createCell(12); 
-                c12.setCellValue(recette); 
-                c12.setCellStyle(recette > 0 ? positiveStyle : numberStyle);
-                
                 Cell c13 = row.createCell(13); 
-                c13.setCellValue(op.getSurRam() != null ? op.getSurRam() : 0.0); 
-                c13.setCellStyle(numberStyle);
-                
+                c13.setCellValue(recette); 
+                c13.setCellStyle(recette > 0 ? positiveStyle : numberStyle);
+
                 Cell c14 = row.createCell(14); 
-                c14.setCellValue(op.getSurEng() != null ? op.getSurEng() : 0.0); 
+                c14.setCellValue(op.getSurRam() != null ? op.getSurRam() : 0.0); 
                 c14.setCellStyle(numberStyle);
-                
+
                 Cell c15 = row.createCell(15); 
-                c15.setCellValue(depense); 
-                c15.setCellStyle(depense > 0 ? negativeStyle : numberStyle);
-                
+                c15.setCellValue(op.getSurEng() != null ? op.getSurEng() : 0.0); 
+                c15.setCellStyle(numberStyle);
+
                 Cell c16 = row.createCell(16); 
-                c16.setCellValue(solde); 
-                c16.setCellStyle(solde >= 0 ? positiveStyle : negativeStyle);
+                c16.setCellValue(depense); 
+                c16.setCellStyle(depense > 0 ? negativeStyle : numberStyle);
+
+                Cell c17 = row.createCell(17); 
+                c17.setCellValue(solde); 
+                c17.setCellStyle(solde >= 0 ? positiveStyle : negativeStyle);
             }
             
             // Ligne de totaux
@@ -143,20 +141,20 @@ public class ExcelUtil {
             Cell labelTotal = totalRow.createCell(0);
             labelTotal.setCellValue("TOTAUX");
             labelTotal.setCellStyle(totalStyle);
-            sheet.addMergedRegion(new CellRangeAddress(rowNum - 1, rowNum - 1, 0, 11));
+            sheet.addMergedRegion(new CellRangeAddress(rowNum - 1, rowNum - 1, 0, 10));
             
-            Cell totalRecetteCell = totalRow.createCell(12);
+            Cell totalRecetteCell = totalRow.createCell(13);
             totalRecetteCell.setCellValue(totalRecette);
             totalRecetteCell.setCellStyle(totalStyle);
             
-            totalRow.createCell(13).setCellStyle(totalStyle);
             totalRow.createCell(14).setCellStyle(totalStyle);
+            totalRow.createCell(15).setCellStyle(totalStyle);
             
-            Cell totalDepenseCell = totalRow.createCell(15);
+            Cell totalDepenseCell = totalRow.createCell(16);
             totalDepenseCell.setCellValue(totalDepense);
             totalDepenseCell.setCellStyle(totalStyle);
             
-            Cell totalSoldeCell = totalRow.createCell(16);
+            Cell totalSoldeCell = totalRow.createCell(17);
             totalSoldeCell.setCellValue(totalRecette - totalDepense);
             totalSoldeCell.setCellStyle(totalStyle);
 
@@ -211,47 +209,45 @@ public class ExcelUtil {
                 if (row != null) {
                     Operation operation = new Operation();
                     // Read according to export order:
-                    // {"imp", "designation", "nature", "n", "budg", "exercice", "beneficiaire",
-                    //  "date_emission", "date_visa", "op_or", "ov_cheq_type", "ov_cheq", "recette",
+                    // {"art","par","lig","imp", "designation", "nature", "n", "budg", "exercice", "beneficiaire",
+                    //  "date_emission", "op_or", "ov_cheq_type", "ov_cheq", "recette",
                     //  "sur_ram", "sur_eng", "depense", "solde", "montant", ...}
-                    operation.setImp(getCellStringValue(row.getCell(0)));
-                    operation.setDesignation(getCellStringValue(row.getCell(1)));
-                    operation.setNature(getCellStringValue(row.getCell(2)));
-                    operation.setN(getCellStringValue(row.getCell(3)));
-                    operation.setBudg(getCellStringValue(row.getCell(4)));
-                    operation.setExercice(getCellStringValue(row.getCell(5)));
-                    operation.setBeneficiaire(getCellStringValue(row.getCell(6)));
-                    // The export writes date_emission (or date_entree) into column 7.
-                    // Populate both dateEmission and dateEntree from that column so downstream
-                    // logic (mois calculation, recap grouping) has a consistent date to use.
-                    java.time.LocalDate parsedCol7 = parseDate(getCellStringValue(row.getCell(7)));
-                    operation.setDateEmission(parsedCol7);
-                    // If the import contains an explicit date_entree, prefer it, otherwise mirror the exported date
-                    operation.setDateEntree(parsedCol7);
-                    operation.setDateVisa(parseDate(getCellStringValue(row.getCell(8))));
+                    operation.setArt(parseNullableInt(getCellStringValue(row.getCell(0))));
+                    operation.setPar(parseNullableInt(getCellStringValue(row.getCell(1))));
+                    operation.setLig(parseNullableInt(getCellStringValue(row.getCell(2))));
+                    operation.setImp(getCellStringValue(row.getCell(3)));
+                    operation.setDesignation(getCellStringValue(row.getCell(4)));
+                    operation.setNature(getCellStringValue(row.getCell(5)));
+                    operation.setN(getCellStringValue(row.getCell(6)));
+                    operation.setBudg(getCellStringValue(row.getCell(7)));
+                    operation.setExercice(getCellStringValue(row.getCell(8)));
+                    operation.setBeneficiaire(getCellStringValue(row.getCell(9)));
+                    // The export writes date_emission (or date_entree) into column 10.
+                    java.time.LocalDate parsedCol10 = parseDate(getCellStringValue(row.getCell(10)));
+                    operation.setDateEmission(parsedCol10);
+                    operation.setDateEntree(parsedCol10);
                     // OP/OR
-                    String opOrStr = getCellStringValue(row.getCell(9));
+                    String opOrStr = getCellStringValue(row.getCell(11));
                     try { operation.setOpOr(opOrStr == null || opOrStr.isBlank() ? null : Integer.parseInt(opOrStr)); } catch (NumberFormatException ex) { operation.setOpOr(null); }
-                    // OV/CHEQ type and value
-                    operation.setOvCheqType(getCellStringValue(row.getCell(10)));
-                    String ovVal = getCellStringValue(row.getCell(11));
+                    // OV/CHEQ value (no OV/CHEQ Type column anymore)
+                    String ovVal = getCellStringValue(row.getCell(12));
                     try { operation.setOvCheq(ovVal == null || ovVal.isBlank() ? null : Integer.parseInt(ovVal)); } catch (NumberFormatException ex) { operation.setOvCheq(null); }
-                    // Numeric columns: recette (12), sur_ram (13), sur_eng (14), depense (15), solde (16), montant (17)
-                    operation.setRecette(getCellNumericValue(row.getCell(12)));
-                    operation.setSurRam(getCellNumericValue(row.getCell(13)));
-                    operation.setSurEng(getCellNumericValue(row.getCell(14)));
-                    operation.setDepense(getCellNumericValue(row.getCell(15)));
-                    Double sol = getCellNumericValue(row.getCell(16));
+                    // Numeric columns: recette (13), sur_ram (14), sur_eng (15), depense (16), solde (17), montant (18)
+                    operation.setRecette(getCellNumericValue(row.getCell(13)));
+                    operation.setSurRam(getCellNumericValue(row.getCell(14)));
+                    operation.setSurEng(getCellNumericValue(row.getCell(15)));
+                    operation.setDepense(getCellNumericValue(row.getCell(16)));
+                    Double sol = getCellNumericValue(row.getCell(17));
                     if (sol != null) operation.setSolde(sol);
-                    Double montantVal = getCellNumericValue(row.getCell(17));
+                    Double montantVal = getCellNumericValue(row.getCell(18));
                     if (montantVal != null) operation.setMontant(montantVal);
                     // additional text fields
-                    operation.setDecision(getCellStringValue(row.getCell(18)));
-                    operation.setMotifRejet(getCellStringValue(row.getCell(19)));
-                    operation.setDateReponse(parseDate(getCellStringValue(row.getCell(20))));
-                    operation.setContenuReponse(getCellStringValue(row.getCell(21)));
-                    // mois column (22) may already be present; prefer explicit mois if provided
-                    String moisCell = getCellStringValue(row.getCell(22));
+                    operation.setDecision(getCellStringValue(row.getCell(19)));
+                    operation.setMotifRejet(getCellStringValue(row.getCell(20)));
+                    operation.setDateReponse(parseDate(getCellStringValue(row.getCell(21))));
+                    operation.setContenuReponse(getCellStringValue(row.getCell(22)));
+                    // mois column (23) may already be present; prefer explicit mois if provided
+                    String moisCell = getCellStringValue(row.getCell(23));
                     if (moisCell != null && !moisCell.isBlank()) operation.setMois(moisCell);
                     // Ensure mois is set based on date_entree (preferred) or date_emission
                     if (operation.getMois() == null || operation.getMois().isBlank()) {
@@ -460,6 +456,13 @@ public class ExcelUtil {
         font.setBold(true);
         style.setFont(font);
         return style;
+    }
+
+    private static Integer parseNullableInt(String s) {
+        if (s == null) return null;
+        s = s.trim();
+        if (s.isEmpty()) return null;
+        try { return Integer.parseInt(s); } catch (NumberFormatException e) { return null; }
     }
 }
 

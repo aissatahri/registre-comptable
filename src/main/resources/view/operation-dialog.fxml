@@ -57,8 +57,7 @@
                 <Label text="Date Emission" GridPane.columnIndex="0" GridPane.rowIndex="5" />
                 <DatePicker fx:id="dateEmissionPicker" GridPane.columnIndex="1" GridPane.rowIndex="5" />
 
-                <Label text="Date Visa" GridPane.columnIndex="2" GridPane.rowIndex="5" />
-                <DatePicker fx:id="dateVisaPicker" GridPane.columnIndex="3" GridPane.rowIndex="5" />
+                
 
                 <Label text="OP/OR" GridPane.columnIndex="0" GridPane.rowIndex="6" />
                 <TextField fx:id="opOrField" promptText="0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
