@@ -221,8 +221,36 @@ public class RechercheController {
         try {
             java.util.List<Operation> toExport = new java.util.ArrayList<>(data);
             ExcelUtil.exportOperationsToExcel(toExport, file.getAbsolutePath());
-            Alert info = new Alert(Alert.AlertType.INFORMATION, "Exportation terminée: " + file.getAbsolutePath());
+            Alert info = new Alert(Alert.AlertType.INFORMATION);
+            info.setHeaderText(null);
+            info.setContentText("Export réussi !");
+            // show and after OK attempt to open the exported file with the system default application
             info.showAndWait();
+
+            try {
+                File f = file;
+                if (f != null) {
+                    try {
+                        if (java.awt.Desktop.isDesktopSupported()) {
+                            java.awt.Desktop.getDesktop().open(f);
+                        } else {
+                            String os = System.getProperty("os.name").toLowerCase();
+                            if (os.contains("win")) {
+                                new ProcessBuilder("cmd", "/c", "start", "\"\"", f.getAbsolutePath()).start();
+                            } else if (os.contains("mac")) {
+                                new ProcessBuilder("open", f.getAbsolutePath()).start();
+                            } else {
+                                new ProcessBuilder("xdg-open", f.getAbsolutePath()).start();
+                            }
+                        }
+                    } catch (Exception openEx) {
+                        // ignore failures to open the file but print to stderr for debugging
+                        System.err.println("Could not open exported file: " + openEx.getMessage());
+                    }
+                }
+            } catch (Exception ex) {
+                // no-op
+            }
         } catch (IOException e) {
             Alert err = new Alert(Alert.AlertType.ERROR, "Erreur lors de l'export: " + e.getMessage());
             err.showAndWait();

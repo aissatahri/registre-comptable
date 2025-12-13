@@ -71,6 +71,9 @@
                     <content>
                         <TableView fx:id="moisOperationsTable" prefHeight="400">
                             <columns>
+                                <TableColumn fx:id="colArt" text="ART" prefWidth="70" />
+                                <TableColumn fx:id="colPar" text="PAR" prefWidth="70" />
+                                <TableColumn fx:id="colLig" text="LIG" prefWidth="70" />
                                 <TableColumn fx:id="colImp" text="IMP" prefWidth="80"/>
                                 <TableColumn fx:id="colDesignation" text="Désignation" prefWidth="200"/>
                                 <TableColumn fx:id="colNature" text="Nature" prefWidth="120"/>

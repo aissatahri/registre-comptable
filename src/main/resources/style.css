@@ -419,6 +419,99 @@
     -fx-padding: 8;
 }
 
+/* Pagination: professional, compact and accessible styling */
+.pagination {
+    -fx-background-color: transparent;
+    -fx-padding: 6 0 6 0;
+    -fx-alignment: center-right;
+}
+
+.pagination .control-button, .pagination .page-index-button {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-text-fill: #2c3e50;
+    -fx-font-weight: 600;
+    -fx-font-size: 13px;
+    -fx-padding: 6 10;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+.pagination .page-index-button {
+    -fx-background-color: #ffffff;
+    -fx-border-color: rgba(44,62,80,0.06);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 4, 0, 0, 1);
+}
+
+.pagination .page-index-button:hover {
+    -fx-background-color: #f6f8fa;
+}
+
+.pagination .page-index-button:selected, .pagination .page-index-button:focused {
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+    -fx-border-color: transparent;
+}
+
+.pagination .control-button .arrow, .pagination .control-button .arrow-button {
+    -fx-text-fill: #2c3e50;
+}
+
+/* Smaller footprint on compact footers */
+.page-footer .pagination {
+    -fx-padding: 4 0 4 0;
+}
+
+/* Improve spacing between pagination and footer info */
+.page-footer > .hbox {
+    -fx-spacing: 12;
+}
+
+/* Small pagination buttons (first/last) */
+.pagination-btn {
+    -fx-min-width: 34px;
+    -fx-min-height: 28px;
+    -fx-padding: 4 8;
+    -fx-background-radius: 6;
+    -fx-background-color: #ffffff;
+    -fx-border-color: rgba(44,62,80,0.12);
+    -fx-border-width: 1;
+    -fx-font-weight: 700;
+    -fx-font-size: 14px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.03), 3, 0, 0, 1);
+    -fx-text-fill: #34495e;
+}
+.pagination-btn:hover {
+    -fx-background-color: #f6f8fa;
+}
+.pagination-btn:pressed {
+    -fx-background-color: #e9eef3;
+}
+
+/* Ensure page indicator label is readable and spaced */
+.page-footer Label#pageIndicator {
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #34495e;
+    -fx-padding: 0 8;
+}
+
+/* make disabled pagination buttons visibly dimmed but still show icon */
+.pagination-btn:disabled {
+    -fx-opacity: 0.32;
+    -fx-text-fill: #95a5a6;
+}
+
+/* pagination indicator label styling */
+.page-footer .label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #7f8c8d;
+}
+
+.page-footer .pagination {
+    -fx-alignment: CENTER;
+}
+
 .text-field:focused, .comboBox:focused {
     -fx-border-color: #3498db;
     -fx-effect: dropshadow(three-pass-box, rgba(52,152,219,0.3), 5, 0, 0, 0);

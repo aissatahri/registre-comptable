@@ -55,6 +55,11 @@ public class RegistreController {
     @FXML private Text dossiersPayesText;
     @FXML private Text dossiersRejetesText;
     @FXML private javafx.scene.control.Pagination pagination;
+    @FXML private Button firstPageBtn;
+    @FXML private Button lastPageBtn;
+    @FXML private Button prevPageBtn;
+    @FXML private Button nextPageBtn;
+    @FXML private Label pageIndicator;
 
     private ObservableList<Operation> operations;
     private ObservableList<Operation> allOperations;
@@ -239,9 +244,63 @@ public class RegistreController {
                 return row;
             });
             updateStatistics();
+
+            // wire pagination control buttons if present
+            if (firstPageBtn != null) firstPageBtn.setOnAction(e -> {
+                if (pagination != null) pagination.setCurrentPageIndex(0);
+            });
+            if (lastPageBtn != null) lastPageBtn.setOnAction(e -> {
+                if (pagination != null) pagination.setCurrentPageIndex(Math.max(0, pagination.getPageCount() - 1));
+            });
+
+            if (prevPageBtn != null) prevPageBtn.setOnAction(e -> {
+                if (pagination != null) pagination.setCurrentPageIndex(Math.max(0, pagination.getCurrentPageIndex() - 1));
+            });
+            if (nextPageBtn != null) nextPageBtn.setOnAction(e -> {
+                if (pagination != null) pagination.setCurrentPageIndex(Math.min(pagination.getPageCount() - 1, pagination.getCurrentPageIndex() + 1));
+            });
+
+            // update page indicator when pagination changes
+            if (pageIndicator != null && pagination != null) {
+                pagination.currentPageIndexProperty().addListener((obs, oldV, newV) -> updatePageIndicator());
+                pagination.pageCountProperty().addListener((obs, oldV, newV) -> updatePageIndicator());
+                updatePageIndicator();
+            }
         } catch (Exception e) {
             showError("Erreur d'initialisation du registre: " + e.getMessage());
         }
+    }
+
+    @FXML
+    private void goFirstPage() {
+        if (pagination != null) pagination.setCurrentPageIndex(0);
+    }
+
+    @FXML
+    private void goLastPage() {
+        if (pagination != null) pagination.setCurrentPageIndex(Math.max(0, pagination.getPageCount() - 1));
+    }
+
+    @FXML
+    private void goPrevPage() {
+        if (pagination != null) pagination.setCurrentPageIndex(Math.max(0, pagination.getCurrentPageIndex() - 1));
+    }
+
+    @FXML
+    private void goNextPage() {
+        if (pagination != null) pagination.setCurrentPageIndex(Math.min(pagination.getPageCount() - 1, pagination.getCurrentPageIndex() + 1));
+    }
+
+    private void updatePageIndicator() {
+        if (pageIndicator == null || pagination == null) return;
+        int current = pagination.getCurrentPageIndex() + 1;
+        int total = Math.max(1, pagination.getPageCount());
+        pageIndicator.setText(current + "/" + total);
+        // disable/enable prev/next appropriately
+        if (prevPageBtn != null) prevPageBtn.setDisable(pagination.getCurrentPageIndex() <= 0);
+        if (nextPageBtn != null) nextPageBtn.setDisable(pagination.getCurrentPageIndex() >= pagination.getPageCount() - 1);
+        if (firstPageBtn != null) firstPageBtn.setDisable(pagination.getCurrentPageIndex() <= 0);
+        if (lastPageBtn != null) lastPageBtn.setDisable(pagination.getCurrentPageIndex() >= pagination.getPageCount() - 1);
     }
 
     /* --------------------------- TABLE BUTTONS --------------------------- */

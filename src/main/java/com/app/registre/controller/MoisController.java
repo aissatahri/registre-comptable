@@ -40,6 +40,9 @@ public class MoisController {
     @FXML private TableView<?> natureTable;
     // Columns aligned with the operation dialog / mois.fxml
     @FXML private TableColumn<Operation, String> colImp;
+    @FXML private TableColumn<Operation, Integer> colArt;
+    @FXML private TableColumn<Operation, Integer> colPar;
+    @FXML private TableColumn<Operation, Integer> colLig;
     @FXML private TableColumn<Operation, String> colDesignation;
     @FXML private TableColumn<Operation, String> colNature;
     @FXML private TableColumn<Operation, String> colN;
@@ -142,6 +145,11 @@ public class MoisController {
     }
 
     private void setupColumns() {
+        // ART / PAR / LIG columns (added to mois view)
+        if (colArt != null) colArt.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("art"));
+        if (colPar != null) colPar.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("par"));
+        if (colLig != null) colLig.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("lig"));
+
         colImp.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("imp"));
         colDesignation.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("designation"));
         colNature.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("nature"));

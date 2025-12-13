@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- update4j manifest for Registre Comptable v1.4.1 -->
+<configuration version="1.4.1">
+    <provider>
+        <name>GitHub Releases</name>
+    </provider>
+
+    <!-- Main application JAR available on GitHub Releases for v1.4.1 -->
+    <file uri="https://github.com/aissatahri/registre-comptable/releases/download/v1.4.1/registre-comptable-1.4.1.jar"
+          os="${user.home}/.registre-comptable/registre-comptable-1.4.1.jar"/>
+
+    <!-- Launcher: main class to run after update -->
+    <launcher class="com.app.registre.Main">
+        <vmArg>-Xmx512m</vmArg>
+    </launcher>
+</configuration>
